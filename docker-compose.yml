@@ -1,0 +1,56 @@
+version: '3'
+
+services:
+  fregepoc-redis:
+    container_name: fregepoc-redis
+    hostname: fregepoc-redis
+    image: redis:latest
+    networks:
+      - fregepoc-main
+    expose:
+      - "${DOCKER_REDIS_PORT}"
+    restart: on-failure
+
+  fregepoc-postgres:
+    container_name: fregepoc-postgres
+    hostname: fregepoc-postgres
+    image: postgres:latest
+    environment:
+       - POSTGRES_USER=${DJANGO_DATABASE_USER}
+       - POSTGRES_PASSWORD=${DJANGO_DATABASE_PASSWORD}
+       - POSTGRES_DB=${DJANGO_DATABASE_NAME}
+    networks:
+      - fregepoc-main
+    expose:
+      - "${DOCKER_POSTGRES_PORT}"
+    restart: on-failure
+    volumes:
+      - fregepoc_postgresql_data:/var/lib/postgresql/data
+
+
+  fregepoc-backend:
+    container_name: fregepoc-backend
+    image: fregepoc-backend-image
+    build: ./backend
+    hostname: backend
+    command: >
+      sh -c "python manage.py runserver
+      0.0.0.0:${DOCKER_BACKEND_PORT}"
+    ports:
+      - "${DOCKER_EGRESS_IP}:${DOCKER_BACKEND_PORT}:${DOCKER_BACKEND_PORT}"
+    depends_on:
+      - fregepoc-postgres
+      - fregepoc-redis
+    volumes:
+      - ./backend:/app
+    networks:
+      - fregepoc-main
+    restart: on-failure
+    env_file:
+      - .env
+
+networks:
+  fregepoc-main:
+
+volumes:
+  fregepoc_postgresql_data:
