@@ -5,8 +5,10 @@ Django
 djangorestframework
 django-cors-headers
 django-celery-beat==2.1.0
+django-celery-results
 websockets
 SQLAlchemy
+celery
 redis
 channels
 channels-redis
