@@ -1,4 +1,4 @@
-version: '3'
+version: "3.9"
 
 services:
   fregepoc-redis:
@@ -7,8 +7,9 @@ services:
     image: redis:latest
     networks:
       - fregepoc-main
-    expose:
-      - "${DOCKER_REDIS_PORT}"
+    ports:
+      - "16379:${DOCKER_REDIS_PORT}"
+    profiles: ["services", "application"]
     restart: on-failure
 
   fregepoc-postgres:
@@ -21,14 +22,14 @@ services:
        - POSTGRES_DB=${DJANGO_DATABASE_NAME}
     networks:
       - fregepoc-main
-    expose:
-      - "${DOCKER_POSTGRES_PORT}"
+    ports:
+      - "15432:${DOCKER_POSTGRES_PORT}"
+    profiles: ["services", "application"]
     restart: on-failure
     volumes:
       - fregepoc_postgresql_data:/var/lib/postgresql/data
 
-
-  fregepoc-backend:
+  fregepoc-backend: &backend
     container_name: fregepoc-backend
     image: fregepoc-backend-image
     build: ./backend
@@ -45,9 +46,17 @@ services:
       - ./backend:/app
     networks:
       - fregepoc-main
+    profiles: [ "application" ]
     restart: on-failure
     env_file:
       - .env
+
+  fregepoc-celery-worker:
+    <<: *backend
+    container_name: fregepoc-celery-worker
+    ports: []
+    command: >
+      sh -c "celery -A fregepoc worker -l info"
 
 networks:
   fregepoc-main:
