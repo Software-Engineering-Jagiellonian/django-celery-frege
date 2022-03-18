@@ -21,7 +21,7 @@ class Repository(models.Model):
         _("crawl time"),
         auto_now_add=True,
         help_text=_(
-            "The time when the repository has got discovered. It is set automatically on creation."
+            "The time when the repository was discovered. It is set automatically on creation."
         ),
     )
     download_time = models.DateTimeField(
