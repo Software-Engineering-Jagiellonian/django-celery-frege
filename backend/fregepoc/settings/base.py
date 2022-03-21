@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django_celery_beat",
     "django_celery_results",
+    "django_extensions",
 ] + PROJECT_APPS
 
 MIDDLEWARE = [
@@ -121,3 +122,5 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+DOWNLOAD_PATH = os.environ.get("DOWNLOAD_PATH", "/tmp/")

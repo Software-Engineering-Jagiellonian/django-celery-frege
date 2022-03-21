@@ -1,7 +1,10 @@
 import uuid
 
+from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+
+from fregepoc.repositories.constants import ProgrammingLanguages
 
 
 class Repository(models.Model):
@@ -28,5 +31,41 @@ class Repository(models.Model):
         _("download time"),
         blank=True,
         null=True,
-        help_text=_("The time when the repository has got downloaded."),
+        help_text=_("The time when the repository was downloaded."),
+    )
+
+
+class RepositoryLanguage(models.Model):
+    language = models.CharField(
+        max_length=20,
+        verbose_name=_("programming language"),
+        help_text=_("Programming language present in the repository."),
+        choices=ProgrammingLanguages.choices,
+    )
+    analyzed = models.BooleanField(
+        _("analyzed"),
+        help_text=_(
+            "Whether the repository has been analyzed with regard to this language."
+        ),
+        default=False,
+    )
+    repository = models.ForeignKey(
+        Repository,
+        on_delete=models.CASCADE,
+        related_name="programming_languages",
+        verbose_name=_("repository"),
+        help_text=_("The related repository."),
+    )
+
+
+class RepositoryLanguageFile(models.Model):
+    repository_language = models.ForeignKey(
+        RepositoryLanguage,
+        on_delete=models.CASCADE,
+        related_name="files",
+        verbose_name=_("source code files"),
+        help_text=_("The source code."),
+    )
+    file_path = models.FilePathField(
+        path=settings.DOWNLOAD_PATH,
     )
