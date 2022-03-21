@@ -27,7 +27,7 @@ DJANGO_CORS_ALLOWED_HOSTS = ["http://localhost:4200"]
 
 # Application definition
 
-# PROJECT_APPS = ["fregepoc.repositories.apps.RepositoriesConfig"]
+PROJECT_APPS = ["fregepoc.repositories.apps.RepositoriesConfig"]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -36,8 +36,9 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_extensions",
     "fregepoc",
-]
+] + PROJECT_APPS
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -142,3 +143,7 @@ REDIS_PORT = os.environ['DJANGO_REDIS_PORT']
 
 CELERY_RESULT_BACKEND = f'redis://{REDIS_HOST}:{REDIS_PORT}/'
 CELERY_CACHE_BACKEND = f'redis://{REDIS_HOST}:{REDIS_PORT}/'
+
+# MISC
+
+DOWNLOAD_PATH = os.environ.get('DJANGO_DOWNLOAD_PATH', '/tmp/')

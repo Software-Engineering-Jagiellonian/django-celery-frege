@@ -9,6 +9,11 @@ from fregepoc.repositories.constants import ProgrammingLanguages
 
 class Repository(models.Model):
     id = models.UUIDField(_("ID"), primary_key=True, default=uuid.uuid4, editable=False)
+    analyzed = models.BooleanField(
+        _("Analyzed"),
+        default=False,
+        help_text="Indicates whether the repository has been analyzed."
+    )
     git_url = models.URLField(
         _("git url"), help_text=_("The url used to clone the repository")
     )
@@ -42,13 +47,6 @@ class RepositoryLanguage(models.Model):
         help_text=_("Programming language present in the repository."),
         choices=ProgrammingLanguages.choices,
     )
-    analyzed = models.BooleanField(
-        _("analyzed"),
-        help_text=_(
-            "Whether the repository has been analyzed with regard to this language."
-        ),
-        default=False,
-    )
     repository = models.ForeignKey(
         Repository,
         on_delete=models.CASCADE,
@@ -58,7 +56,12 @@ class RepositoryLanguage(models.Model):
     )
 
 
-class RepositoryLanguageFile(models.Model):
+class RepositoryFile(models.Model):
+    analyzed = models.BooleanField(
+        _("Analyzed"),
+        default=False,
+        help_text="Whether the file has been analyzed or not."
+    )
     repository_language = models.ForeignKey(
         RepositoryLanguage,
         on_delete=models.CASCADE,
