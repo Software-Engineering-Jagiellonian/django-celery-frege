@@ -138,8 +138,9 @@ CELERY_BROKER_URL = f"redis://{os.environ.get('DJANGO_REDIS_HOST', '127.0.0.1')}
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 
-REDIS_HOST = os.environ['DJANGO_REDIS_HOST']
-REDIS_PORT = os.environ['DJANGO_REDIS_PORT']
+# TODO: cleanup
+REDIS_HOST = os.environ.get('DJANGO_REDIS_HOST', 'fregepoc-redis')
+REDIS_PORT = os.environ.get('DJANGO_REDIS_PORT', '6379')
 
 CELERY_RESULT_BACKEND = f'redis://{REDIS_HOST}:{REDIS_PORT}/'
 CELERY_CACHE_BACKEND = f'redis://{REDIS_HOST}:{REDIS_PORT}/'

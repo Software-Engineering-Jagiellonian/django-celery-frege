@@ -1,6 +1,3 @@
-import uuid
-
-from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -8,7 +5,6 @@ from fregepoc.repositories.constants import ProgrammingLanguages
 
 
 class Repository(models.Model):
-    id = models.UUIDField(_("ID"), primary_key=True, default=uuid.uuid4, editable=False)
     analyzed = models.BooleanField(
         _("Analyzed"),
         default=False,
@@ -25,50 +21,52 @@ class Repository(models.Model):
         verbose_name=_("commit hash"),
         help_text=_("The commit hash actual at the time of crawling."),
     )
-    crawl_time = models.DateTimeField(
-        _("crawl time"),
+    discovered_time = models.DateTimeField(
+        _("discovered time"),
         auto_now_add=True,
         help_text=_(
             "The time when the repository was discovered. It is set automatically on creation."
         ),
     )
-    download_time = models.DateTimeField(
-        _("download time"),
+    fetch_time = models.DateTimeField(
+        _("fetch time"),
         blank=True,
         null=True,
         help_text=_("The time when the repository was downloaded."),
     )
 
 
-class RepositoryLanguage(models.Model):
+class RepositoryFile(models.Model):
+    repository = models.ForeignKey(
+        Repository,
+        on_delete=models.CASCADE,
+        related_name="files",
+        help_text=_("The repository that this file belongs to."),
+    )
+    analyzed = models.BooleanField(
+        _("Analyzed"),
+        default=False,
+        help_text="Whether the file has been analyzed or not."
+    )
     language = models.CharField(
         max_length=20,
         verbose_name=_("programming language"),
         help_text=_("Programming language present in the repository."),
         choices=ProgrammingLanguages.choices,
     )
-    repository = models.ForeignKey(
-        Repository,
-        on_delete=models.CASCADE,
-        related_name="programming_languages",
-        verbose_name=_("repository"),
-        help_text=_("The related repository."),
+    repo_relative_file_path = models.FilePathField(
+        blank=True,
+        null=True,
+        help_text=_("File path, relative to the repository root."),
     )
-
-
-class RepositoryFile(models.Model):
-    analyzed = models.BooleanField(
-        _("Analyzed"),
-        default=False,
-        help_text="Whether the file has been analyzed or not."
+    metrics = models.JSONField(
+        _("metrics"),
+        blank=True,
+        null=True,
+        help_text=_("The metrics of the file."),
     )
-    repository_language = models.ForeignKey(
-        RepositoryLanguage,
-        on_delete=models.CASCADE,
-        related_name="files",
-        verbose_name=_("source code files"),
-        help_text=_("The source code."),
-    )
-    file_path = models.FilePathField(
-        path=settings.DOWNLOAD_PATH,
+    analysed_time = models.DateTimeField(
+        _("analysed time"),
+        auto_now_add=True,
+        help_text=_("The time when the file was analyzed."),
     )
