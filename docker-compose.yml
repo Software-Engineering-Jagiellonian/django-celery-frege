@@ -35,7 +35,8 @@ services:
     build: ./backend
     hostname: backend
     command: >
-      sh -c "python manage.py runserver
+      sh -c "python manage.py migrate --noinput
+      && python manage.py runserver
       0.0.0.0:${DOCKER_BACKEND_PORT}"
     ports:
       - "${DOCKER_EGRESS_IP}:${DOCKER_BACKEND_PORT}:${DOCKER_BACKEND_PORT}"
@@ -56,7 +57,7 @@ services:
     container_name: fregepoc-celery-worker
     ports: []
     command: >
-      sh -c "celery -A fregepoc worker -l info"
+      sh -c "python3 manage.py celery_dev_autoreload"
 
 networks:
   fregepoc-main:
