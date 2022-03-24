@@ -12,3 +12,4 @@ channels-redis
 django-redis
 psycopg2
 Faker
+GitPython
