@@ -5,6 +5,11 @@ from fregepoc.repositories.constants import ProgrammingLanguages
 
 
 class Repository(models.Model):
+    name = models.CharField(
+        max_length=255,
+        verbose_name=_('Repository name'),
+        help_text=_('The name of the repository'),
+    )
     analyzed = models.BooleanField(
         _("Analyzed"),
         default=False,
@@ -34,6 +39,9 @@ class Repository(models.Model):
         null=True,
         help_text=_("The time when the repository was downloaded."),
     )
+
+    def __str__(self):
+        return self.name
 
 
 class RepositoryFile(models.Model):

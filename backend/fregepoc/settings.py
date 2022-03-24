@@ -148,4 +148,4 @@ CELERY_CACHE_BACKEND = f'redis://{REDIS_HOST}:{REDIS_PORT}/'
 
 # MISC
 
-DOWNLOAD_PATH = os.environ.get('DJANGO_DOWNLOAD_PATH', '/tmp/')
+DOWNLOAD_PATH = os.environ.get('DJANGO_DOWNLOAD_PATH', '/usr/fregepoc-tmp/')

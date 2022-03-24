@@ -45,6 +45,7 @@ services:
       - fregepoc-redis
     volumes:
       - ./backend:/app
+      - fregepoc_tmp:/usr/fregepoc-tmp/
     networks:
       - fregepoc-main
     profiles: [ "application" ]
@@ -64,3 +65,4 @@ networks:
 
 volumes:
   fregepoc_postgresql_data:
+  fregepoc_tmp:

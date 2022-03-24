@@ -13,3 +13,4 @@ django-redis
 psycopg2
 Faker
 GitPython
+radon

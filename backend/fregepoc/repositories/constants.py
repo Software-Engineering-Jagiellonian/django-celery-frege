@@ -1,10 +1,5 @@
 from django.db import models
-
-
-# TODO: try to couple this with the ProgrammingLanguages enum
-extension_to_analyzer = {
-    'py': 'this_is_a_python_analyzer_class_placeholder',
-}
+from fregepoc.repositories.analyzers import PythonAnalyzer
 
 
 class ProgrammingLanguages(models.TextChoices):
@@ -17,3 +12,9 @@ class ProgrammingLanguages(models.TextChoices):
     JS = "JS"
     PHP = "PHP"
     RUBY = "Ruby"
+
+
+# TODO: try to couple this with the ProgrammingLanguages enum
+extension_to_analyzer = {
+    ProgrammingLanguages.PYTHON: PythonAnalyzer,
+}
