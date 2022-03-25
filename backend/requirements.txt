@@ -14,4 +14,6 @@ psycopg2
 Faker
 GitPython
 radon
+
 PyGithub
+lizard

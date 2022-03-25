@@ -19,10 +19,13 @@ def _get_repo_local_path(repo):
     return os.path.join(settings.DOWNLOAD_PATH, repo.name)
 
 
+# TODO: quick hack, clean this out
 def _get_repo_files(repo_obj):
     for file_path in repo_obj.git.ls_files().split('\n'):
         if file_path.endswith('.py'):
             yield file_path, ProgrammingLanguages.PYTHON
+        elif file_path.endswith(('.cpp', '.hpp')):
+            yield file_path, ProgrammingLanguages.CPP
 
 
 def _finalize_repo_analysis(repo_obj):
@@ -58,8 +61,8 @@ def crawl_repos_task():
         #       and should be removed
         g = Github()
 
-    # TODO: save last known page & increase query result page size - current
-    #       approach is very hacky
+    # TODO: save last known page, increase query result page size - current
+    #       approach is very hacky & mb. let the range be adjustable
     for page in range(5000):
         list_of_repos = g.search_repositories(
             query=f'forks:>={min_forks} stars:>={min_stars} is:public',
@@ -78,18 +81,6 @@ def crawl_repos_task():
         Repository.objects.bulk_create(repos_to_process)
         for repo in repos_to_process:
             process_repo_task.delay(repo.id)
-
-    # url = 'https://github.com/Software-Engineering-Jagiellonian/frege-git-repository-analyzer.git'
-
-    # # TODO: this will most likely be converted to bulk_create
-    # repo_name = os.path.basename(url).split('.')[0]
-    # repo = Repository.objects.create(
-    #     name=repo_name,
-    #     git_url=url,
-    #     repo_url=url,
-    #     commit_hash='master')
-
-    # process_repo_task.delay(repo.id)
 
 
 @app.task
@@ -111,8 +102,13 @@ def process_repo_task(repo_id):
         repo.save()
         print('process_repo_task >>> repo cloned')
     except git.exc.GitCommandError:
-        repo_obj = git.Repo(repo_local_path)
-        print('process_repo_task >>> repo already exists, fetched from disk')
+        try:
+            repo_obj = git.Repo(repo_local_path)
+            print('process_repo_task >>> repo already exists, fetched from disk')
+        except git.exc.NoSuchPathError:
+            print('process_repo_task >>> tried fetching from disk, '
+                  'but repo does not exist')
+            return
 
     repo_files = [
         RepositoryFile(
@@ -160,5 +156,5 @@ def analyze_file_task(repo_file_id):
     repo_file.analysed_time = timezone.now()
     repo_file.save()
 
-    print(f'repo_file {os.path.basename(repo_file.repo_relative_file_path)} analyzed')
+    print(f'analyze_file_task >>> repo_file {repo_file.repository.name} analyzed')
     _finalize_repo_analysis(repo_file.repository)

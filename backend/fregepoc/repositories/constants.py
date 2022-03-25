@@ -1,5 +1,8 @@
 from django.db import models
-from fregepoc.repositories.analyzers import PythonAnalyzer
+from fregepoc.repositories.analyzers import (
+    PythonAnalyzer,
+    CppAnalyzer,
+)
 
 
 class ProgrammingLanguages(models.TextChoices):
@@ -17,4 +20,5 @@ class ProgrammingLanguages(models.TextChoices):
 # TODO: try to couple this with the ProgrammingLanguages enum
 extension_to_analyzer = {
     ProgrammingLanguages.PYTHON: PythonAnalyzer,
+    ProgrammingLanguages.CPP: CppAnalyzer,
 }
