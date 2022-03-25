@@ -2,12 +2,14 @@ from fregepoc.repositories.constants import (
     extension_to_analyzer,
     ProgrammingLanguages)
 from fregepoc.repositories.models import Repository, RepositoryFile
+from celery.signals import celeryd_init
 from django.utils import timezone
 from django.conf import settings
 from fregepoc import celery_app as app
 from github import Github
 import git
 import os
+
 
 # TODO: switch to proper logging instead of printing
 # TODO: should probably move aux functions somewhere else
@@ -33,10 +35,13 @@ def _finalize_repo_analysis(repo_obj):
         os.system(f'rm -rf {repo_local_path}')
 
 
+@celeryd_init.connect
+def init_worker(**kwargs):
+    crawl_repos_task.delay()
+
+
 @app.task
 def crawl_repos_task():
-    # TODO: crawl repos using provided crawler class, dispatching
-    #       processors as it goes
     # TODO: crawler & dispatcher might need to be merged to allow
     #       us to determine if we've hit a throttling limit or not
     # TODO: switch between using ssh and https when having tokens available
