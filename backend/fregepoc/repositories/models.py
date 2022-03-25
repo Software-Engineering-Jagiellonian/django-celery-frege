@@ -10,6 +10,13 @@ class Repository(models.Model):
         verbose_name=_('Repository name'),
         help_text=_('The name of the repository'),
     )
+    description = models.TextField(
+        max_length=2048,
+        verbose_name=_('Repository description'),
+        help_text=_('The description of the repository'),
+        blank=True,
+        null=True,
+    )
     analyzed = models.BooleanField(
         _("Analyzed"),
         default=False,

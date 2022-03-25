@@ -1,7 +1,7 @@
 from radon.metrics import h_visit, mi_visit, mi_rank
 from radon.raw import analyze
 
-# NOTE: this file is meant to be split into a folder with files for analyzers
+# NOTE: this file is meant to be split into a folder with files representing analyzers
 
 
 class BaseAnalyzer:

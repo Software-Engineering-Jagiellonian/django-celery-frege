@@ -5,6 +5,7 @@ from fregepoc.repositories.models import Repository, RepositoryFile
 from django.utils import timezone
 from django.conf import settings
 from fregepoc import celery_app as app
+from github import Github
 import git
 import os
 
@@ -33,25 +34,57 @@ def _finalize_repo_analysis(repo_obj):
 
 
 @app.task
-def crawl_repos_task(crawler):
+def crawl_repos_task():
     # TODO: crawl repos using provided crawler class, dispatching
     #       processors as it goes
-
     # TODO: crawler & dispatcher might need to be merged to allow
     #       us to determine if we've hit a throttling limit or not
-
     # TODO: switch between using ssh and https when having tokens available
-    url = 'https://github.com/Software-Engineering-Jagiellonian/frege-git-repository-analyzer.git'
+    # TODO: use envs to set query parameters
 
-    # TODO: this will most likely be converted to bulk_create
-    repo_name = os.path.basename(url).split('.')[0]
-    repo = Repository.objects.create(
-        name=repo_name,
-        git_url=url,
-        repo_url=url,
-        commit_hash='master')
+    min_forks = 100
+    min_stars = 100
 
-    process_repo_task.delay(repo.id)
+    github_token = os.environ.get('GITHUB_TOKEN')
+    if github_token:
+        g = Github(github_token)
+    else:
+        # TODO: this will not be able to fetch data from github api,
+        #       and should be removed
+        g = Github()
+
+    # TODO: save last known page & increase query result page size - current
+    #       approach is very hacky
+    for page in range(5000):
+        list_of_repos = g.search_repositories(
+            query=f'forks:>={min_forks} stars:>={min_stars} is:public',
+            sort='stars', page=page)
+
+        repos_to_process = []
+        for repo in list_of_repos:
+            repos_to_process.append(Repository(
+                name=repo.name,
+                description=repo.description,
+                git_url=repo.clone_url,
+                repo_url=repo.html_url,
+                commit_hash=repo.get_branch(repo.default_branch).commit.sha,
+            ))
+
+        Repository.objects.bulk_create(repos_to_process)
+        for repo in repos_to_process:
+            process_repo_task.delay(repo.id)
+
+    # url = 'https://github.com/Software-Engineering-Jagiellonian/frege-git-repository-analyzer.git'
+
+    # # TODO: this will most likely be converted to bulk_create
+    # repo_name = os.path.basename(url).split('.')[0]
+    # repo = Repository.objects.create(
+    #     name=repo_name,
+    #     git_url=url,
+    #     repo_url=url,
+    #     commit_hash='master')
+
+    # process_repo_task.delay(repo.id)
 
 
 @app.task
@@ -71,9 +104,10 @@ def process_repo_task(repo_id):
         repo_obj = git.Repo.clone_from(repo.git_url, repo_local_path)
         repo.fetch_time = timezone.now()
         repo.save()
+        print('process_repo_task >>> repo cloned')
     except git.exc.GitCommandError:
-        # repo already exists, trying to fetch from disk
         repo_obj = git.Repo(repo_local_path)
+        print('process_repo_task >>> repo already exists, fetched from disk')
 
     repo_files = [
         RepositoryFile(
@@ -86,12 +120,13 @@ def process_repo_task(repo_id):
 
     for repo_file in repo_files:
         analyze_file_task.delay(repo_file.id)
+    else:
+        _finalize_repo_analysis(repo)
 
 
 @app.task
 def analyze_file_task(repo_file_id):
-    # TODO: use the analyzer provided, dump data to database,
-    #       delete repo if all files were analyzed
+    # TODO: docstring & cleanup
 
     try:
         repo_file = RepositoryFile.objects.get(id=repo_file_id)
@@ -104,6 +139,9 @@ def analyze_file_task(repo_file_id):
     except KeyError:
         print('analyze_file_task >>> analyzer not found '
               f'(lang: {repo_file.language})')
+        # hacky way to "mark" file as analyzed, and allow the cleaner to
+        # pass the all-analyzed check
+        repo_file.delete()
         return
 
     file_abs_path = os.path.join(
