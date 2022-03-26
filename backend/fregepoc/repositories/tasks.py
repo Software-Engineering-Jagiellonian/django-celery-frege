@@ -1,6 +1,7 @@
 import os
 
 import git
+from celery import shared_task
 from celery.signals import celeryd_init
 from django.conf import settings
 from django.utils import timezone
@@ -46,7 +47,7 @@ def init_worker(**kwargs):
     crawl_repos_task.delay()
 
 
-@app.task
+@shared_task
 def crawl_repos_task():
     # TODO: crawler & dispatcher might need to be merged to allow
     #       us to determine if we've hit a throttling limit or not
@@ -79,7 +80,7 @@ def crawl_repos_task():
             process_repo_task.delay(repo.id)
 
 
-@app.task
+@shared_task
 def process_repo_task(repo_id):
     # TODO: docstring & cleanup
 
@@ -125,7 +126,7 @@ def process_repo_task(repo_id):
         _finalize_repo_analysis(repo)
 
 
-@app.task
+@shared_task
 def analyze_file_task(repo_file_id):
     # TODO: docstring & cleanup
 
