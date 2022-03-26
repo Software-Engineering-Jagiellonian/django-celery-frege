@@ -7,7 +7,6 @@ from django.conf import settings
 from django.utils import timezone
 from github import Github
 
-from fregepoc import celery_app as app
 from fregepoc.repositories.analyzers.base import AnalyzerFactory
 from fregepoc.repositories.constants import ProgrammingLanguages
 
@@ -68,13 +67,16 @@ def crawl_repos_task():
             page=page,
         )
 
-        repos_to_process = [Repository(
-                    name=repo.name,
-                    description=repo.description,
-                    git_url=repo.clone_url,
-                    repo_url=repo.html_url,
-                    commit_hash=repo.get_branch(repo.default_branch).commit.sha,
-                ) for repo in list_of_repos]
+        repos_to_process = [
+            Repository(
+                name=repo.name,
+                description=repo.description,
+                git_url=repo.clone_url,
+                repo_url=repo.html_url,
+                commit_hash=repo.get_branch(repo.default_branch).commit.sha,
+            )
+            for repo in list_of_repos
+        ]
         Repository.objects.bulk_create(repos_to_process)
         for repo in repos_to_process:
             process_repo_task.delay(repo.id)
