@@ -7,8 +7,9 @@ from django.utils import timezone
 from github import Github
 
 from fregepoc import celery_app as app
-from fregepoc.repositories.constants import (ProgrammingLanguages,
-                                             extension_to_analyzer)
+from fregepoc.repositories.analyzers.base import AnalyzerFactory
+from fregepoc.repositories.constants import ProgrammingLanguages
+
 from fregepoc.repositories.models import Repository, RepositoryFile
 
 # TODO: switch to proper logging instead of printing
@@ -134,14 +135,8 @@ def analyze_file_task(repo_file_id):
         print("analyze_file_task >>> repo_file does not exist")
         return
 
-    try:
-        analyzer = extension_to_analyzer[repo_file.language]
-    except KeyError:
-        print(
-            "analyze_file_task >>> analyzer not found " f"(lang: {repo_file.language})"
-        )
-        # hacky way to "mark" file as analyzed, and allow the cleaner to
-        # pass the all-analyzed check
+    analyzers = AnalyzerFactory.make_analyzers(repo_file.language)
+    if not analyzers:
         repo_file.delete()
         return
 
@@ -149,7 +144,8 @@ def analyze_file_task(repo_file_id):
         _get_repo_local_path(repo_file.repository), repo_file.repo_relative_file_path
     )
     with open(file_abs_path, "r") as f:
-        metrics_dict = analyzer.analyze(f.read())
+        for analyzer in analyzers:
+            metrics_dict = analyzer.analyze(f.read())
 
     repo_file.metrics = metrics_dict
     repo_file.analyzed = True

@@ -3,7 +3,8 @@ from typing import TypedDict
 from radon.metrics import h_visit, mi_rank, mi_visit
 from radon.raw import analyze
 
-from fregepoc.repositories.analyzers.base import BaseAnalyzer
+from fregepoc.repositories.analyzers.base import BaseAnalyzer, AnalyzerFactory
+from fregepoc.repositories.constants import ProgrammingLanguages
 
 
 class PythonFileAnalysisResult(TypedDict):
@@ -13,6 +14,7 @@ class PythonFileAnalysisResult(TypedDict):
     MIM_visit_metrics: float
 
 
+@AnalyzerFactory.register(ProgrammingLanguages.PYTHON)
 class PythonAnalyzer(BaseAnalyzer[[str], PythonFileAnalysisResult]):
     @classmethod
     def analyze(cls, file_content):

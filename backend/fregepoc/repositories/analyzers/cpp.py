@@ -3,8 +3,9 @@ from typing import TypedDict
 import lizard
 from lizard_ext import auto_read
 
-from fregepoc.repositories.analyzers.base import BaseAnalyzer
+from fregepoc.repositories.analyzers.base import BaseAnalyzer, AnalyzerFactory
 from fregepoc.repositories.analyzers.exceptions import LizardException
+from fregepoc.repositories.constants import ProgrammingLanguages
 
 
 class CustomFileAnalyzer(lizard.FileAnalyzer):
@@ -86,13 +87,14 @@ class CppFileAnalysisResult(TypedDict):
     max_nesting_depth: int
 
 
+@AnalyzerFactory.register(ProgrammingLanguages.PYTHON)
 class CppAnalyzer(BaseAnalyzer[[str, str], CppFileAnalysisResult]):
     @classmethod
     def analyze(cls, file_path, file_content):
         result = {}
         try:
             analyze_file = CustomFileAnalyzer(lizard.get_extensions(["nd"]))
-            result = AnalyzeResult(analyze_file(file_path[1]).__dict__)
+            result = AnalyzeResult(analyze_file(file_path[1]).__dict__).as_dict()
         except LizardException:
             pass
-        return result.as_dict()
+        return result

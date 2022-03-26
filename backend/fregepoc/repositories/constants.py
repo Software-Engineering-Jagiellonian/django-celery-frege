@@ -1,8 +1,5 @@
 from django.db import models
 
-from fregepoc.repositories.analyzers.cpp import CppAnalyzer
-from fregepoc.repositories.analyzers.python import PythonAnalyzer
-
 
 class ProgrammingLanguages(models.TextChoices):
     PYTHON = "Python"
@@ -14,10 +11,3 @@ class ProgrammingLanguages(models.TextChoices):
     JS = "JS"
     PHP = "PHP"
     RUBY = "Ruby"
-
-
-# TODO: try to couple this with the ProgrammingLanguages enum
-extension_to_analyzer = {
-    ProgrammingLanguages.PYTHON: PythonAnalyzer,
-    ProgrammingLanguages.CPP: CppAnalyzer,
-}
