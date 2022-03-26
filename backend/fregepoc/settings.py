@@ -30,6 +30,7 @@ DJANGO_CORS_ALLOWED_HOSTS = ["http://localhost:4200"]
 PROJECT_APPS = ["fregepoc.repositories.apps.RepositoriesConfig"]
 
 INSTALLED_APPS = [
+    "jazzmin",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
