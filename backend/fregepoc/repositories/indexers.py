@@ -1,7 +1,7 @@
 from github import Github
 
-
 # NOTE: this file is meant to be split into a folder with files representing analyzers
+
 
 class BaseIndexer:
     pass

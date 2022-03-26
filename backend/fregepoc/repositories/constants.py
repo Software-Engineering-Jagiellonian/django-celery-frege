@@ -1,8 +1,7 @@
 from django.db import models
-from fregepoc.repositories.analyzers import (
-    PythonAnalyzer,
-    CppAnalyzer,
-)
+
+from fregepoc.repositories.analyzers.cpp import CppAnalyzer
+from fregepoc.repositories.analyzers.python import PythonAnalyzer
 
 
 class ProgrammingLanguages(models.TextChoices):

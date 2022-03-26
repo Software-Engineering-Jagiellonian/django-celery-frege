@@ -6,14 +6,19 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('repositories', '0001_initial'),
+        ("repositories", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='repository',
-            name='name',
-            field=models.CharField(default='noname', help_text='The name of the repository', max_length=255, verbose_name='Repository name'),
+            model_name="repository",
+            name="name",
+            field=models.CharField(
+                default="noname",
+                help_text="The name of the repository",
+                max_length=255,
+                verbose_name="Repository name",
+            ),
             preserve_default=False,
         ),
     ]
