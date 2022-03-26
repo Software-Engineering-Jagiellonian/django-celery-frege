@@ -88,13 +88,14 @@ class CppFileAnalysisResult(TypedDict):
 
 
 @AnalyzerFactory.register(ProgrammingLanguages.PYTHON)
-class CppAnalyzer(BaseAnalyzer[[str, str], CppFileAnalysisResult]):
+class CppAnalyzer(BaseAnalyzer[CppFileAnalysisResult]):
     @classmethod
-    def analyze(cls, file_path, file_content):
+    def analyze(cls, repo_file_obj):
         result = {}
+        file_path = repo_file_obj.repo_relative_file_path
         try:
             analyze_file = CustomFileAnalyzer(lizard.get_extensions(["nd"]))
-            result = AnalyzeResult(analyze_file(file_path[1]).__dict__).as_dict()
+            result = AnalyzeResult(vars(analyze_file(file_path))).as_dict()
         except LizardException:
             pass
         return result

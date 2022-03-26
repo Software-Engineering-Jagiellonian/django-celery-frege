@@ -14,20 +14,20 @@ from typing import (
 )
 
 from fregepoc.repositories.constants import ProgrammingLanguages
+from fregepoc.repositories.models import RepositoryFile
 
 OutputType = TypeVar("OutputType", bound=TypedDict)
-ParamsType = ParamSpec("P")
 
 
 @runtime_checkable
-class BaseAnalyzer(Protocol[ParamsType, OutputType]):
+class BaseAnalyzer(Protocol[OutputType]):
     """
     The base protocol class for all the analyzers present in the system.
     """
 
     @classmethod
     @abstractmethod
-    def analyze(cls, *args: ParamsType.args, **kwargs: ParamsType.kwargs) -> OutputType:
+    def analyze(cls, repo_file_obj: RepositoryFile) -> OutputType:
         """
         A method performing language-specific file analysis.
         """
