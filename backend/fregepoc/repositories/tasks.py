@@ -108,6 +108,7 @@ def process_repo_task(repo_pk):
             analyzed=False,
         )
         for relative_file_path, language in get_repo_files(repo_obj)
+        if AnalyzerFactory.has_analyzers(language)
     ]
     RepositoryFile.objects.bulk_create(repo_files)
 

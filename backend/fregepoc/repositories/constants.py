@@ -19,6 +19,7 @@ file_extensions_registry: dict[ProgrammingLanguages, list[str]] = {}
 
 
 def register_extension(lang_name: str, extensions: list[str]):
+    # TODO: docstring
     if lang_name not in ProgrammingLanguages.__members__:
         raise AssertionError(
             f"There is no such programming language as {lang_name} in the system."
@@ -28,6 +29,7 @@ def register_extension(lang_name: str, extensions: list[str]):
 
 
 def get_extensions_for_language(language: ProgrammingLanguages) -> list[str]:
+    # TODO: docstring
     try:
         return file_extensions_registry[language]
     except KeyError as ke:
@@ -38,6 +40,7 @@ def get_extensions_for_language(language: ProgrammingLanguages) -> list[str]:
 
 
 def get_languages_by_extension(extension: str) -> Generator[ProgrammingLanguages]:
+    # TODO: docstring
     for lang, extensions in file_extensions_registry.items():
         if extension in extensions:
             yield lang

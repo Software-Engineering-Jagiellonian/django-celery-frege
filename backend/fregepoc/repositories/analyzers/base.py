@@ -51,6 +51,16 @@ class AnalyzerFactory:
         return [analyzer_cls() for analyzer_cls in cls.analyzers[programming_language]]
 
     @classmethod
+    def has_analyzers(cls, programming_language: ProgrammingLanguages) -> bool:
+        """
+        Verifies whether there are analyzers dedicated to the given programming languages registered in the system.
+
+        :param programming_language: The programming language whose analyzers will get looked up.
+        :return: Whether the corresponding analyzers were found.
+        """
+        return bool(cls.analyzers[programming_language])
+
+    @classmethod
     def register(
         cls, programming_language: ProgrammingLanguages
     ) -> Callable[[Type[BaseAnalyzer]], Type[BaseAnalyzer]]:
@@ -61,7 +71,7 @@ class AnalyzerFactory:
         :return: A wrapper function.
         """
 
-        def wrapper(analyzer_cls: BaseAnalyzer):
+        def wrapper(analyzer_cls: BaseAnalyzer) -> BaseAnalyzer:
             cls.analyzers[programming_language].append(analyzer_cls)
             return analyzer_cls
 
