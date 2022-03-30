@@ -18,3 +18,9 @@ django-jazzmin
 
 PyGithub
 lizard
+
+pytest
+pytest-django
+pytest-mock
+
+factory_boy

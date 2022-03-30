@@ -87,10 +87,9 @@ class CppFileAnalysisResult(TypedDict):
     max_nesting_depth: int
 
 
-@AnalyzerFactory.register(ProgrammingLanguages.PYTHON)
+@AnalyzerFactory.register(ProgrammingLanguages.CPP)
 class CppAnalyzer(BaseAnalyzer[CppFileAnalysisResult]):
-    @classmethod
-    def analyze(cls, repo_file_obj):
+    def analyze(self, repo_file_obj):
         result = {}
         file_path = repo_file_obj.repo_relative_file_path
         try:

@@ -3,39 +3,24 @@ import os
 import git
 from celery import shared_task
 from celery.signals import celeryd_init
-from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
 from github import Github
 
 from fregepoc.repositories.analyzers.base import AnalyzerFactory
-from fregepoc.repositories.constants import ProgrammingLanguages
 
 from fregepoc.repositories.models import Repository, RepositoryFile
 
 from celery.utils.log import get_task_logger
 
+from fregepoc.repositories.utils.paths import get_repo_local_path, get_repo_files
 
 logger = get_task_logger(__name__)
 
-# TODO: switch to proper logging instead of printing
-# TODO: should probably move aux functions somewhere else
-
-
-def _get_repo_local_path(repo):
-    return os.path.join(settings.DOWNLOAD_PATH, repo.name)
-
 
 # TODO: quick hack, clean this out
-def _get_repo_files(repo_obj):
-    for file_path in repo_obj.git.ls_files().split("\n"):
-        if file_path.endswith(".py"):
-            yield file_path, ProgrammingLanguages.PYTHON
-        elif file_path.endswith((".cpp", ".hpp")):
-            yield file_path, ProgrammingLanguages.CPP
 
 
-@transaction.atomic
 def _finalize_repo_analysis(repo_obj):
     if all(repo_obj.files.all().values_list("analyzed", flat=True)):
         repo_obj.analyzed = True
@@ -44,7 +29,7 @@ def _finalize_repo_analysis(repo_obj):
             f"Repository {repo_obj.git_url} fully analyzed, "
             "deleting files from disk..."
         )
-        repo_local_path = _get_repo_local_path(repo_obj)
+        repo_local_path = get_repo_local_path(repo_obj)
         os.system(f"rm -rf {repo_local_path}")
 
 
@@ -99,7 +84,7 @@ def process_repo_task(repo_pk):
         logger.error("process_repo_task >>> repo does not exist")
         return
 
-    repo_local_path = _get_repo_local_path(repo)
+    repo_local_path = get_repo_local_path(repo)
     logger.info(f"process_repo_task >>> fetching repo via url: {repo.git_url}")
 
     try:
@@ -125,7 +110,7 @@ def process_repo_task(repo_pk):
             language=language,
             analyzed=False,
         )
-        for relative_file_path, language in _get_repo_files(repo_obj)
+        for relative_file_path, language in get_repo_files(repo_obj)
     ]
     RepositoryFile.objects.bulk_create(repo_files)
 

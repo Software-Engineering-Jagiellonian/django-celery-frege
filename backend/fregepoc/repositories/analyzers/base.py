@@ -23,9 +23,8 @@ class BaseAnalyzer(Protocol[OutputType]):
     The base protocol class for all the analyzers present in the system.
     """
 
-    @classmethod
     @abstractmethod
-    def analyze(cls, repo_file_obj: RepositoryFile) -> OutputType:
+    def analyze(self, repo_file_obj: RepositoryFile) -> OutputType:
         """
         A method performing language-specific file analysis.
         """
@@ -41,7 +40,7 @@ class AnalyzerFactory:
 
     @classmethod
     def make_analyzers(
-        cls, programming_language: ProgrammingLanguages, *args, **kwargs
+        cls, programming_language: ProgrammingLanguages
     ) -> list[BaseAnalyzer]:
         """
         Creates a list analyzers instances assigned for a given programming language.
@@ -49,10 +48,7 @@ class AnalyzerFactory:
         :param programming_language: The programming language whose analyzers will get returned.
         :return: The analyzer instances list.
         """
-        return [
-            analyzer_cls(*args, **kwargs)
-            for analyzer_cls in cls.analyzers[programming_language]
-        ]
+        return [analyzer_cls() for analyzer_cls in cls.analyzers[programming_language]]
 
     @classmethod
     def register(
