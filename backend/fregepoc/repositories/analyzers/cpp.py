@@ -6,6 +6,7 @@ from lizard_ext import auto_read
 from fregepoc.repositories.analyzers.base import BaseAnalyzer, AnalyzerFactory
 from fregepoc.repositories.analyzers.exceptions import LizardException
 from fregepoc.repositories.constants import ProgrammingLanguages
+from fregepoc.repositories.utils.paths import get_file_abs_path
 
 
 class CustomFileAnalyzer(lizard.FileAnalyzer):
@@ -91,10 +92,10 @@ class CppFileAnalysisResult(TypedDict):
 class CppAnalyzer(BaseAnalyzer[CppFileAnalysisResult]):
     def analyze(self, repo_file_obj):
         result = {}
-        file_path = repo_file_obj.repo_relative_file_path
+        file_path = str(get_file_abs_path(repo_file_obj))
         try:
             analyze_file = CustomFileAnalyzer(lizard.get_extensions(["nd"]))
             result = AnalyzeResult(vars(analyze_file(file_path))).as_dict()
-        except LizardException:
+        except LizardException as le:
             pass
         return result

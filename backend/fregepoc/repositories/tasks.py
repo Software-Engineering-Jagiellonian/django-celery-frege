@@ -18,9 +18,6 @@ from fregepoc.repositories.utils.paths import get_repo_local_path, get_repo_file
 logger = get_task_logger(__name__)
 
 
-# TODO: quick hack, clean this out
-
-
 def _finalize_repo_analysis(repo_obj):
     if all(repo_obj.files.all().values_list("analyzed", flat=True)):
         repo_obj.analyzed = True
