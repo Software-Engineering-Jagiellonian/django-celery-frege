@@ -85,8 +85,8 @@ class RepositoryFile(models.Model):
         null=True,
         help_text=_("The metrics of the file."),
     )
-    analysed_time = models.DateTimeField(
-        _("analysed time"),
+    analyzed_time = models.DateTimeField(
+        _("analyzed time"),
         auto_now_add=True,
         help_text=_("The time when the file was analyzed."),
     )

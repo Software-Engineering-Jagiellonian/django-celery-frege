@@ -24,6 +24,6 @@ class RepositoryFileAdmin(admin.ModelAdmin):
         "language",
         "repo_relative_file_path",
         "metrics",
-        "analysed_time",
+        "analyzed_time",
     )
-    ordering = ("-analysed_time",)
+    ordering = ("-analyzed_time",)

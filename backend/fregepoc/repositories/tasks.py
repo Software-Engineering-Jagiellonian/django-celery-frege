@@ -140,7 +140,7 @@ def analyze_file_task(repo_file_pk):
     with transaction.atomic():
         repo_file.metrics = metrics_dict
         repo_file.analyzed = True
-        repo_file.analysed_time = timezone.now()
+        repo_file.analyzed_time = timezone.now()
         repo_file.save(update_fields=["metrics", "analyzed", "analyzed_time"])
 
     logger.info(f"analyze_file_task >>> repo_file {repo_file.repository.name} analyzed")

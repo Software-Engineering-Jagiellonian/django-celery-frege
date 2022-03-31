@@ -26,6 +26,7 @@ class FileInformationDict(TypedDict):
 def lizard_file_information_to_dict(
     file_information: FileInformation,
 ) -> FileInformationDict:
+    # TODO: docstring
     return {
         key: getattr(file_information, key)
         for key in FileInformationDict.__annotations__
