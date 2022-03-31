@@ -78,26 +78,23 @@ def process_repo_task(repo_pk):
     try:
         repo = Repository.objects.get(pk=repo_pk)
     except Repository.DoesNotExist:
-        logger.error("process_repo_task >>> repo does not exist")
+        logger.error(f"Repository does not exist ({repo_pk = })")
         return
 
     repo_local_path = get_repo_local_path(repo)
-    logger.info(f"process_repo_task >>> fetching repo via url: {repo.git_url}")
+    logger.info(f"Fetching repository via url: {repo.git_url}")
 
     try:
         repo_obj = git.Repo.clone_from(repo.git_url, repo_local_path)
         repo.fetch_time = timezone.now()
         repo.save()
-        logger.info("process_repo_task >>> repo cloned")
+        logger.info("Repository cloned")
     except git.exc.GitCommandError:
         try:
             repo_obj = git.Repo(repo_local_path)
-            logger.info("process_repo_task >>> repo already exists, fetched from disk")
+            logger.info("Repo already exists, fetched from disk")
         except git.exc.NoSuchPathError:
-            logger.error(
-                "process_repo_task >>> tried fetching from disk, "
-                "but repo does not exist"
-            )
+            logger.error("Tried fetching from disk, but repository does not exist")
             return
 
     repo_files = [
@@ -125,7 +122,7 @@ def analyze_file_task(repo_file_pk):
     try:
         repo_file = RepositoryFile.objects.get(pk=repo_file_pk)
     except RepositoryFile.DoesNotExist:
-        logger.error("analyze_file_task >>> repo_file does not exist")
+        logger.error("repo_file does not exist")
         return
 
     analyzers = AnalyzerFactory.make_analyzers(repo_file.language)
@@ -143,5 +140,5 @@ def analyze_file_task(repo_file_pk):
         repo_file.analyzed_time = timezone.now()
         repo_file.save(update_fields=["metrics", "analyzed", "analyzed_time"])
 
-    logger.info(f"analyze_file_task >>> repo_file {repo_file.repository.name} analyzed")
+    logger.info(f"repo_file {repo_file.repository.name} analyzed")
     _finalize_repo_analysis(repo_file.repository)
