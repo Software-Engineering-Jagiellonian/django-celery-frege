@@ -39,5 +39,4 @@ class TestAnalyzers:
         )
         for analyzer in analyzers:
             result_dict = analyzer.analyze(repo_file)
-            print(lang, result_dict)
             assert result_dict

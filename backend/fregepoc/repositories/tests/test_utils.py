@@ -1,4 +1,5 @@
 import pytest
+from pytest_mock import MockerFixture
 from pytest_unordered import unordered
 
 from fregepoc.repositories.constants import ProgrammingLanguages
@@ -30,7 +31,7 @@ def test_repo_file_content(settings, dummy_repo):
             assert content == f.read()
 
 
-def test_get_repo_files(mocker):
+def test_get_repo_files(mocker: MockerFixture):
     repo_obj_mock = mocker.MagicMock()
     repo_obj_mock.git.ls_files = lambda: "ans.cpp\nhello_world.py"
     assert list(get_repo_files(repo_obj_mock)) == unordered(
