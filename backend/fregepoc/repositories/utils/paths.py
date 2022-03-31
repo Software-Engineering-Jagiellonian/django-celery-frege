@@ -28,6 +28,7 @@ def get_repo_files(
 
 
 def get_file_abs_path(repo_file_obj: RepositoryFile):
+    # TODO: docstring
     return (
         Path(get_repo_local_path(repo_file_obj.repository))
         / repo_file_obj.repo_relative_file_path

@@ -1,9 +1,10 @@
 import pytest
+from pytest_unordered import unordered
 
 from fregepoc.repositories.constants import ProgrammingLanguages
 from fregepoc.repositories.models import RepositoryFile
 from fregepoc.repositories.utils.analyzers import repo_file_content
-from fregepoc.repositories.utils.paths import get_repo_local_path
+from fregepoc.repositories.utils.paths import get_repo_local_path, get_repo_files
 from fregepoc.repositories.utils.tests import MOCK_DOWNLOAD_PATH
 
 
@@ -27,3 +28,14 @@ def test_repo_file_content(settings, dummy_repo):
     with repo_file_content(repo_file) as content:
         with open(MOCK_DOWNLOAD_PATH / "dummy_repo" / "hello_world.py") as f:
             assert content == f.read()
+
+
+def test_get_repo_files(mocker):
+    repo_obj_mock = mocker.MagicMock()
+    repo_obj_mock.git.ls_files = lambda: "ans.cpp\nhello_world.py"
+    assert list(get_repo_files(repo_obj_mock)) == unordered(
+        [
+            ("ans.cpp", ProgrammingLanguages.CPP),
+            ("hello_world.py", ProgrammingLanguages.PYTHON),
+        ]
+    )

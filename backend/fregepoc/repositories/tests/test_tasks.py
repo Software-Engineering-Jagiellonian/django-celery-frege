@@ -19,7 +19,8 @@ class TestProcessRepoTask:
         repo_obj_mock.git.ls_files = lambda: "ans.cpp\nhello_world.py"
         clone_from_mock.return_value = repo_obj_mock
         mocker.patch(
-            "fregepoc.repositories.tasks.analyze_file_task.delay", analyze_file_task_mock
+            "fregepoc.repositories.tasks.analyze_file_task.delay",
+            analyze_file_task_mock,
         )
         mocker.patch("fregepoc.repositories.tasks.logger")
         mocker.patch("git.repo.base.Repo.clone_from", clone_from_mock)

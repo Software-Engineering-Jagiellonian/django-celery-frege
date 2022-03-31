@@ -94,7 +94,7 @@ def process_repo_task(repo_pk):
             repo_obj = git.Repo(repo_local_path)
             logger.info("process_repo_task >>> repo already exists, fetched from disk")
         except git.exc.NoSuchPathError:
-            logger.exec(
+            logger.error(
                 "process_repo_task >>> tried fetching from disk, "
                 "but repo does not exist"
             )

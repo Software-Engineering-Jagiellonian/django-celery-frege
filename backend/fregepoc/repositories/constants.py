@@ -35,7 +35,7 @@ def get_extensions_for_language(language: ProgrammingLanguages) -> list[str]:
     except KeyError as ke:
         raise AssertionError(
             f"The file_extensions_registry does not comprise the extensions for {language} programming language."
-            " Please use register_extension function to register the extensions for this language."
+            " Please, use register_extension function to register the extensions for this language."
         ) from ke
 
 

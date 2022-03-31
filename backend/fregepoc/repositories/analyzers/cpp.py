@@ -96,6 +96,6 @@ class CppAnalyzer(BaseAnalyzer[CppFileAnalysisResult]):
         try:
             analyze_file = CustomFileAnalyzer(lizard.get_extensions(["nd"]))
             result = AnalyzeResult(vars(analyze_file(file_path))).as_dict()
-        except LizardException as le:
+        except LizardException:
             pass
         return result

@@ -22,5 +22,6 @@ lizard
 pytest
 pytest-django
 pytest-mock
+pytest-unordered
 
 factory_boy

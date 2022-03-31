@@ -53,7 +53,8 @@ class AnalyzerFactory:
     @classmethod
     def has_analyzers(cls, programming_language: ProgrammingLanguages) -> bool:
         """
-        Verifies whether there are analyzers dedicated to the given programming languages registered in the system.
+        Determines whether there are analyzers registered in the system and dedicated
+        to the given programming language.
 
         :param programming_language: The programming language whose analyzers will get looked up.
         :return: Whether the corresponding analyzers were found.
