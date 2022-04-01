@@ -43,7 +43,7 @@ class AnalyzerFactory:
         cls, programming_language: ProgrammingLanguages
     ) -> list[BaseAnalyzer]:
         """
-        Creates a list analyzers instances assigned for a given programming language.
+        Creates a list of analyzer instances assigned to a given programming language.
 
         :param programming_language: The programming language whose analyzers will get returned.
         :return: The analyzer instances list.

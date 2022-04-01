@@ -33,7 +33,7 @@ class GitHubIndexer(SingletonModel, BaseIndexer):
         default=100,
     )
     current_page = models.PositiveIntegerField(
-        _("min stars"),
+        _("current page"),
         default=0,
         help_text=_("The last visited page via GitHub API."),
     )
@@ -58,7 +58,7 @@ class GitHubIndexer(SingletonModel, BaseIndexer):
                 )
                 self.current_page += 1
                 self.save(update_fields=["current_page"])
-                repos_to_process = (
+                repos_to_process = [
                     Repository(
                         name=repo.name,
                         description=repo.description,
@@ -67,7 +67,7 @@ class GitHubIndexer(SingletonModel, BaseIndexer):
                         commit_hash=repo.get_branch(repo.default_branch).commit.sha,
                     )
                     for repo in list_of_repos
-                )
+                ]
                 Repository.objects.bulk_create(repos_to_process)
             except github.RateLimitExceededException:
                 self.rate_limit_exceeded = True
