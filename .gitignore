@@ -9,3 +9,6 @@ env/
 *.py.old
 # nginx
 .idea
+
+# pyenv
+.python-version

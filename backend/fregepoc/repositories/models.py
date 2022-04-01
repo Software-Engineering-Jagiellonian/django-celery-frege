@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -7,20 +8,20 @@ from fregepoc.repositories.constants import ProgrammingLanguages
 class Repository(models.Model):
     name = models.CharField(
         max_length=255,
-        verbose_name=_('Repository name'),
-        help_text=_('The name of the repository'),
+        verbose_name=_("Repository name"),
+        help_text=_("The name of the repository"),
     )
     description = models.TextField(
         max_length=2048,
-        verbose_name=_('Repository description'),
-        help_text=_('The description of the repository'),
+        verbose_name=_("Repository description"),
+        help_text=_("The description of the repository"),
         blank=True,
         null=True,
     )
     analyzed = models.BooleanField(
         _("Analyzed"),
         default=False,
-        help_text="Indicates whether the repository has been analyzed."
+        help_text="Indicates whether the repository has been analyzed.",
     )
     git_url = models.URLField(
         _("git url"), help_text=_("The url used to clone the repository")
@@ -50,6 +51,9 @@ class Repository(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name_plural = _("Repositories")
+
 
 class RepositoryFile(models.Model):
     repository = models.ForeignKey(
@@ -61,7 +65,7 @@ class RepositoryFile(models.Model):
     analyzed = models.BooleanField(
         _("Analyzed"),
         default=False,
-        help_text="Whether the file has been analyzed or not."
+        help_text="Whether the file has been analyzed or not.",
     )
     language = models.CharField(
         max_length=20,
@@ -72,6 +76,7 @@ class RepositoryFile(models.Model):
     repo_relative_file_path = models.FilePathField(
         blank=True,
         null=True,
+        path=settings.DOWNLOAD_PATH,
         help_text=_("File path, relative to the repository root."),
     )
     metrics = models.JSONField(
@@ -80,8 +85,8 @@ class RepositoryFile(models.Model):
         null=True,
         help_text=_("The metrics of the file."),
     )
-    analysed_time = models.DateTimeField(
-        _("analysed time"),
+    analyzed_time = models.DateTimeField(
+        _("analyzed time"),
         auto_now_add=True,
         help_text=_("The time when the file was analyzed."),
     )
