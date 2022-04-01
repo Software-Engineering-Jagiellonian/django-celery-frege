@@ -5,7 +5,7 @@ from pytest_unordered import unordered
 from fregepoc.repositories.constants import ProgrammingLanguages
 from fregepoc.repositories.models import RepositoryFile
 from fregepoc.repositories.utils.analyzers import repo_file_content
-from fregepoc.repositories.utils.paths import get_repo_local_path, get_repo_files
+from fregepoc.repositories.utils.paths import get_repo_files, get_repo_local_path
 from fregepoc.repositories.utils.tests import MOCK_DOWNLOAD_PATH
 
 

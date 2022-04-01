@@ -19,7 +19,7 @@ class TestProcessRepoTask:
         repo_obj_mock.git.ls_files = lambda: "ans.cpp\nhello_world.py"
         clone_from_mock.return_value = repo_obj_mock
         mocker.patch(
-            "fregepoc.repositories.tasks.analyze_file_task.delay",
+            "fregepoc.repositories.tasks.analyze_file_task.apply_async",
             analyze_file_task_mock,
         )
         mocker.patch("fregepoc.repositories.tasks.logger")
@@ -30,4 +30,4 @@ class TestProcessRepoTask:
         )
         assert RepositoryFile.objects.filter(repository=dummy_repo).count() == 2
         for repo_file in dummy_repo.files.all():
-            analyze_file_task_mock.assert_has_calls([call(repo_file.pk)])
+            analyze_file_task_mock.assert_has_calls([call(args=(repo_file.pk,))])

@@ -1,12 +1,12 @@
 import pytest
+from django.core.validators import URLValidator
 
 from fregepoc.repositories.constants import (
-    get_extensions_for_language,
     ProgrammingLanguages,
+    get_extensions_for_language,
 )
 from fregepoc.repositories.factories import RepositoryFactory, RepositoryFileFactory
 from fregepoc.repositories.models import Repository, RepositoryFile
-from django.core.validators import URLValidator
 
 
 @pytest.mark.django_db

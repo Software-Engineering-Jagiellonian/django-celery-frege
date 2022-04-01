@@ -3,8 +3,8 @@ import os
 from datetime import timedelta
 
 import github.GithubException
-from django.utils.translation import gettext_lazy as _
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from github import Github
 
 from fregepoc.repositories.models import Repository

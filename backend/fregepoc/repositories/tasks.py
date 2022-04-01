@@ -1,20 +1,17 @@
 import os
 
 import git
-import github
 from celery import shared_task
 from celery.signals import celeryd_init
+from celery.utils.log import get_task_logger
+from django.apps import apps
 from django.db import transaction
 from django.utils import timezone
 
 from fregepoc.indexers.models import GitHubIndexer
 from fregepoc.repositories.analyzers.base import AnalyzerFactory
-
 from fregepoc.repositories.models import Repository, RepositoryFile
-
-from celery.utils.log import get_task_logger
-
-from fregepoc.repositories.utils.paths import get_repo_local_path, get_repo_files
+from fregepoc.repositories.utils.paths import get_repo_files, get_repo_local_path
 
 logger = get_task_logger(__name__)
 
@@ -33,21 +30,26 @@ def _finalize_repo_analysis(repo_obj):
 
 @celeryd_init.connect
 def init_worker(**kwargs):
-    crawl_repos_task.delay()
+    crawl_repos_task.apply_async(args=(GitHubIndexer.__name__, ))
 
 
 @shared_task
-def crawl_repos_task():
-    indexer: GitHubIndexer = GitHubIndexer.load()
+def crawl_repos_task(indexer_class_name):
+    indexer_model = apps.get_model("indexers", indexer_class_name)
+    indexer = indexer_model.load()
     for repo in indexer:
-        process_repo_task.delay(repo.pk)
+        # TODO: Use a better repo identifier to perform a check.
+        if not Repository.objects.filter(name=repo.name).exists():
+            process_repo_task.apply_async(args=(repo.pk, ))
 
     if indexer.rate_limit_exceeded:
         logger.info(
             f"The rate limit has been exceeded for {indexer.__class__.__qualname__}. "
             f"Waiting {indexer.rate_limit_timeout}"
         )
-        crawl_repos_task.apply_async(countdown=indexer.rate_limit_timeout.seconds)
+        crawl_repos_task.apply_async(
+            args=(indexer_class_name,), countdown=indexer.rate_limit_timeout.seconds
+        )
 
 
 @shared_task
@@ -89,7 +91,7 @@ def process_repo_task(repo_pk):
     RepositoryFile.objects.bulk_create(repo_files)
 
     for repo_file in repo_files:
-        analyze_file_task.delay(repo_file.pk)
+        analyze_file_task.apply_async(args=(repo_file.pk, ))
     else:
         _finalize_repo_analysis(repo)
 

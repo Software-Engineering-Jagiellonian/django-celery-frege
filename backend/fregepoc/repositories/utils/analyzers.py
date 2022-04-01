@@ -1,7 +1,7 @@
 from contextlib import contextmanager
 from typing import TypedDict
 
-from lizard import analyze_file, FileInformation
+from lizard import FileInformation, analyze_file
 from lizard_ext import auto_read
 
 from fregepoc.repositories.models import RepositoryFile

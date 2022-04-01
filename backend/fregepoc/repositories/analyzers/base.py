@@ -1,14 +1,14 @@
 from abc import abstractmethod
 from collections import defaultdict
 from typing import (
+    Callable,
+    ClassVar,
+    DefaultDict,
     Protocol,
+    Type,
     TypedDict,
     TypeVar,
     runtime_checkable,
-    ClassVar,
-    Type,
-    Callable,
-    DefaultDict,
 )
 
 from fregepoc.repositories.constants import ProgrammingLanguages

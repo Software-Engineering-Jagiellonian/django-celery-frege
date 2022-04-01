@@ -4,11 +4,11 @@ from pathlib import Path
 from django.conf import settings
 from github import Repository as GitHubRepository
 
-from fregepoc.repositories.constants import (
-    get_languages_by_extension,
-    ProgrammingLanguages,
-)
 from fregepoc.repositories import models
+from fregepoc.repositories.constants import (
+    ProgrammingLanguages,
+    get_languages_by_extension,
+)
 from fregepoc.repositories.models import RepositoryFile
 
 

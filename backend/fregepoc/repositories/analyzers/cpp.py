@@ -3,7 +3,7 @@ from typing import TypedDict
 import lizard
 from lizard_ext import auto_read
 
-from fregepoc.repositories.analyzers.base import BaseAnalyzer, AnalyzerFactory
+from fregepoc.repositories.analyzers.base import AnalyzerFactory, BaseAnalyzer
 from fregepoc.repositories.analyzers.exceptions import LizardException
 from fregepoc.repositories.constants import ProgrammingLanguages
 from fregepoc.repositories.utils.paths import get_file_abs_path
