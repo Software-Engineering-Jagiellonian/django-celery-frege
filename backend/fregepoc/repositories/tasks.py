@@ -1,12 +1,13 @@
 import os
 
 import git
+import github
 from celery import shared_task
 from celery.signals import celeryd_init
 from django.db import transaction
 from django.utils import timezone
-from github import Github
 
+from fregepoc.indexers.models import GitHubIndexer
 from fregepoc.repositories.analyzers.base import AnalyzerFactory
 
 from fregepoc.repositories.models import Repository, RepositoryFile
@@ -19,7 +20,7 @@ logger = get_task_logger(__name__)
 
 
 def _finalize_repo_analysis(repo_obj):
-    if all(repo_obj.files.all().values_list("analyzed", flat=True)):
+    if not repo_obj.files.filter(analyzed=False).exists():
         repo_obj.analyzed = True
         repo_obj.save()
         logger.info(
@@ -37,38 +38,16 @@ def init_worker(**kwargs):
 
 @shared_task
 def crawl_repos_task():
-    # TODO: crawler & dispatcher might need to be merged to allow
-    #       us to determine if we've hit a throttling limit or not
-    # TODO: switch between using ssh and https when having tokens available
-    # TODO: use envs to set query parameters
+    indexer: GitHubIndexer = GitHubIndexer.load()
+    for repo in indexer:
+        process_repo_task.delay(repo.pk)
 
-    min_forks = 100
-    min_stars = 100
-
-    github_token = os.environ.get("GITHUB_TOKEN")
-    g = Github(github_token) if github_token else Github()
-    # TODO: save last known page, increase query result page size - current
-    #       approach is very hacky & mb. let the range be adjustable
-    for page in range(5000):
-        list_of_repos = g.search_repositories(
-            query=f"forks:>={min_forks} stars:>={min_stars} is:public",
-            sort="stars",
-            page=page,
+    if indexer.rate_limit_exceeded:
+        logger.info(
+            f"The rate limit has been exceeded for {indexer.__class__.__qualname__}. "
+            f"Waiting {indexer.rate_limit_timeout}"
         )
-
-        repos_to_process = [
-            Repository(
-                name=repo.name,
-                description=repo.description,
-                git_url=repo.clone_url,
-                repo_url=repo.html_url,
-                commit_hash=repo.get_branch(repo.default_branch).commit.sha,
-            )
-            for repo in list_of_repos
-        ]
-        Repository.objects.bulk_create(repos_to_process)
-        for repo in repos_to_process:
-            process_repo_task.delay(repo.pk)
+        crawl_repos_task.apply_async(countdown=indexer.rate_limit_timeout.seconds)
 
 
 @shared_task

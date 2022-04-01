@@ -27,7 +27,10 @@ DJANGO_CORS_ALLOWED_HOSTS = ["http://localhost:4200"]
 
 # Application definition
 
-PROJECT_APPS = ["fregepoc.repositories.apps.RepositoriesConfig"]
+PROJECT_APPS = [
+    "fregepoc.repositories.apps.RepositoriesConfig",
+    "fregepoc.indexers.apps.IndexersConfig",
+]
 
 INSTALLED_APPS = [
     "jazzmin",
@@ -93,6 +96,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
@@ -103,6 +107,7 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 
 USE_TZ = True
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
