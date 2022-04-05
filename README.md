@@ -2,7 +2,7 @@
 
 ## Perequisites
 
-Docker & docker compose is required to be available on the host system.
+Docker & docker-compose is required to be available on the host system.
 
 ## Usage
 
