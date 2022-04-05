@@ -36,6 +36,7 @@ services:
     hostname: backend
     command: >
       sh -c "python manage.py migrate --noinput
+      && python manage.py initadmin
       && python manage.py runserver
       0.0.0.0:${DOCKER_BACKEND_PORT}"
     ports:
