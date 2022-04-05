@@ -1,3 +1,4 @@
+import contextlib
 from typing import TypedDict
 
 import lizard
@@ -93,9 +94,7 @@ class CppAnalyzer(BaseAnalyzer[CppFileAnalysisResult]):
     def analyze(self, repo_file_obj):
         result = {}
         file_path = str(get_file_abs_path(repo_file_obj))
-        try:
+        with contextlib.suppress(LizardException):
             analyze_file = CustomFileAnalyzer(lizard.get_extensions(["nd"]))
             result = AnalyzeResult(vars(analyze_file(file_path))).as_dict()
-        except LizardException:
-            pass
         return result
