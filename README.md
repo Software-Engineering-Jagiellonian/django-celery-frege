@@ -16,7 +16,7 @@ and then editing the `.env` file optionally (although the unchanged configuratio
 
 >The following commands should be run from the **root** of the application
 
-To run the application, you need to run the following command:
+To run the application, you need to use the following command:
 
 ```bash
 docker compose --profile application up
