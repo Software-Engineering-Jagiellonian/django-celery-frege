@@ -53,6 +53,35 @@ services:
     env_file:
       - .env
 
+  fregepoc-prometheus:
+    image: prom/prometheus
+    container_name: fregepoc-prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090
+    networks:
+      - fregepoc-main
+
+  fregepoc-grafana:
+    image: grafana/grafana
+    container_name: fregepoc-grafana
+    depends_on:
+      - fregepoc-prometheus
+    volumes:
+      - fregepoc_grafana_storage:/var/lib/grafana
+    environment:
+      - GF_USERS_DEFAULT_THEME=dark
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_USERS_ALLOW_ORG_CREATE=false
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+    ports:
+      - 3000:3000
+    networks:
+      - fregepoc-main
+    env_file:
+      - .env
+
   fregepoc-celery-worker:
     <<: *backend
     container_name: fregepoc-celery-worker
@@ -60,9 +89,23 @@ services:
     command: >
       sh -c "python3 manage.py celery_dev_autoreload"
 
+  fregepoc-flower:
+    <<: *backend
+    container_name: fregepoc-flower
+    command: celery -A fregepoc flower
+    ports:
+      - 5555:5555
+    environment:
+      CELERY_BROKER_URL: redis://fregepoc-redis
+      CELERY_RESULT_BACKEND: redis://fregepoc-redis
+    depends_on:
+      - fregepoc-celery-worker
+      - fregepoc-redis
+
 networks:
   fregepoc-main:
 
 volumes:
   fregepoc_postgresql_data:
   fregepoc_tmp:
+  fregepoc_grafana_storage:
