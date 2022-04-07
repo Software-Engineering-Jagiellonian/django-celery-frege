@@ -6,7 +6,7 @@ When we first approached the Frege project, we noticed that the project's codeba
 
 We believe that lack of code language unification leads to a severe reduction in maintainability and extendability. While we are not adamant about using python, we strongly recommend establishing concrete code rules.
 
-Moreover, we noticed that some microservices became redundant (namely, the `downloader` and the `extractor`). 
+Moreover, we noticed that some microservices became redundant (namely, the `downloader` and the `extractor`).
 
 We aim to seamlessly transition the current architecture to a more simplified one to make it easier to understand, maintain and expand.
 
@@ -88,11 +88,11 @@ Moreover, upon startup should celery discover that any repositories / repository
 
 ### Monitoring & data exposition
 
-The data can be accessed in several ways: 
+The data can be accessed in several ways:
+
 - Prometheus provides an interface for accessing the system performance metrics which can be aggregated and reorganized in a comprehensive manner in order to be displayed in Grafana. Prometheus exposes an API which can be accessed via the HTTP protocol.
 - Django is utilized to expose a public API for accessing any relevant metrics or the analysis results. The communication can be established both via Web Sockets (for real-time data gathering) and via the HTTP (for bulk data retieval).
 - Both Prometheus and Django expose the data to be consumed by our frontend. Additionally, we expose the aforementioned API for the third-parties to use, while employing such measures as throtling, authentication, and permissions to govern access.
-
 
 ### Scalability
 
