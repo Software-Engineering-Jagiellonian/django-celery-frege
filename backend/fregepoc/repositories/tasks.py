@@ -37,7 +37,8 @@ def init_worker(**kwargs):
         return
 
     for indexer_cls in indexers:
-        crawl_repos_task.apply_async(args=(indexer_cls.__name__,))
+        if indexer_cls.__name__ != "SourceforgeIndexer": # Temporarily disable SourceforgeIndexer
+            crawl_repos_task.apply_async(args=(indexer_cls.__name__,))
 
 
 @shared_task
