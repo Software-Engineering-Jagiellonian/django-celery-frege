@@ -38,14 +38,19 @@ The project employs a number of linters and formatters such as `flake8`, `isort`
 in order to improve the overall DX.
 
 Also, aiming to prevent common mistakes from being committed and pushed
-to the origin, one can register the git hooks configured via `pre-commit`:
+to the origin, it is highly advised to register the git hooks configured via `pre-commit`:
 
 ```bash
 pip install -r backend/requirements.txt
 pre-commit install
 ```
 
-Moreover, to run the linters and formatters over the entire codebase with `pre-commit`, execute the following command:
+Moreover, to explicitly run the linters and formatters over the entire codebase with `pre-commit`, execute the following command:
 ```bash
 pre-commit run --all-files
 ```
+
+### Commit messages convention
+
+We strongly recommend adhering to a certain commit messages convention.
+The one that has been utilized so far can be found following the [link](https://www.conventionalcommits.org/en/v1.0.0/)

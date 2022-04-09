@@ -35,3 +35,4 @@ repos:
     rev: 22.3.0
     hooks:
       - id: black
+        args: ["--config=backend/pyproject.toml"]
