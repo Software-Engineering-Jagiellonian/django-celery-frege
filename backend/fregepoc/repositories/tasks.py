@@ -49,7 +49,8 @@ def crawl_repos_task(indexer_class_name):
 
     if indexer.rate_limit_exceeded:
         logger.info(
-            f"The rate limit has been exceeded for {indexer.__class__.__qualname__}. "
+            f"The rate limit has been exceeded for "
+            f"{indexer.__class__.__qualname__}. "
             f"Waiting {indexer.rate_limit_timeout}"
         )
         crawl_repos_task.apply_async(

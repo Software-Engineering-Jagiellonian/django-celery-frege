@@ -16,7 +16,6 @@ class Repository(models.Model):
         verbose_name=_("Repository description"),
         help_text=_("The description of the repository"),
         blank=True,
-        null=True,
     )
     analyzed = models.BooleanField(
         _("Analyzed"),
@@ -39,7 +38,8 @@ class Repository(models.Model):
         _("discovered time"),
         auto_now_add=True,
         help_text=_(
-            "The time when the repository was discovered. It is set automatically on creation."
+            "The time when the repository was discovered. "
+            "It is set automatically on creation."
         ),
     )
     fetch_time = models.DateTimeField(
@@ -74,7 +74,7 @@ class RepositoryFile(models.Model):
         help_text=_("Programming language present in the repository."),
         choices=ProgrammingLanguages.choices,
     )
-    repo_relative_file_path = models.FilePathField(
+    repo_relative_file_path = models.FilePathField(  # noqa: DJ01
         blank=True,
         null=True,
         path=settings.DOWNLOAD_PATH,
@@ -91,3 +91,6 @@ class RepositoryFile(models.Model):
         auto_now_add=True,
         help_text=_("The time when the file was analyzed."),
     )
+
+    def __str__(self):
+        return f"file: {self.repository.name}/{self.repo_relative_file_path}"

@@ -52,7 +52,10 @@ class GitHubIndexer(SingletonModel, BaseIndexer):
         while True:
             try:
                 list_of_repos = g.search_repositories(
-                    query=f"forks:>={self.min_forks} stars:>={self.min_stars} is:public",
+                    query=(
+                        f"forks:>={self.min_forks} "
+                        f"stars:>={self.min_stars} is:public"
+                    ),
                     sort="stars",
                     page=self.current_page,
                 )
