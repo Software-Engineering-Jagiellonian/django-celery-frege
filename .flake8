@@ -1,0 +1,12 @@
+[flake8]
+extend-ignore = E203
+per-file-ignores =
+    __init__.py: F401
+exclude =
+    .git,
+    __pycache__,
+    manage.py,
+    */__init__.py,
+    */settings/*,
+    */migrations/*,
+max-line-length = 79

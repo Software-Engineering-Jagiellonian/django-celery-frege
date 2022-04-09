@@ -28,11 +28,15 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "min_forks",
-                    models.PositiveIntegerField(default=100, verbose_name="min forks"),
+                    models.PositiveIntegerField(
+                        default=100, verbose_name="min forks"
+                    ),
                 ),
                 (
                     "min_stars",
-                    models.PositiveIntegerField(default=100, verbose_name="min stars"),
+                    models.PositiveIntegerField(
+                        default=100, verbose_name="min stars"
+                    ),
                 ),
                 (
                     "current_page",

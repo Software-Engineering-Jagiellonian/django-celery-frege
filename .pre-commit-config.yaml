@@ -1,0 +1,37 @@
+---
+default_language_version:
+  python: python3.10
+default_stages: [ commit ]
+fail_fast: false
+minimum_pre_commit_version: 2.18.1
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.2.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+        args: [ "--fix=lf" ]
+      - id: check-yaml
+      - id: check-added-large-files
+  - repo: https://gitlab.com/pycqa/flake8
+    rev: 3.9.2
+    hooks:
+      - id: flake8
+        additional_dependencies: [
+            'flake8-comprehensions==3.8.0',
+            'flake8-debugger==4.0.0',
+            'flake8-django==1.1.2',
+            'flake8-bugbear==21.11.29',
+            'flake8-no-pep420==2.0.0',
+        ]
+        args: ["--config=.flake8"]
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.10.1
+    hooks:
+      - id: isort
+        args: ["--settings-file=backend/pyproject.toml"]
+  - repo: https://github.com/ambv/black
+    rev: 22.3.0
+    hooks:
+      - id: black
