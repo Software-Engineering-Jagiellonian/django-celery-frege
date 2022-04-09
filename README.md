@@ -37,7 +37,7 @@ There exists a number of docker-compose profiles in the project, consult `docker
 The project employs a number of linters and formatters such as `flake8`, `isort`, or `black`
 in order to improve the overall DX.
 
-Also, aiming to prevent common mistakes from being committed and pushed
+Also, to prevent common mistakes from being committed and pushed
 to the origin, it is required to register the git hooks configured via `pre-commit`:
 
 ```bash
