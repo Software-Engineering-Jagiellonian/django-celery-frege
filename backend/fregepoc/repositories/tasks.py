@@ -8,7 +8,7 @@ from django.apps import apps
 from django.db import transaction
 from django.utils import timezone
 
-from fregepoc.indexers.models import GitHubIndexer
+from fregepoc.indexers.base import indexers
 from fregepoc.repositories.analyzers.base import AnalyzerFactory
 from fregepoc.repositories.models import Repository, RepositoryFile
 from fregepoc.repositories.utils.paths import (
@@ -33,7 +33,8 @@ def _finalize_repo_analysis(repo_obj):
 
 @celeryd_init.connect
 def init_worker(**kwargs):
-    crawl_repos_task.apply_async(args=(GitHubIndexer.__name__,))
+    for indexer_cls in indexers:
+        crawl_repos_task.apply_async(args=(indexer_cls.__name__,))
 
 
 @shared_task

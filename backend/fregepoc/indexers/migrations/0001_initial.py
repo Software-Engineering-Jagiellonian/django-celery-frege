@@ -4,6 +4,7 @@ import datetime
 
 from django.db import migrations, models
 
+import fregepoc.indexers.base
 import fregepoc.indexers.models
 
 
@@ -57,6 +58,6 @@ class Migration(migrations.Migration):
             options={
                 "abstract": False,
             },
-            bases=(models.Model, fregepoc.indexers.models.BaseIndexer),
+            bases=(models.Model, fregepoc.indexers.base.BaseIndexer),
         ),
     ]
