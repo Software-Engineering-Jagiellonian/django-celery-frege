@@ -42,7 +42,9 @@ def crawl_repos_task(indexer_class_name):
     indexer = indexer_model.load()
     for repo in indexer:
         # TODO: Use a better repo identifier to perform a check.
-        if not Repository.objects.filter(name=repo.name).exists():
+        if not Repository.objects.filter(
+            name=repo.name, analyzed=True
+        ).exists():
             process_repo_task.apply_async(args=(repo.pk,))
 
     if indexer.rate_limit_exceeded:
