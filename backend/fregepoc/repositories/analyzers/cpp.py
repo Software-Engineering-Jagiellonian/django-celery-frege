@@ -23,7 +23,9 @@ class CustomFileAnalyzer(lizard.FileAnalyzer):
                 f"Error: Fail to read source file {filename}"
             ) from ioe
         except IndexError as ie:
-            raise LizardException(f"Error: Fail to parse file {filename}") from ie
+            raise LizardException(
+                f"Error: Fail to parse file {filename}"
+            ) from ie
 
 
 class AnalyzeResult:
@@ -33,8 +35,12 @@ class AnalyzeResult:
         self.function_list = result["function_list"] or []
         self.token_count = result["token_count"]
 
-    average_lines_of_code = property(lambda self: self.functions_average("nloc"))
-    average_token_count = property(lambda self: self.functions_average("token_count"))
+    average_lines_of_code = property(
+        lambda self: self.functions_average("nloc")
+    )
+    average_token_count = property(
+        lambda self: self.functions_average("token_count")
+    )
     average_cyclomatic_complexity = property(
         lambda self: self.functions_average("cyclomatic_complexity")
     )
@@ -58,7 +64,9 @@ class AnalyzeResult:
             "token_count": int(self.token_count),
             "average_lines_of_code": int(self.average_lines_of_code),
             "average_token_count": int(self.average_token_count),
-            "average_cyclomatic_complexity": int(self.average_cyclomatic_complexity),
+            "average_cyclomatic_complexity": int(
+                self.average_cyclomatic_complexity
+            ),
             "average_parameter_count": int(self.average_parameter_count),
             "average_nesting_depth": int(self.average_nesting_depth),
             "max_nesting_depth": int(self.max_nesting_depth),

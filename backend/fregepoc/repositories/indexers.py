@@ -1,11 +1,11 @@
-from github import Github
 from collections.abc import Iterator
 
+from github import Github
 
 # NOTE: this file is meant to be split into a folder with files representing analyzers
 
 
-class BaseIndexer():
+class BaseIndexer:
     pass
 
 

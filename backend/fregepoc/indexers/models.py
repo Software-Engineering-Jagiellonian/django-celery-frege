@@ -64,7 +64,9 @@ class GitHubIndexer(SingletonModel, BaseIndexer):
                         description=repo.description,
                         git_url=repo.clone_url,
                         repo_url=repo.html_url,
-                        commit_hash=repo.get_branch(repo.default_branch).commit.sha,
+                        commit_hash=repo.get_branch(
+                            repo.default_branch
+                        ).commit.sha,
                     )
                     for repo in list_of_repos
                 ]

@@ -25,7 +25,9 @@ def register_extension(lang_name: str, extensions: list[str]):
             f"There is no such programming language as {lang_name} in the system."
         )
 
-    file_extensions_registry[getattr(ProgrammingLanguages, lang_name)] = extensions
+    file_extensions_registry[
+        getattr(ProgrammingLanguages, lang_name)
+    ] = extensions
 
 
 def get_extensions_for_language(language: ProgrammingLanguages) -> list[str]:
@@ -39,7 +41,9 @@ def get_extensions_for_language(language: ProgrammingLanguages) -> list[str]:
         ) from ke
 
 
-def get_languages_by_extension(extension: str) -> Generator[ProgrammingLanguages]:
+def get_languages_by_extension(
+    extension: str,
+) -> Generator[ProgrammingLanguages]:
     # TODO: docstring
     for lang, extensions in file_extensions_registry.items():
         if extension in extensions:

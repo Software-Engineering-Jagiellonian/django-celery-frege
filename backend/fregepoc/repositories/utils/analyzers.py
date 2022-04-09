@@ -34,7 +34,9 @@ def lizard_file_information_to_dict(
     }
 
 
-def generic_source_code_analysis(repo_file_obj: RepositoryFile) -> FileInformationDict:
+def generic_source_code_analysis(
+    repo_file_obj: RepositoryFile,
+) -> FileInformationDict:
     # TODO: docstring
     with repo_file_content(repo_file_obj) as source_code:
         return lizard_file_information_to_dict(

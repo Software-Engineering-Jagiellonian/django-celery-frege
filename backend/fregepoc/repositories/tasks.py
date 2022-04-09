@@ -11,7 +11,10 @@ from django.utils import timezone
 from fregepoc.indexers.models import GitHubIndexer
 from fregepoc.repositories.analyzers.base import AnalyzerFactory
 from fregepoc.repositories.models import Repository, RepositoryFile
-from fregepoc.repositories.utils.paths import get_repo_files, get_repo_local_path
+from fregepoc.repositories.utils.paths import (
+    get_repo_files,
+    get_repo_local_path,
+)
 
 logger = get_task_logger(__name__)
 
@@ -30,7 +33,7 @@ def _finalize_repo_analysis(repo_obj):
 
 @celeryd_init.connect
 def init_worker(**kwargs):
-    crawl_repos_task.apply_async(args=(GitHubIndexer.__name__, ))
+    crawl_repos_task.apply_async(args=(GitHubIndexer.__name__,))
 
 
 @shared_task
@@ -40,7 +43,7 @@ def crawl_repos_task(indexer_class_name):
     for repo in indexer:
         # TODO: Use a better repo identifier to perform a check.
         if not Repository.objects.filter(name=repo.name).exists():
-            process_repo_task.apply_async(args=(repo.pk, ))
+            process_repo_task.apply_async(args=(repo.pk,))
 
     if indexer.rate_limit_exceeded:
         logger.info(
@@ -48,7 +51,8 @@ def crawl_repos_task(indexer_class_name):
             f"Waiting {indexer.rate_limit_timeout}"
         )
         crawl_repos_task.apply_async(
-            args=(indexer_class_name,), countdown=indexer.rate_limit_timeout.seconds
+            args=(indexer_class_name,),
+            countdown=indexer.rate_limit_timeout.seconds,
         )
 
 
@@ -75,7 +79,9 @@ def process_repo_task(repo_pk):
             repo_obj = git.Repo(repo_local_path)
             logger.info("Repo already exists, fetched from disk")
         except git.exc.NoSuchPathError:
-            logger.error("Tried fetching from disk, but repository does not exist")
+            logger.error(
+                "Tried fetching from disk, but repository does not exist"
+            )
             return
 
     repo_files = [

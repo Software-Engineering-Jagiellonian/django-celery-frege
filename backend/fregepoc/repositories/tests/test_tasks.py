@@ -11,7 +11,9 @@ from fregepoc.repositories.utils.tests import MOCK_DOWNLOAD_PATH
 
 @pytest.mark.django_db
 class TestProcessRepoTask:
-    def test_process_repo_task(self, mocker: MockerFixture, dummy_repo, settings):
+    def test_process_repo_task(
+        self, mocker: MockerFixture, dummy_repo, settings
+    ):
         settings.DOWNLOAD_PATH = MOCK_DOWNLOAD_PATH
         analyze_file_task_mock = mocker.MagicMock()
         clone_from_mock = mocker.MagicMock()
@@ -28,6 +30,10 @@ class TestProcessRepoTask:
         clone_from_mock.assert_called_once_with(
             dummy_repo.git_url, get_repo_local_path(dummy_repo)
         )
-        assert RepositoryFile.objects.filter(repository=dummy_repo).count() == 2
+        assert (
+            RepositoryFile.objects.filter(repository=dummy_repo).count() == 2
+        )
         for repo_file in dummy_repo.files.all():
-            analyze_file_task_mock.assert_has_calls([call(args=(repo_file.pk,))])
+            analyze_file_task_mock.assert_has_calls(
+                [call(args=(repo_file.pk,))]
+            )

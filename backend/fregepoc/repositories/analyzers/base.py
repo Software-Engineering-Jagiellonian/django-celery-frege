@@ -36,7 +36,9 @@ class AnalyzerFactory:
     The factory for creating the analyzer instances corresponding to the particular programming languages.
     """
 
-    analyzers: ClassVar[DefaultDict[str, list[Type[BaseAnalyzer]]]] = defaultdict(list)
+    analyzers: ClassVar[
+        DefaultDict[str, list[Type[BaseAnalyzer]]]
+    ] = defaultdict(list)
 
     @classmethod
     def make_analyzers(
@@ -48,7 +50,10 @@ class AnalyzerFactory:
         :param programming_language: The programming language whose analyzers will get returned.
         :return: The analyzer instances list.
         """
-        return [analyzer_cls() for analyzer_cls in cls.analyzers[programming_language]]
+        return [
+            analyzer_cls()
+            for analyzer_cls in cls.analyzers[programming_language]
+        ]
 
     @classmethod
     def has_analyzers(cls, programming_language: ProgrammingLanguages) -> bool:

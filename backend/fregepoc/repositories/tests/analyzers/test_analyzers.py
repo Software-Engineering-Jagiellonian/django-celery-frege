@@ -12,7 +12,10 @@ class TestAnalyzers:
         ["lang", "repo_file_params"],
         [
             (ProgrammingLanguages.CPP, {"repo_relative_file_path": "ans.cpp"}),
-            (ProgrammingLanguages.RUBY, {"repo_relative_file_path": "hello_world.rb"}),
+            (
+                ProgrammingLanguages.RUBY,
+                {"repo_relative_file_path": "hello_world.rb"},
+            ),
             (
                 ProgrammingLanguages.JAVA,
                 {"repo_relative_file_path": "binary_tree.java"},

@@ -11,12 +11,16 @@ from fregepoc.repositories.constants import (
 class TestProgrammingLanguages:
     def test_get_extensions_for_language(self):
         for lang in list(ProgrammingLanguages):
-            assert get_extensions_for_language(lang) == file_extensions_registry[lang]
+            assert (
+                get_extensions_for_language(lang)
+                == file_extensions_registry[lang]
+            )
 
     def test_get_languages_by_extensions(self):
         for extension in itertools.chain.from_iterable(
             file_extensions_registry.values()
         ):
             assert isinstance(
-                next(get_languages_by_extension(extension)), ProgrammingLanguages
+                next(get_languages_by_extension(extension)),
+                ProgrammingLanguages,
             )

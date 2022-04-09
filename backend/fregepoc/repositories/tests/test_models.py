@@ -5,7 +5,10 @@ from fregepoc.repositories.constants import (
     ProgrammingLanguages,
     get_extensions_for_language,
 )
-from fregepoc.repositories.factories import RepositoryFactory, RepositoryFileFactory
+from fregepoc.repositories.factories import (
+    RepositoryFactory,
+    RepositoryFileFactory,
+)
 from fregepoc.repositories.models import Repository, RepositoryFile
 
 
@@ -13,7 +16,9 @@ from fregepoc.repositories.models import Repository, RepositoryFile
 class TestRepositoryModel:
     def test_create(self):
         repo_obj: Repository = RepositoryFactory()
-        assert not repo_obj.analyzed, "The newly created repo must not be analyzed"
+        assert (
+            not repo_obj.analyzed
+        ), "The newly created repo must not be analyzed"
         url_validator = URLValidator()
         url_validator(repo_obj.repo_url)
 

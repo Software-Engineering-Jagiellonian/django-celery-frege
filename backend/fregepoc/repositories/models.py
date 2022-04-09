@@ -27,7 +27,8 @@ class Repository(models.Model):
         _("git url"), help_text=_("The url used to clone the repository")
     )
     repo_url = models.URLField(
-        _("repo url"), help_text=_("The url used to crawl or visit the repository.")
+        _("repo url"),
+        help_text=_("The url used to crawl or visit the repository."),
     )
     commit_hash = models.CharField(
         max_length=40,
