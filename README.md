@@ -52,4 +52,4 @@ pre-commit run --all-files
 
 ### Commit messages convention
 
-In order to unify the commit messages creation strategy, we strongly recommend adhering to the [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/).
+In order to unify the commit messages creation strategy, we strongly recommend adhering to [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/).
