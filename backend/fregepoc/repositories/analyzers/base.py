@@ -4,6 +4,7 @@ from typing import (
     Callable,
     ClassVar,
     DefaultDict,
+    Optional,
     Protocol,
     Type,
     TypedDict,
@@ -33,21 +34,32 @@ class BaseAnalyzer(Protocol[OutputType]):
 
 class AnalyzerFactory:
     """
-    The factory for creating the analyzer instances corresponding to the particular programming languages.
+    The factory for creating the analyzer instances
+    corresponding to the particular programming languages.
     """
+
+    __instance: Optional["AnalyzerFactory"] = None
 
     analyzers: ClassVar[
         DefaultDict[str, list[Type[BaseAnalyzer]]]
     ] = defaultdict(list)
+
+    def __new__(cls):
+        if not cls.__instance:
+            cls.__instance = super().__new__(cls)
+        return cls.__instance
 
     @classmethod
     def make_analyzers(
         cls, programming_language: ProgrammingLanguages
     ) -> list[BaseAnalyzer]:
         """
-        Creates a list of analyzer instances assigned to a given programming language.
+        Creates a list of analyzer instances assigned
+        to a given programming language.
 
-        :param programming_language: The programming language whose analyzers will get returned.
+        :param programming_language: The programming language
+        whose analyzers will get returned.
+
         :return: The analyzer instances list.
         """
         return [
@@ -58,10 +70,12 @@ class AnalyzerFactory:
     @classmethod
     def has_analyzers(cls, programming_language: ProgrammingLanguages) -> bool:
         """
-        Determines whether there are analyzers registered in the system and dedicated
-        to the given programming language.
+        Determines whether there are analyzers registered in the system
+        and dedicated to the given programming language.
 
-        :param programming_language: The programming language whose analyzers will get looked up.
+        :param programming_language: The programming language
+        whose analyzers will get looked up.
+
         :return: Whether the corresponding analyzers were found.
         """
         return bool(cls.analyzers[programming_language])
@@ -73,7 +87,9 @@ class AnalyzerFactory:
         """
         Assigns an analyzer class to a given programming language.
 
-        :param programming_language: The programming language the analyzer class will get assigned to.
+        :param programming_language: The programming language
+        the analyzer class will get assigned to.
+
         :return: A wrapper function.
         """
 

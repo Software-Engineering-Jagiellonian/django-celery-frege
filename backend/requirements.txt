@@ -26,3 +26,8 @@ pytest-mock
 pytest-unordered
 
 factory_boy
+
+black
+isort
+flake8
+pre-commit

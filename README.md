@@ -31,3 +31,25 @@ docker compose --profile application build
 >On older versions of Docker, you may need to substitute `docker compose` with `docker-compose`.
 
 There exists a number of docker-compose profiles in the project, consult `docker-compose.yml` for more information.
+
+### Linters and Formatters
+
+The project employs a number of linters and formatters such as `flake8`, `isort`, or `black`
+in order to improve the overall DX.
+
+Also, to prevent common mistakes from being committed and pushed
+to the origin, it is required to register the git hooks configured via `pre-commit`:
+
+```bash
+pip install -r backend/requirements.txt
+pre-commit install
+```
+
+Moreover, to explicitly run the linters and formatters over the entire codebase with `pre-commit`, execute the following command:
+```bash
+pre-commit run --all-files
+```
+
+### Commit messages convention
+
+In order to unify the commit messages creation strategy, we strongly recommend adhering to [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/).

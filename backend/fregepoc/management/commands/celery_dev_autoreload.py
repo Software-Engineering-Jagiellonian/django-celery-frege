@@ -4,7 +4,8 @@ import subprocess
 from django.core.management.base import BaseCommand
 from django.utils import autoreload
 
-# Taken from: https://medium.com/aubergine-solutions/auto-reload-development-mode-for-celery-worker-using-docker-compose-and-django-management-2ba8e313eb37
+# Taken from:
+# https://medium.com/aubergine-solutions/auto-reload-development-mode-for-celery-worker-using-docker-compose-and-django-management-2ba8e313eb37  # noqa: E501
 
 
 def restart_celery(*args, **kwargs):

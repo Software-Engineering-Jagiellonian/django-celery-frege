@@ -4,6 +4,7 @@ import datetime
 
 from django.db import migrations, models
 
+import fregepoc.indexers.base
 import fregepoc.indexers.models
 
 
@@ -28,11 +29,15 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "min_forks",
-                    models.PositiveIntegerField(default=100, verbose_name="min forks"),
+                    models.PositiveIntegerField(
+                        default=100, verbose_name="min forks"
+                    ),
                 ),
                 (
                     "min_stars",
-                    models.PositiveIntegerField(default=100, verbose_name="min stars"),
+                    models.PositiveIntegerField(
+                        default=100, verbose_name="min stars"
+                    ),
                 ),
                 (
                     "current_page",
@@ -53,6 +58,6 @@ class Migration(migrations.Migration):
             options={
                 "abstract": False,
             },
-            bases=(models.Model, fregepoc.indexers.models.BaseIndexer),
+            bases=(models.Model, fregepoc.indexers.base.BaseIndexer),
         ),
     ]

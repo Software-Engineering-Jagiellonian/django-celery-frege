@@ -1,0 +1,13 @@
+[flake8]
+extend-ignore = E203
+per-file-ignores =
+    __init__.py: F401
+    hello_world.py: INP001
+exclude =
+    .git,
+    __pycache__,
+    manage.py,
+    settings.py,
+    */__init__.py,
+    */migrations/*,
+max-line-length = 79

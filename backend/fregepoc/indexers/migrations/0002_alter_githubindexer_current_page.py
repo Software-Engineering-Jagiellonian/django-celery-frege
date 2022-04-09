@@ -6,13 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('indexers', '0001_initial'),
+        ("indexers", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='githubindexer',
-            name='current_page',
-            field=models.PositiveIntegerField(default=0, help_text='The last visited page via GitHub API.', verbose_name='current page'),
+            model_name="githubindexer",
+            name="current_page",
+            field=models.PositiveIntegerField(
+                default=0,
+                help_text="The last visited page via GitHub API.",
+                verbose_name="current page",
+            ),
         ),
     ]

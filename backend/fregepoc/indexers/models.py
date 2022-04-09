@@ -1,4 +1,3 @@
-import abc
 import os
 from datetime import timedelta
 
@@ -7,20 +6,9 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from github import Github
 
+from fregepoc.indexers.base import BaseIndexer
 from fregepoc.repositories.models import Repository
 from fregepoc.utils.models import SingletonModel
-
-indexers = []
-
-
-class BaseIndexer:
-    def __init_subclass__(cls, *args, **kwargs):
-        super().__init_subclass__(*args, **kwargs)
-        indexers.append(cls)
-
-    @abc.abstractmethod
-    def __iter__(self):
-        ...
 
 
 class GitHubIndexer(SingletonModel, BaseIndexer):
@@ -52,7 +40,10 @@ class GitHubIndexer(SingletonModel, BaseIndexer):
         while True:
             try:
                 list_of_repos = g.search_repositories(
-                    query=f"forks:>={self.min_forks} stars:>={self.min_stars} is:public",
+                    query=(
+                        f"forks:>={self.min_forks} "
+                        f"stars:>={self.min_stars} is:public"
+                    ),
                     sort="stars",
                     page=self.current_page,
                 )

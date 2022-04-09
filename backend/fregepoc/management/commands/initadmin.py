@@ -4,7 +4,8 @@ from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 
 
-# Taken from: https://stackoverflow.com/questions/39744593/how-to-create-a-django-superuser-if-it-doesnt-exist-non-interactively
+# Taken from:
+# https://stackoverflow.com/questions/39744593/how-to-create-a-django-superuser-if-it-doesnt-exist-non-interactively  # noqa: E501
 class Command(BaseCommand):
     help = "Creates an admin user non-interactively if it doesn't exist"
 
