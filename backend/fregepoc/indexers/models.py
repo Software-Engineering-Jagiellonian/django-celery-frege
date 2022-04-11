@@ -1,5 +1,4 @@
 import os
-from datetime import timedelta
 
 import github.GithubException
 from django.db import models
@@ -8,10 +7,9 @@ from github import Github
 
 from fregepoc.indexers.base import BaseIndexer
 from fregepoc.repositories.models import Repository
-from fregepoc.utils.models import SingletonModel
 
 
-class GitHubIndexer(SingletonModel, BaseIndexer):
+class GitHubIndexer(BaseIndexer):
     min_forks = models.PositiveIntegerField(
         _("min forks"),
         default=100,
@@ -25,14 +23,6 @@ class GitHubIndexer(SingletonModel, BaseIndexer):
         default=0,
         help_text=_("The last visited page via GitHub API."),
     )
-    rate_limit_timeout = models.DurationField(
-        _("rate limit timeout"),
-        default=timedelta(minutes=30),
-    )
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.rate_limit_exceeded = False
 
     def __iter__(self):
         github_token = os.environ.get("GITHUB_TOKEN")
@@ -66,3 +56,7 @@ class GitHubIndexer(SingletonModel, BaseIndexer):
                 self.rate_limit_exceeded = True
                 break
             yield from repos_to_process
+
+    class Meta:
+        verbose_name = _("Github Indexer")
+        verbose_name_plural = verbose_name

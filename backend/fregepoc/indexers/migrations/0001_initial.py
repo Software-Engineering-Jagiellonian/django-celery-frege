@@ -58,6 +58,6 @@ class Migration(migrations.Migration):
             options={
                 "abstract": False,
             },
-            bases=(models.Model, fregepoc.indexers.base.BaseIndexer),
+            bases=(fregepoc.indexers.base.BaseIndexer,),
         ),
     ]
