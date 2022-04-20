@@ -46,7 +46,7 @@ services:
       - fregepoc-redis
     volumes:
       - ./backend:/app
-      - fregepoc_tmp:/usr/fregepoc-tmp/
+      - fregepoc_tmp:${DJANGO_DOWNLOAD_PATH}
     networks:
       - fregepoc-main
     profiles: [ "application" ]
