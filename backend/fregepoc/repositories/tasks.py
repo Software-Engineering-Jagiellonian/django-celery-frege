@@ -33,6 +33,9 @@ def _finalize_repo_analysis(repo_obj):
 
 @celeryd_init.connect
 def init_worker(**kwargs):
+    if os.environ.get("CELERY_CRAWL_ON_STARTUP", "true").lower() != "true":
+        return
+
     for indexer_cls in indexers:
         crawl_repos_task.apply_async(args=(indexer_cls.__name__,))
 

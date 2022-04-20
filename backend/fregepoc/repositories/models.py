@@ -74,10 +74,10 @@ class RepositoryFile(models.Model):
         help_text=_("Programming language present in the repository."),
         choices=ProgrammingLanguages.choices,
     )
-    repo_relative_file_path = models.FilePathField(  # noqa: DJ01
+    repo_relative_file_path = models.CharField(  # noqa: DJ01
+        max_length=512,
         blank=True,
         null=True,
-        path=settings.DOWNLOAD_PATH,
         help_text=_("File path, relative to the repository root."),
     )
     metrics = models.JSONField(
