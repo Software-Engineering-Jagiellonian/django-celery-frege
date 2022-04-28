@@ -30,6 +30,7 @@ DJANGO_CORS_ALLOWED_HOSTS = ["http://localhost:4200"]
 # Application definition
 
 PROJECT_APPS = [
+    "fregepoc",
     "fregepoc.repositories.apps.RepositoriesConfig",
     "fregepoc.indexers.apps.IndexersConfig",
     "fregepoc.analyzers.apps.AnalyzersConfig",
@@ -44,12 +45,15 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django_extensions",
-    "fregepoc",
+    "rest_framework",
+    "corsheaders",
+    "django_filters"
 ] + PROJECT_APPS
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -154,3 +158,18 @@ CELERY_CACHE_BACKEND = f"redis://{REDIS_HOST}:{REDIS_PORT}/"
 # MISC
 
 DOWNLOAD_PATH = os.environ.get("DJANGO_DOWNLOAD_PATH", "/usr/fregepoc-tmp/")
+
+# REST FRAMEWORK
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 100,
+    'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.IsAuthenticated'],
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+}
+
+# CORS
+
+CORS_ALLOWED_ORIGINS = [
+    # set for production
+]
