@@ -1,33 +1,33 @@
-Django
-djangorestframework
-django-cors-headers
-django-celery-beat==2.1.0
-django-celery-results
-django-extensions
-websockets
-celery
-redis
-channels
-channels-redis
-django-redis
-psycopg2
-Faker
-GitPython
-radon
-flower
-django-jazzmin
+# Project dependencies:
+Django~=4.0.4
+djangorestframework~=3.13.1
+django-extensions~=3.1.5
+celery[redis]~=5.2.6
+psycopg2~=2.9.3
+Faker~=13.6.0
+GitPython~=3.1.27
+radon~=5.1.0
+flower~=1.0.0
+django-jazzmin~=2.5.0
+PyGithub~=1.55
+lizard~=1.17.10
+pytest~=7.1.2
+pytest-mock~=3.7.0
+pytest-unordered~=0.4.1
+factory-boy~=3.2.1
 
-PyGithub
-lizard
+# Currently unused/useful for later:
+# channels
+# channels-redis
+# django-redis
+# django-cors-headers~=3.11.0
+# django-celery-beat==2.1.0
+# django-celery-results
+# websockets
+# pytest-django
 
-pytest
-pytest-django
-pytest-mock
-pytest-unordered
-
-factory_boy
-
-black
-isort
-flake8
-pre-commit
+# Development tools:
+black~=22.3.0
+isort~=5.10.1
+flake8~=4.0.1
+pre-commit~=2.18.1
