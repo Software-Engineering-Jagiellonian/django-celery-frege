@@ -8,7 +8,7 @@ from django.apps import apps
 from django.db import transaction
 from django.utils import timezone
 
-from fregepoc.indexers.base import indexers
+from fregepoc.indexers.base import BaseIndexer, indexers
 from fregepoc.repositories.analyzers.base import AnalyzerFactory
 from fregepoc.repositories.models import Repository, RepositoryFile
 from fregepoc.repositories.utils.paths import (
@@ -22,7 +22,7 @@ logger = get_task_logger(__name__)
 def _finalize_repo_analysis(repo_obj):
     if not repo_obj.files.filter(analyzed=False).exists():
         repo_obj.analyzed = True
-        repo_obj.save()
+        repo_obj.save(update_fields=["analyzed"])
         logger.info(
             f"Repository {repo_obj.git_url} fully analyzed, "
             "deleting files from disk..."
@@ -43,12 +43,10 @@ def init_worker(**kwargs):
 @shared_task
 def crawl_repos_task(indexer_class_name):
     indexer_model = apps.get_model("indexers", indexer_class_name)
-    indexer = indexer_model.load()
+    indexer: BaseIndexer = indexer_model.load()
     for repo in indexer:
-        # TODO: Use a better repo identifier to perform a check.
-        if not Repository.objects.filter(
-            name=repo.name, analyzed=True
-        ).exists():
+        repo.refresh_from_db()
+        if not repo.analyzed:
             process_repo_task.apply_async(args=(repo.pk,))
 
     if indexer.rate_limit_exceeded:
@@ -79,7 +77,7 @@ def process_repo_task(repo_pk):
     try:
         repo_obj = git.Repo.clone_from(repo.git_url, repo_local_path)
         repo.fetch_time = timezone.now()
-        repo.save()
+        repo.save(update_fields=["fetch_time"])
         logger.info("Repository cloned")
     except git.exc.GitCommandError:
         try:
