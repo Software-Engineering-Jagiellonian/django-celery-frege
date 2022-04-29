@@ -102,7 +102,7 @@ def process_repo_task(repo_pk):
     RepositoryFile.objects.bulk_create(repo_files)
 
     for repo_file in repo_files:
-        analyze_file_task.delay(repo_file.pk)
+        analyze_file_task.apply_async(args=(repo_file.pk,))
     _finalize_repo_analysis(repo)
 
 
