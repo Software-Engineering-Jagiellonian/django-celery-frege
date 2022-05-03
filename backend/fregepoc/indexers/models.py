@@ -164,7 +164,7 @@ class SourceforgeIndexer(BaseIndexer):
 class BitbucketIndexer(BaseIndexer):
     min_forks = models.PositiveIntegerField(
         _("min forks"),
-        default=3,
+        default=1,
     )
 
     current_date = models.DateTimeField(
@@ -211,7 +211,7 @@ class BitbucketIndexer(BaseIndexer):
                 commit_hash=commit_hash,
             )
 
-            Repository.objects.create(repository=repo_to_process)
+            Repository.objects.bulk_create([repo_to_process])
 
             yield repo_to_process
 
