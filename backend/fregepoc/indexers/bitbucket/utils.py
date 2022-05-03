@@ -1,22 +1,39 @@
 import datetime as _datetime
-import urllib.parse as _parse
+from urllib import parse as _parse
 
 import requests as _requests
 
-_API_URL = "https://api.bitbucket.org/2.0/repositories"
+_BITBUCKET_HOSTNAME = "bitbucket.org"
+_API_REPOSITORIES_ENDPOINT = "https://api.bitbucket.org/2.0/repositories"
+
 DEFAULT_DATE = _datetime.datetime(1970, 1, 1, tzinfo=_datetime.timezone.utc)
 
 
-def get_next_repo(current_date):
+def get_next_page(current_date):
+    current_date_as_iso = _datetime.datetime.isoformat(current_date)
+
     response = _requests.get(
-        _API_URL, params={"pagelen": 1, "after": str(current_date)}
+        _API_REPOSITORIES_ENDPOINT,
+        params={"pagelen": 1, "after": current_date_as_iso},
     )
 
-    return _get_response_first_value(response)
+    if response.status_code != 200:
+        return (None, None)
 
+    response_json = response.json()
 
-def parse_next_date(url):
-    return _parse.parse_qs(_parse.urlparse(url)).get("after")
+    repository_data_values = response_json.get("values")
+    next_url = response_json.get("next")
+
+    repository_data = (
+        repository_data_values[0] if repository_data_values else None
+    )
+
+    next_date = (
+        _parse_date_from_next_url(next_url) or _datetime.datetime.utcnow()
+    )
+
+    return (repository_data, next_date)
 
 
 def get_forks_count(repository_data):
@@ -30,21 +47,30 @@ def get_forks_count(repository_data):
     if response.status_code != 200:
         return 0
 
-    return response.json().get("size", 0)
+    forks_count = response.json().get("size", 0)
+
+    return forks_count
 
 
 def get_clone_url(repository_data):
-    clone_objects = _safe_get(repository_data, ["links", "clone"])
+    clone_objects = _safe_get(repository_data, ["links", "clone"]) or []
 
     for clone_details in clone_objects:
-        if clone_details["name"] in ["http", "https"]:
-            return clone_details["href"]
-    else:
-        return None
+        clone_type = clone_details.get("name")
+        clone_url = clone_details.get("href")
+
+        # reject repositoriest from github.com etc.
+        clone_url_host = _parse.urlparse(clone_url).netloc
+
+        if (
+            clone_type in {"http", "https"}
+            and clone_url_host == _BITBUCKET_HOSTNAME
+        ):
+            return clone_url
 
 
 def get_repo_url(repository_data):
-    return _safe_get(repository_data, ["links", "html", "href"]) or ""
+    return _safe_get(repository_data, ["links", "html", "href"])
 
 
 def get_last_commit_hash(repository_data):
@@ -54,28 +80,30 @@ def get_last_commit_hash(repository_data):
         return None
 
     response = _requests.get(url, params={"pagelen": 1})
-    last_commit = _get_response_first_value(response)
 
-    if last_commit:
-        return last_commit["hash"]
-    else:
-        return None
-
-
-def _get_response_first_value(response):
     if response.status_code != 200:
         return None
 
-    values = response.json()["values"]
+    commits = response.json().get("values")
 
-    if not values:
-        return None
+    if commits:
+        return commits[0].get("hash")
 
-    return values[0]
+
+def _parse_date_from_next_url(url):
+    parsed_url = _parse.urlparse(url)
+    query_string = _parse.parse_qs(parsed_url.query)
+    after_params = query_string.get("after")
+
+    if after_params:
+        return _datetime.datetime.fromisoformat(after_params[0])
 
 
 def _safe_get(root, keys):
     for key in keys:
-        root = root.get(key, {})
+        root = root.get(key)
+
+        if root is None:
+            break
 
     return root

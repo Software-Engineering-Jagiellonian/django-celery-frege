@@ -1,6 +1,5 @@
 import itertools
 import os
-from datetime import datetime
 
 import github.GithubException
 from django.db import models
@@ -165,14 +164,14 @@ class SourceforgeIndexer(BaseIndexer):
 class BitbucketIndexer(BaseIndexer):
     min_forks = models.PositiveIntegerField(
         _("min forks"),
-        default=10,
+        default=3,
     )
 
     current_date = models.DateTimeField(
-        _("min date"),
+        _("current date"),
         default=bitbucket.DEFAULT_DATE,
         help_text=_(
-            "The minimum creation date of repository. "
+            "The creation date of repository from which to start searching. "
             "Please note that Bitbucket API paginates repos by creation date, "
             "so the dates are used to iterate over repositories."
         ),
@@ -180,16 +179,15 @@ class BitbucketIndexer(BaseIndexer):
 
     def __iter__(self):
         while True:
-            repository_data = bitbucket.get_next_repo(self.current_date)
+            repository_data, next_date = bitbucket.get_next_page(
+                self.current_date
+            )
+
             if not repository_data:
+                self.rate_limit_exceeded = True
                 break
 
-            next_url = repository_data["next"]
-            if next_url:
-                self.current_date = bitbucket.parse_next_date(next_url)
-            else:
-                self.current_date = datetime.utcnow()
-
+            self.current_date = next_date
             self.save(update_fields=["current_date"])
 
             if (
@@ -205,18 +203,18 @@ class BitbucketIndexer(BaseIndexer):
             if not (clone_url and repo_url and commit_hash):
                 continue
 
-            repo = Repository(
-                name=repository_data["name"],
-                description=repository_data["description"],
+            repo_to_process = Repository(
+                name=repository_data.get("name"),
+                description=repository_data.get("description"),
                 git_url=clone_url,
                 repo_url=repo_url,
                 commit_hash=commit_hash,
             )
 
-            Repository.objects.create(repo)
+            Repository.objects.create(repository=repo_to_process)
 
-            yield repo
+            yield repo_to_process
 
     class Meta:
         verbose_name = _("Bitbucket Indexer")
-        verbose_name_plural = _(f"{verbose_name}s")
+        verbose_name_plural = verbose_name
