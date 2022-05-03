@@ -1,19 +1,22 @@
 import itertools
 import os
+from datetime import datetime
 
 import github.GithubException
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from github import Github
 
+from fregepoc.indexers import bitbucket
 from fregepoc.indexers.base import BaseIndexer
+from fregepoc.indexers.sourceforge import (
+    SinglePageProjectsExtractor,
+    SingleProjectCodeUrlExtractor,
+    SingleProjectGitLinkExtractor,
+    SingleProjectGitUrlExtractor,
+    SingleProjectResponseExtractor,
+)
 from fregepoc.repositories.models import Repository
-
-from fregepoc.indexers.sourceforge import SinglePageProjectsExtractor
-from fregepoc.indexers.sourceforge import SingleProjectCodeUrlExtractor
-from fregepoc.indexers.sourceforge import SingleProjectGitLinkExtractor
-from fregepoc.indexers.sourceforge import SingleProjectGitUrlExtractor
-from fregepoc.indexers.sourceforge import SingleProjectResponseExtractor
 
 
 class GitHubIndexer(BaseIndexer):
@@ -95,15 +98,25 @@ class SourceforgeIndexer(BaseIndexer):
             for project_name in projects:
                 repos_to_process = []
 
-                single_project_soup = self.singleProjectResponseExtractor.extract(project_name)
+                single_project_soup = (
+                    self.singleProjectResponseExtractor.extract(project_name)
+                )
 
-                project_code_url = self.singleProjectCodeUrlExtractor.extract(single_project_soup)
-                repo_from_code_url = self.handle_code_url(project_name, project_code_url)
+                project_code_url = self.singleProjectCodeUrlExtractor.extract(
+                    single_project_soup
+                )
+                repo_from_code_url = self.handle_code_url(
+                    project_name, project_code_url
+                )
                 if repo_from_code_url is not None:
                     repos_to_process.append(repo_from_code_url)
 
-                project_git_ulr = self.singleProjectGitUrlExtractor.extract(single_project_soup)
-                repos_to_process.extend(self.handle_git_url(project_name, project_git_ulr))
+                project_git_ulr = self.singleProjectGitUrlExtractor.extract(
+                    single_project_soup
+                )
+                repos_to_process.extend(
+                    self.handle_git_url(project_name, project_git_ulr)
+                )
 
                 Repository.objects.bulk_create(repos_to_process)
                 yield from repos_to_process
@@ -112,7 +125,9 @@ class SourceforgeIndexer(BaseIndexer):
         if project_code_url is None:
             return None
 
-        project_git_url_from_code_url = self.singleProjectGitLinkExtractor.extract(project_code_url)
+        project_git_url_from_code_url = (
+            self.singleProjectGitLinkExtractor.extract(project_code_url)
+        )
         if project_git_url_from_code_url is None:
             return None
 
@@ -126,10 +141,7 @@ class SourceforgeIndexer(BaseIndexer):
 
     def handle_git_url(self, project_name, project_git_urls):
         extracted_git_url = [
-            (
-                subproject,
-                self.singleProjectGitLinkExtractor.extract(git_url)
-            )
+            (subproject, self.singleProjectGitLinkExtractor.extract(git_url))
             for (subproject, git_url) in project_git_urls
         ]
 
@@ -141,9 +153,70 @@ class SourceforgeIndexer(BaseIndexer):
                 repo_url=git_url,  # TODO
                 commit_hash="HEAD",  # TODO
             )
-            for (subproject, git_url) in extracted_git_url if git_url is not None
+            for (subproject, git_url) in extracted_git_url
+            if git_url is not None
         ]
 
     class Meta:
         verbose_name = _("Sourceforge Indexer")
         verbose_name_plural = verbose_name
+
+
+class BitbucketIndexer(BaseIndexer):
+    min_forks = models.PositiveIntegerField(
+        _("min forks"),
+        default=10,
+    )
+
+    current_date = models.DateTimeField(
+        _("min date"),
+        default=bitbucket.DEFAULT_DATE,
+        help_text=_(
+            "The minimum creation date of repository. "
+            "Please note that Bitbucket API paginates repos by creation date, "
+            "so the dates are used to iterate over repositories."
+        ),
+    )
+
+    def __iter__(self):
+        while True:
+            repository_data = bitbucket.get_next_repo(self.current_date)
+            if not repository_data:
+                break
+
+            next_url = repository_data["next"]
+            if next_url:
+                self.current_date = bitbucket.parse_next_date(next_url)
+            else:
+                self.current_date = datetime.utcnow()
+
+            self.save(update_fields=["current_date"])
+
+            if (
+                self.min_forks
+                and bitbucket.get_forks_count(repository_data) < self.min_forks
+            ):
+                continue
+
+            clone_url = bitbucket.get_clone_url(repository_data)
+            repo_url = bitbucket.get_repo_url(repository_data)
+            commit_hash = bitbucket.get_last_commit_hash(repository_data)
+
+            if not (clone_url and repo_url and commit_hash):
+                continue
+
+            repo = Repository(
+                name=repository_data["name"],
+                description=repository_data["description"],
+                git_url=clone_url,
+                repo_url=repo_url,
+                commit_hash=commit_hash,
+            )
+
+            Repository.objects.create(repo)
+
+            yield repo
+
+    class Meta:
+        verbose_name = _("Bitbucket Indexer")
+        verbose_name_plural = _(f"{verbose_name}s")

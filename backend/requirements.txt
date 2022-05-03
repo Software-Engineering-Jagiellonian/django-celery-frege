@@ -15,7 +15,7 @@ pytest~=7.1.2
 pytest-mock~=3.7.0
 pytest-unordered~=0.4.1
 factory-boy~=3.2.1
-requests~=2.25.1
+requests~=2.27.1
 beautifulsoup4~=4.9.3
 
 # Currently unused/useful for later:

@@ -8,6 +8,6 @@ class SingleProjectResponseExtractor:
         if not project_name:
             return
 
-        url = f'https://sourceforge.net/{project_name}'
+        url = f"https://sourceforge.net/{project_name}"
         response = requests.get(url)
-        return BeautifulSoup(response.text, 'html.parser')
+        return BeautifulSoup(response.text, "html.parser")
