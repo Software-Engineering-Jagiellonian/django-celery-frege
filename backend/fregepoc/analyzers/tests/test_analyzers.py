@@ -1,6 +1,6 @@
 import pytest
 
-from fregepoc.repositories.analyzers.base import AnalyzerFactory
+from fregepoc.analyzers.core import AnalyzerFactory
 from fregepoc.repositories.constants import ProgrammingLanguages
 from fregepoc.repositories.factories import RepositoryFileFactory
 from fregepoc.repositories.utils.tests import MOCK_DOWNLOAD_PATH
