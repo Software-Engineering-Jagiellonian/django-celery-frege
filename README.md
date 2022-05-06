@@ -40,7 +40,7 @@ in order to improve the overall DX.
 Also, to prevent common mistakes from being committed and pushed
 to the origin, it is required to register the git hooks configured via `pre-commit`:
 
-One might want to create a virtual environment (e.g. `venv`, `virtualenv`, conda) before executing commands below.
+>One might want to create a virtual environment (e.g. `venv`, `virtualenv`, conda) before executing commands below.
 
 ```bash
 pip install -r backend/requirements.txt
