@@ -98,17 +98,17 @@ class SourceforgeIndexer(BaseIndexer):
                 single_project_soup = self.singleProjectResponseExtractor.extract(project_name)
 
                 project_code_url = self.singleProjectCodeUrlExtractor.extract(single_project_soup)
-                repo_from_code_url = self.handel_code_url(project_name, project_code_url)
+                repo_from_code_url = self.handle_code_url(project_name, project_code_url)
                 if repo_from_code_url is not None:
                     repos_to_process.append(repo_from_code_url)
 
                 project_git_ulr = self.singleProjectGitUrlExtractor.extract(single_project_soup)
-                repos_to_process.extend(self.handel_git_url(project_name, project_git_ulr))
+                repos_to_process.extend(self.handle_git_url(project_name, project_git_ulr))
 
                 Repository.objects.bulk_create(repos_to_process)
                 yield from repos_to_process
 
-    def handel_code_url(self, project_name, project_code_url):
+    def handle_code_url(self, project_name, project_code_url):
         if project_code_url is None:
             return None
 
@@ -124,7 +124,7 @@ class SourceforgeIndexer(BaseIndexer):
             commit_hash="HEAD",  # TODO
         )
 
-    def handel_git_url(self, project_name, project_git_urls):
+    def handle_git_url(self, project_name, project_git_urls):
         extracted_git_url = [
             (
                 subproject,
