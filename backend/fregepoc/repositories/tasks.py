@@ -37,15 +37,16 @@ def init_worker(**kwargs):
         return
 
     for indexer_cls in indexers:
-        if indexer_cls.__name__ != "SourceforgeIndexer": # Temporarily disable SourceforgeIndexer
-            crawl_repos_task.apply_async(args=(indexer_cls.__name__,))
+        crawl_repos_task.apply_async(args=(indexer_cls.__name__,))
 
 
 @shared_task
 def crawl_repos_task(indexer_class_name):
     indexer_model = apps.get_model("indexers", indexer_class_name)
     indexer: BaseIndexer = indexer_model.load()
-    for repo in indexer:
+
+    batch = next(iter(indexer))
+    for repo in batch:
         repo.refresh_from_db()
         if not repo.analyzed:
             process_repo_task.apply_async(args=(repo.pk,))
@@ -60,6 +61,8 @@ def crawl_repos_task(indexer_class_name):
             args=(indexer_class_name,),
             countdown=indexer.rate_limit_timeout.seconds,
         )
+    else:
+        crawl_repos_task.apply_async(args=(indexer_class_name,))
 
 
 @shared_task
@@ -104,6 +107,8 @@ def process_repo_task(repo_pk):
 
     for repo_file in repo_files:
         analyze_file_task.apply_async(args=(repo_file.pk,))
+
+    repo_obj.close()
     _finalize_repo_analysis(repo)
 
 
