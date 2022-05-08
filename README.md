@@ -52,6 +52,12 @@ Moreover, to explicitly run the linters and formatters over the entire codebase 
 pre-commit run --all-files
 ```
 
+### Testing
+To run tests from the docker container, execute the following command:
+```bash
+docker-compose exec -T fregepoc-backend pytest
+```
+
 ### Commit messages convention
 
 In order to unify the commit messages creation strategy, we strongly recommend adhering to [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/).
