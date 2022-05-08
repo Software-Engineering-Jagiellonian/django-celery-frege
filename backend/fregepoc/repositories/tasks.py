@@ -8,8 +8,8 @@ from django.apps import apps
 from django.db import transaction
 from django.utils import timezone
 
+from fregepoc.analyzers.core import AnalyzerFactory
 from fregepoc.indexers.base import BaseIndexer, indexers
-from fregepoc.repositories.analyzers.base import AnalyzerFactory
 from fregepoc.repositories.models import Repository, RepositoryFile
 from fregepoc.repositories.utils.paths import (
     get_repo_files,
