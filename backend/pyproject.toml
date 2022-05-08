@@ -12,3 +12,6 @@ exclude = '/(migrations|\.direnv|\.eggs|\.git|\.hg|\.mypy_cache|\.nox|\.tox|\.ve
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "fregepoc.settings"
 python_files = "tests.py test_*.py *_tests.py"
+pythonpath = [
+  ".", "fregepoc",
+]
