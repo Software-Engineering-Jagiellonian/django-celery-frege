@@ -80,7 +80,7 @@ def get_clone_url(repository_data: RepositoryData) -> str | None:
         clone_type = clone_details.get("name")
         clone_url = clone_details.get("href")
 
-        # reject repositoriest from github.com etc.
+        # reject repositories from github.com etc.
         clone_url_host = parse.urlparse(clone_url).netloc
 
         if (
