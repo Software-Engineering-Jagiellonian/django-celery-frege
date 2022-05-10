@@ -6,7 +6,6 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from github import Github
 
-from fregepoc.indexers import bitbucket
 from fregepoc.indexers.base import BaseIndexer
 from fregepoc.indexers.sourceforge import (
     SinglePageProjectsExtractor,
@@ -15,6 +14,7 @@ from fregepoc.indexers.sourceforge import (
     SingleProjectGitUrlExtractor,
     SingleProjectResponseExtractor,
 )
+from fregepoc.indexers.utils import bitbucket
 from fregepoc.repositories.models import Repository
 
 
@@ -203,15 +203,13 @@ class BitbucketIndexer(BaseIndexer):
             if not (clone_url and repo_url and commit_hash):
                 continue
 
-            repo_to_process = Repository(
+            repo_to_process = Repository.objects.create(
                 name=repository_data.get("name"),
                 description=repository_data.get("description"),
                 git_url=clone_url,
                 repo_url=repo_url,
                 commit_hash=commit_hash,
             )
-
-            Repository.objects.bulk_create([repo_to_process])
 
             yield repo_to_process
 
