@@ -15,7 +15,7 @@ __all__ = [
 
 BITBUCKET_HOSTNAME = "bitbucket.org"
 API_REPOSITORIES_ENDPOINT = "https://api.bitbucket.org/2.0/repositories"
-RepositoryData = NewType("RepositoryData", dict[str, str])
+RepositoryData = NewType("RepositoryData", dict[str, str | dict])
 
 DEFAULT_DATE = datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc)
 
