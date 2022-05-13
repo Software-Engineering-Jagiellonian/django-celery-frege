@@ -16,16 +16,22 @@ and then editing the `.env` file optionally (although the unchanged configuratio
 
 >The following commands should be run from the **root** of the application
 
-To run the application, you need to use the following command:
-
-```bash
-docker compose --profile application up
-```
-
 If the containers were not built yet, you can do so by running the following command:
 
 ```bash
-docker compose --profile application build
+docker compose --profile application-dev build
+```
+
+To run the application, you need to use the following command:
+
+```bash
+docker compose --profile application-dev up
+```
+
+For the production environment, use the following instead:
+
+```bash
+docker compose --profile application-prod up -d
 ```
 
 >On older versions of Docker, you may need to substitute `docker compose` with `docker-compose`.
