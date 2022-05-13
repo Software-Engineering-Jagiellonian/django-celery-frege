@@ -1,7 +1,7 @@
-import itertools
 import os
 
 import github.GithubException
+import requests
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from github import Github
@@ -62,7 +62,7 @@ class GitHubIndexer(BaseIndexer):
             except github.RateLimitExceededException:
                 self.rate_limit_exceeded = True
                 break
-            yield from repos_to_process
+            yield repos_to_process
 
     class Meta:
         verbose_name = _("Github Indexer")
@@ -83,30 +83,40 @@ class SourceforgeIndexer(BaseIndexer):
     singleProjectGitUrlExtractor = SingleProjectGitUrlExtractor()
 
     def __iter__(self):
-        for i in itertools.count(start=self.current_page):
-            projects = self.singlePageProjectsExtractor.extract(i)
+        while True:
+            try:
+                yield self.main_loop()
+            except requests.exceptions.RequestException:
+                pass
 
-            self.current_page += 1
-            self.save(update_fields=["current_page"])
+    def main_loop(self):
+        projects = self.singlePageProjectsExtractor.extract(self.current_page)
 
-            if not projects:
-                continue
+        self.current_page += 1
+        if self.current_page >= 1000:
+            # The maximum page on the SourceForge  is 999. When we reach the limit, we just start over.
+            # In the future, we may want to change by using some filters (categories) to scrap more data.
+            self.current_page = 0
+        self.save(update_fields=["current_page"])
 
-            for project_name in projects:
-                repos_to_process = []
+        if not projects:
+            return []
 
-                single_project_soup = self.singleProjectResponseExtractor.extract(project_name)
+        for project_name in projects:
+            repos_to_process = []
 
-                project_code_url = self.singleProjectCodeUrlExtractor.extract(single_project_soup)
-                repo_from_code_url = self.handle_code_url(project_name, project_code_url)
-                if repo_from_code_url is not None:
-                    repos_to_process.append(repo_from_code_url)
+            single_project_soup = self.singleProjectResponseExtractor.extract(project_name)
 
-                project_git_ulr = self.singleProjectGitUrlExtractor.extract(single_project_soup)
-                repos_to_process.extend(self.handle_git_url(project_name, project_git_ulr))
+            project_code_url = self.singleProjectCodeUrlExtractor.extract(single_project_soup)
+            repo_from_code_url = self.handle_code_url(project_name, project_code_url)
+            if repo_from_code_url is not None:
+                repos_to_process.append(repo_from_code_url)
 
-                Repository.objects.bulk_create(repos_to_process)
-                yield from repos_to_process
+            project_git_ulr = self.singleProjectGitUrlExtractor.extract(single_project_soup)
+            repos_to_process.extend(self.handle_git_url(project_name, project_git_ulr))
+
+            Repository.objects.bulk_create(repos_to_process)
+            return repos_to_process
 
     def handle_code_url(self, project_name, project_code_url):
         if project_code_url is None:
