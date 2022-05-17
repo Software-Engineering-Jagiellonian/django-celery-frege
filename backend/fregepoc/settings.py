@@ -32,6 +32,7 @@ DJANGO_CORS_ALLOWED_HOSTS = ["http://localhost:4200"]
 PROJECT_APPS = [
     "fregepoc.repositories.apps.RepositoriesConfig",
     "fregepoc.indexers.apps.IndexersConfig",
+    "fregepoc.analyzers.apps.AnalyzersConfig",
 ]
 
 INSTALLED_APPS = [

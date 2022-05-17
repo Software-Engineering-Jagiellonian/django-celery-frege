@@ -3,7 +3,7 @@ from typing import TypedDict
 from radon.metrics import h_visit, mi_rank, mi_visit
 from radon.raw import analyze
 
-from fregepoc.repositories.analyzers.base import AnalyzerFactory, BaseAnalyzer
+from fregepoc.analyzers.core.base import AnalyzerFactory, BaseAnalyzer
 from fregepoc.repositories.constants import ProgrammingLanguages
 from fregepoc.repositories.utils.analyzers import repo_file_content
 
