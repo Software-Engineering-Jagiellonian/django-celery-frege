@@ -131,7 +131,7 @@ DATABASES = {
         "USER": os.environ.get("DJANGO_DATABASE_USER", "frege"),
         "PASSWORD": os.environ.get("DJANGO_DATABASE_PASSWORD", "admin"),
         "HOST": os.environ.get("DJANGO_DATABASE_HOST", "127.0.0.1"),
-        "PORT": os.environ.get("DJANGO_DATABASE_PORT", "15432"),
+        "PORT": os.environ.get("DOCKER_POSTGRES_PORT", "15432"),
     }
 }
 
