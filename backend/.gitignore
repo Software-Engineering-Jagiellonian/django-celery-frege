@@ -218,3 +218,4 @@ fabric.properties
 *.sqlite3
 data/*
 *.json
+venv/
