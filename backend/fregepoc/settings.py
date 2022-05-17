@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django_extensions",
     "rest_framework",
+    "rest_framework_api_key",
     "corsheaders",
     "django_filters"
 ] + PROJECT_APPS
@@ -139,21 +140,26 @@ DATABASES = {
     }
 }
 
+REDIS_HOST = os.environ.get("DJANGO_REDIS_HOST", "127.0.0.1")
+REDIS_PORT = os.environ.get("DJANGO_REDIS_PORT", "16379")
+
 # CELERY STUFF
-CELERY_BROKER_URL = (
-    f"redis://{os.environ.get('DJANGO_REDIS_HOST', '127.0.0.1')}:"
-    + f"{os.environ.get('DJANGO_REDIS_PORT', '16379')}"
-)
+CELERY_BROKER_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/"
 CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_TASK_SERIALIZER = "json"
 # CELERY_IMPORTS = ("fregepoc.repositories.celery_tasks",)
 
-# TODO: cleanup
-REDIS_HOST = os.environ.get("DJANGO_REDIS_HOST", "fregepoc-redis")
-REDIS_PORT = os.environ.get("DJANGO_REDIS_PORT", "6379")
-
 CELERY_RESULT_BACKEND = f"redis://{REDIS_HOST}:{REDIS_PORT}/"
 CELERY_CACHE_BACKEND = f"redis://{REDIS_HOST}:{REDIS_PORT}/"
+
+# CACHE
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': f"redis://{REDIS_HOST}:{REDIS_PORT}/",
+    }
+}
 
 # MISC
 
@@ -165,7 +171,13 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 100,
     'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.IsAuthenticated'],
-    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    'DEFAULT_THROTTLE_CLASSES': [
+        'fregepoc.utils.throttling.ApiKeyRateThrottle'
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'apikey': '500/minute'
+    },
 }
 
 # CORS

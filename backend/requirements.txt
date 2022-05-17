@@ -16,6 +16,7 @@ django-filter~=21.1
 requests~=2.25.1
 beautifulsoup4~=4.9.3
 django-cors-headers~=3.11.0
+djangorestframework-api-key~=2.2.0
 
 # Currently unused/useful for later:
 # channels
