@@ -11,22 +11,21 @@ flower~=1.0.0
 django-jazzmin~=2.5.0
 PyGithub~=1.55
 lizard~=1.17.10
-pytest~=7.1.2
-pytest-mock~=3.7.0
-pytest-unordered~=0.4.1
 factory-boy~=3.2.1
+django-filter~=21.1
 requests~=2.27.1
 beautifulsoup4~=4.9.3
+django-cors-headers~=3.11.0
+djangorestframework-api-key~=2.2.0
 
 # Currently unused/useful for later:
 # channels
 # channels-redis
 # django-redis
-# django-cors-headers~=3.11.0
+
 # django-celery-beat==2.1.0
 # django-celery-results
 # websockets
-
 # Development tools:
 black~=22.3.0
 isort~=5.10.1
@@ -34,4 +33,7 @@ flake8~=4.0.1
 pre-commit~=2.18.1
 
 # Testing
+pytest~=7.1.2
+pytest-mock~=3.7.0
+pytest-unordered~=0.4.1
 pytest-django~=4.5.2
