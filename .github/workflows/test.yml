@@ -18,6 +18,6 @@ jobs:
       - name: Build
         run: docker compose --profile application build
       - name: Run
-        run: docker compose --profile application up
+        run: docker compose --profile application up -d
       - name: Run tests
         run: docker compose exec -T fregepoc-backend pytest
