@@ -36,7 +36,7 @@ PROJECT_APPS = [
     "fregepoc.analyzers.apps.AnalyzersConfig",
 ]
 
-INSTALLED_APPS = [
+EXTERNAL_APPS = [
     "jazzmin",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -49,7 +49,10 @@ INSTALLED_APPS = [
     "rest_framework_api_key",
     "corsheaders",
     "django_filters",
-] + PROJECT_APPS
+    "channels",
+]
+
+INSTALLED_APPS = EXTERNAL_APPS + PROJECT_APPS
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -81,6 +84,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "fregepoc.wsgi.application"
+ASGI_APPLICATION = "fregepoc.asgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
@@ -187,3 +191,14 @@ REST_FRAMEWORK = {
 CORS_ALLOWED_ORIGINS = [
     # set for production
 ]
+
+# CHANNELS
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [(REDIS_HOST, REDIS_PORT)],
+        },
+    },
+}

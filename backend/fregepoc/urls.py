@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
 
+from fregepoc.repositories.consumers import LiveStatusConsumer
 from fregepoc.repositories.views import (
     RepositoryFileViewSet,
     RepositoryViewSet,
@@ -32,3 +33,5 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include(router.urls)),
 ]
+
+websocket_urlpatterns = [path("ws/", LiveStatusConsumer.as_asgi())]

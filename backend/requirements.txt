@@ -17,10 +17,11 @@ requests~=2.27.1
 beautifulsoup4~=4.9.3
 django-cors-headers~=3.11.0
 djangorestframework-api-key~=2.2.0
+channels~=3.0.4
+channels-redis~=3.4.0
+djangochannelsrestframework~=1.0.0
 
 # Currently unused/useful for later:
-# channels
-# channels-redis
 # django-redis
 
 # django-celery-beat==2.1.0
@@ -37,3 +38,4 @@ pytest~=7.1.2
 pytest-mock~=3.7.0
 pytest-unordered~=0.4.1
 pytest-django~=4.5.2
+pytest-asyncio~=0.18.3
