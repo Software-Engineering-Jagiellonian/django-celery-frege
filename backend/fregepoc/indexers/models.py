@@ -176,7 +176,7 @@ class BitbucketIndexer(BaseIndexer):
                 commit_hash=commit_hash,
             )
 
-            yield repo_to_process
+            yield [repo_to_process]
 
     class Meta:
         verbose_name = _("Bitbucket Indexer")
