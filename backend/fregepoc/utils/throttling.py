@@ -3,7 +3,7 @@ from rest_framework_api_key.permissions import KeyParser
 
 
 class ApiKeyRateThrottle(SimpleRateThrottle):
-    scope = 'apikey'
+    scope = "apikey"
 
     def get_cache_key(self, request, view):
         key = KeyParser().get(request)
@@ -12,7 +12,4 @@ class ApiKeyRateThrottle(SimpleRateThrottle):
         else:
             ident = self.get_ident(request)
 
-        return self.cache_format % {
-            'scope': self.scope,
-            'ident': ident
-        }
+        return self.cache_format % {"scope": self.scope, "ident": ident}

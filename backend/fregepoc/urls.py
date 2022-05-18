@@ -14,16 +14,21 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import include, path
 from rest_framework import routers
 
-from fregepoc.repositories.views import RepositoryViewSet, RepositoryFileViewSet
+from fregepoc.repositories.views import (
+    RepositoryFileViewSet,
+    RepositoryViewSet,
+)
 
 router = routers.DefaultRouter()
-router.register('repositories', RepositoryViewSet, basename='repositories')
-router.register('repositoryfiles', RepositoryFileViewSet, basename='repositoryfiles')
+router.register("repositories", RepositoryViewSet, basename="repositories")
+router.register(
+    "repositoryfiles", RepositoryFileViewSet, basename="repositoryfiles"
+)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/", include(router.urls))
+    path("api/", include(router.urls)),
 ]

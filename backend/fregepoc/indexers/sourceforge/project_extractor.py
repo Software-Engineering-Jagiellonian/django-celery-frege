@@ -1,11 +1,17 @@
 from dataclasses import dataclass
-from typing import Optional, List
+from typing import List, Optional
 
 import requests
 from bs4 import BeautifulSoup
 
-from fregepoc.indexers.sourceforge.project_code_extractor import SourceforgeProjectCodeExtractor, GitCloneInfo
-from fregepoc.indexers.sourceforge.subprojects_extractor import SourceforgeSubprojectsExtractor, SourceforgeSubprojects
+from fregepoc.indexers.sourceforge.project_code_extractor import (
+    GitCloneInfo,
+    SourceforgeProjectCodeExtractor,
+)
+from fregepoc.indexers.sourceforge.subprojects_extractor import (
+    SourceforgeSubprojects,
+    SourceforgeSubprojectsExtractor,
+)
 
 
 @dataclass
@@ -18,9 +24,9 @@ class SourceforgeProject:
 
 
 def _extract_code_url(soup: BeautifulSoup) -> Optional[str]:
-    for span in soup.find_all('span'):
-        if span.text == 'Code':
-            return span.find_parents('a')[0]['href'][1:]
+    for span in soup.find_all("span"):
+        if span.text == "Code":
+            return span.find_parents("a")[0]["href"][1:]
     return None
 
 
@@ -33,9 +39,13 @@ def _extract_description(soup: BeautifulSoup) -> Optional[str]:
 
 class SourceforgeProjectExtractor:
     def __init__(
-            self,
-            subprojects_extractor: Optional[SourceforgeSubprojectsExtractor] = None,
-            project_code_extractor: Optional[SourceforgeProjectCodeExtractor] = None
+        self,
+        subprojects_extractor: Optional[
+            SourceforgeSubprojectsExtractor
+        ] = None,
+        project_code_extractor: Optional[
+            SourceforgeProjectCodeExtractor
+        ] = None,
     ):
         self.subprojects_extractor = subprojects_extractor
         if self.subprojects_extractor is None:
@@ -48,15 +58,17 @@ class SourceforgeProjectExtractor:
             self.project_code_extractor = SourceforgeProjectCodeExtractor()
 
     def extract(self, project_name: str) -> Optional[SourceforgeProject]:
-        url = f'https://sourceforge.net/projects/{project_name}'
+        url = f"https://sourceforge.net/projects/{project_name}"
         response = requests.get(url)
         if not response.ok:
             return None
 
-        project_page = BeautifulSoup(response.text, 'html.parser')
+        project_page = BeautifulSoup(response.text, "html.parser")
         main_project_code_url = _extract_code_url(project_page)
         if main_project_code_url is not None:
-            project_code = self.project_code_extractor.extract(main_project_code_url)
+            project_code = self.project_code_extractor.extract(
+                main_project_code_url
+            )
         else:
             project_code = None
 
@@ -68,5 +80,5 @@ class SourceforgeProjectExtractor:
             url=url,
             code=project_code,
             subprojects=subprojects,
-            description=description if description is not None else "Unknown"
+            description=description if description is not None else "Unknown",
         )

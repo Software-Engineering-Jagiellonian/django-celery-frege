@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_api_key",
     "corsheaders",
-    "django_filters"
+    "django_filters",
 ] + PROJECT_APPS
 
 MIDDLEWARE = [
@@ -155,9 +155,9 @@ CELERY_CACHE_BACKEND = f"redis://{REDIS_HOST}:{REDIS_PORT}/"
 # CACHE
 
 CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': f"redis://{REDIS_HOST}:{REDIS_PORT}/",
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": f"redis://{REDIS_HOST}:{REDIS_PORT}/",
     }
 }
 
@@ -168,16 +168,18 @@ DOWNLOAD_PATH = os.environ.get("DJANGO_DOWNLOAD_PATH", "/var/tmp/frege/")
 # REST FRAMEWORK
 
 REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 100,
-    'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.IsAuthenticated'],
-    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
-    'DEFAULT_THROTTLE_CLASSES': [
-        'fregepoc.utils.throttling.ApiKeyRateThrottle'
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": 100,
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated"
     ],
-    'DEFAULT_THROTTLE_RATES': {
-        'apikey': '500/minute'
-    },
+    "DEFAULT_FILTER_BACKENDS": [
+        "django_filters.rest_framework.DjangoFilterBackend"
+    ],
+    "DEFAULT_THROTTLE_CLASSES": [
+        "fregepoc.utils.throttling.ApiKeyRateThrottle"
+    ],
+    "DEFAULT_THROTTLE_RATES": {"apikey": "500/minute"},
 }
 
 # CORS
