@@ -19,6 +19,7 @@
   },
   "plugins": ["react", "@typescript-eslint"],
   "rules": {
-    "prettier/prettier": "warn"
+    "prettier/prettier": "warn",
+    "no-unused-vars": "warn"
   }
 }

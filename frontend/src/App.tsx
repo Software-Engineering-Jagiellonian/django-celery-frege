@@ -1,19 +1,27 @@
-import React from 'react';
-import './App.scss';
+import React, { useState } from 'react';
+import styles from './App.module.scss';
 import { Routes, Route } from 'react-router-dom';
 import Home from './components/pages/home/Home';
 import About from './components/pages/about/About';
-import Navbar from './components/navbar/Navbar';
+import { SideMenu } from './components/sideMenu/SideMenu';
+import TopBar from './components/topBar/TopBar';
 
 function App() {
+  const [isMenuCollapsed, setIsMenuCollapsed] = useState(false);
+
   return (
-    <>
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="about" element={<About />} />
-      </Routes>
-    </>
+    <div className={styles.App}>
+      <TopBar onMenuClick={() => setIsMenuCollapsed(!isMenuCollapsed)} />
+      <div className={styles.ContentNav}>
+        <SideMenu className={isMenuCollapsed ? styles.hidden : undefined} />
+        <div className={styles.mainContent}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="about" element={<About />} />
+          </Routes>
+        </div>
+      </div>
+    </div>
   );
 }
 

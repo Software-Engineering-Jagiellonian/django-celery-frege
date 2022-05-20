@@ -1,0 +1,28 @@
+@import "colors.module";
+.App {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  background: $background-color;
+  color: $button-font-color;
+}
+
+.ContentNav {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.sideMenu {
+  flex: 0 0 200px;
+}
+
+.mainContent {
+  flex: 1;
+  padding: 10px;
+}
+
+.hidden {
+  display: none !important;
+}
