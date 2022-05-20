@@ -102,7 +102,18 @@ services:
     depends_on:
       - fregepoc-celery-worker
       - fregepoc-redis
-
+  fregepoc-frontend:
+    command : npm start
+    container_name: fregepoc-frontend
+    hostname: fregepoc-frontend
+    build: ./frontend
+    ports:
+      - "3030:3000"
+    stdin_open: true
+    depends_on:
+      - fregepoc-grafana
+    networks:
+      - fregepoc-main
 networks:
   fregepoc-main:
 
