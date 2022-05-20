@@ -71,6 +71,8 @@ services:
       - fregepoc-prometheus
     volumes:
       - fregepoc_grafana_storage:/var/lib/grafana
+      - ./backend/fregepoc/observability/datasources:/etc/grafana/provisioning/datasources/
+      - ./backend/fregepoc/observability/dashboards:/etc/grafana/provisioning/dashboards/
     environment:
       - GF_USERS_DEFAULT_THEME=dark
       - GF_USERS_ALLOW_SIGN_UP=false
