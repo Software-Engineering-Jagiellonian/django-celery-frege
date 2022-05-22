@@ -1,0 +1,132 @@
+{
+	"pagelen": 1,
+	"values": [
+		{
+			"scm": "git",
+			"has_wiki": false,
+			"links": {
+				"watchers": {
+					"href": "https://api.bitbucket.org/2.0/repositories/jwalton/git-scripts/watchers"
+				},
+				"branches": {
+					"href": "https://api.bitbucket.org/2.0/repositories/jwalton/git-scripts/refs/branches"
+				},
+				"tags": {
+					"href": "https://api.bitbucket.org/2.0/repositories/jwalton/git-scripts/refs/tags"
+				},
+				"commits": {
+					"href": "https://api.bitbucket.org/2.0/repositories/jwalton/git-scripts/commits"
+				},
+				"clone": [
+					{
+						"href": "https://bitbucket.org/jwalton/git-scripts.git",
+						"name": "https"
+					},
+					{
+						"href": "git@bitbucket.org:jwalton/git-scripts.git",
+						"name": "ssh"
+					}
+				],
+				"self": {
+					"href": "https://api.bitbucket.org/2.0/repositories/jwalton/git-scripts"
+				},
+				"source": {
+					"href": "https://api.bitbucket.org/2.0/repositories/jwalton/git-scripts/src"
+				},
+				"html": {
+					"href": "https://bitbucket.org/jwalton/git-scripts"
+				},
+				"avatar": {
+					"href": "https://bytebucket.org/ravatar/%7B9a355a32-dad9-4efd-9828-ccce80dd3109%7D?ts=default"
+				},
+				"hooks": {
+					"href": "https://api.bitbucket.org/2.0/repositories/jwalton/git-scripts/hooks"
+				},
+				"forks": {
+					"href": "https://api.bitbucket.org/2.0/repositories/jwalton/git-scripts/forks"
+				},
+				"downloads": {
+					"href": "https://api.bitbucket.org/2.0/repositories/jwalton/git-scripts/downloads"
+				},
+				"pullrequests": {
+					"href": "https://api.bitbucket.org/2.0/repositories/jwalton/git-scripts/pullrequests"
+				}
+			},
+			"created_on": "2011-07-08T08:59:53.298617+00:00",
+			"full_name": "jwalton/git-scripts",
+			"owner": {
+				"display_name": "Joseph Walton",
+				"uuid": "{c040300f-f69e-4a65-87a6-5a8f3ef1bbf1}",
+				"links": {
+					"self": {
+						"href": "https://api.bitbucket.org/2.0/users/%7Bc040300f-f69e-4a65-87a6-5a8f3ef1bbf1%7D"
+					},
+					"html": {
+						"href": "https://bitbucket.org/%7Bc040300f-f69e-4a65-87a6-5a8f3ef1bbf1%7D/"
+					},
+					"avatar": {
+						"href": "https://secure.gravatar.com/avatar/cbed2f56195ed90bdebd4feec31ac054?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJW-1.png"
+					}
+				},
+				"type": "user",
+				"nickname": "jwalton",
+				"account_id": "557058:8679ff30-e82d-47b5-90f0-94127260782a"
+			},
+			"size": 394778,
+			"uuid": "{9a355a32-dad9-4efd-9828-ccce80dd3109}",
+			"type": "repository",
+			"website": "",
+			"override_settings": {
+				"branching_model": false,
+				"default_merge_strategy": false
+			},
+			"description": "",
+			"has_issues": false,
+			"slug": "git-scripts",
+			"is_private": false,
+			"name": "git-scripts",
+			"language": "shell",
+			"fork_policy": "allow_forks",
+			"project": {
+				"links": {
+					"self": {
+						"href": "https://api.bitbucket.org/2.0/workspaces/jwalton/projects/PROJ"
+					},
+					"html": {
+						"href": "https://bitbucket.org/jwalton/workspace/projects/PROJ"
+					},
+					"avatar": {
+						"href": "https://bitbucket.org/account/user/jwalton/projects/PROJ/avatar/32?ts=1543459298"
+					}
+				},
+				"type": "project",
+				"name": "Untitled project",
+				"key": "PROJ",
+				"uuid": "{6eed76e0-e831-48d0-83ac-cbbd8ee04173}"
+			},
+			"mainbranch": {
+				"type": "branch",
+				"name": "master"
+			},
+			"workspace": {
+				"slug": "jwalton",
+				"type": "workspace",
+				"name": "Joseph Walton",
+				"links": {
+					"self": {
+						"href": "https://api.bitbucket.org/2.0/workspaces/jwalton"
+					},
+					"html": {
+						"href": "https://bitbucket.org/jwalton/"
+					},
+					"avatar": {
+						"href": "https://bitbucket.org/workspaces/jwalton/avatar/?ts=1543459298"
+					}
+				},
+				"uuid": "{c040300f-f69e-4a65-87a6-5a8f3ef1bbf1}"
+			},
+			"updated_on": "2017-03-19T16:09:30.336053+00:00"
+		}
+	],
+	"next": "https://api.bitbucket.org/2.0/repositories?pagelen=1&after=2011-08-10T00%3A42%3A35.509559%2B00%3A00"
+}
