@@ -40,6 +40,8 @@ in order to improve the overall DX.
 Also, to prevent common mistakes from being committed and pushed
 to the origin, it is required to register the git hooks configured via `pre-commit`:
 
+>One might want to create a virtual environment (e.g. `venv`, `virtualenv`, conda) before executing commands below.
+
 ```bash
 pip install -r backend/requirements.txt
 pre-commit install
@@ -48,6 +50,12 @@ pre-commit install
 Moreover, to explicitly run the linters and formatters over the entire codebase with `pre-commit`, execute the following command:
 ```bash
 pre-commit run --all-files
+```
+
+### Testing
+To run tests from the docker container, execute the following command:
+```bash
+docker compose exec -T fregepoc-backend pytest
 ```
 
 ### Commit messages convention

@@ -1,6 +1,6 @@
 from typing import TypeVar
 
-from fregepoc.repositories.analyzers import BaseAnalyzer
+from fregepoc.analyzers.core import BaseAnalyzer
 from fregepoc.repositories.utils.analyzers import (
     FileInformationDict,
     generic_source_code_analysis,

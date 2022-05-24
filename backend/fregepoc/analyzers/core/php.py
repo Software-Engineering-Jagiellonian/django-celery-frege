@@ -3,9 +3,8 @@ from typing import TypedDict
 
 from lizard import FileAnalyzer, get_extensions
 from lizard_ext import auto_read
-
-from fregepoc.repositories.analyzers import AnalyzerFactory
-from fregepoc.repositories.analyzers.generic import GenericAnalyzer
+from fregepoc.analyzers.core import AnalyzerFactory
+from fregepoc.analyzers.core.generic import GenericAnalyzer
 from fregepoc.repositories.constants import ProgrammingLanguages
 from fregepoc.repositories.utils.analyzers import FileInformationDict
 from fregepoc.repositories.analyzers.exceptions import LizardException
