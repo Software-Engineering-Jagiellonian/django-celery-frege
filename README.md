@@ -1,6 +1,6 @@
 # Fregepoc
 
-## Perequisites
+## Prerequisites
 
 Docker & docker-compose is required to be available on the host system.
 
