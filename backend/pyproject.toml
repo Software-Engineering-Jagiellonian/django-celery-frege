@@ -7,7 +7,7 @@ line_length = 79
 line-length = 79
 target-version = ['py310']
 include = '\.pyi?$'
-exclude = '/(migrations|\.direnv|\.eggs|\.git|\.hg|\.mypy_cache|\.nox|\.tox|\.venv|venv|\.env|env|\.svn|_build|buck-out|build|dist)/'
+force-exclude = '/(migrations|\.direnv|\.eggs|\.git|\.hg|\.mypy_cache|\.nox|\.tox|\.venv|venv|\.env|env|\.svn|_build|buck-out|build|dist)/'
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "fregepoc.settings"
