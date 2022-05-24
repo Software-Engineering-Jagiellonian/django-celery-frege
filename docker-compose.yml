@@ -69,8 +69,11 @@ services:
     container_name: fregepoc-grafana
     depends_on:
       - fregepoc-prometheus
+      - fregepoc-postgres
     volumes:
       - fregepoc_grafana_storage:/var/lib/grafana
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
     environment:
       - GF_USERS_DEFAULT_THEME=dark
       - GF_USERS_ALLOW_SIGN_UP=false
