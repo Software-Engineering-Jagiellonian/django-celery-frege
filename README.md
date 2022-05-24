@@ -16,16 +16,22 @@ and then editing the `.env` file optionally (although the unchanged configuratio
 
 >The following commands should be run from the **root** of the application
 
-To run the application, you need to use the following command:
-
-```bash
-docker compose --profile application up
-```
-
 If the containers were not built yet, you can do so by running the following command:
 
 ```bash
-docker compose --profile application build
+docker compose --profile dev build
+```
+
+To run the application, you need to use the following command:
+
+```bash
+docker compose --profile dev up
+```
+
+For the production environment, use the following instead:
+
+```bash
+docker compose --profile prod up -d
 ```
 
 >On older versions of Docker, you may need to substitute `docker compose` with `docker-compose`.
@@ -55,7 +61,7 @@ pre-commit run --all-files
 ### Testing
 To run tests from the docker container, execute the following command:
 ```bash
-docker compose exec -T fregepoc-backend pytest
+docker compose exec -T fregepoc-backend-dev pytest
 ```
 
 ### Commit messages convention

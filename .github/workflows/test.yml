@@ -16,8 +16,8 @@ jobs:
       - name: Set env variables
         run: cp .env.template .env
       - name: Build
-        run: docker compose --profile application build
+        run: docker compose --profile dev build
       - name: Run
-        run: docker compose --profile application up -d
+        run: docker compose --profile dev up -d
       - name: Run tests
-        run: docker compose exec -T fregepoc-backend pytest
+        run: docker compose exec -T fregepoc-backend-dev pytest
