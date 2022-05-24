@@ -6,15 +6,14 @@ import requests
 from pytest_mock import MockerFixture
 
 from fregepoc.indexers.models import BitbucketIndexer
-
-from .constants import MOCK_PATH
+from fregepoc.indexers.tests.constants import MOCK_DIR
 
 
 def mocked_requests_get(repositories, forks, commits):
     class MockResponse:
         def __init__(self, response_file, status_code):
             response_text = Path(
-                MOCK_PATH / f"{response_file}.json"
+                MOCK_DIR / f"{response_file}.json"
             ).read_text()
             self.json_data = json.loads(response_text)
             self.status_code = status_code
