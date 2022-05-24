@@ -23,11 +23,11 @@ SECRET_KEY = (
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DJANGO_DEBUG", "true").lower() == "true"
 
-ALLOWED_HOSTS = [".localhost", "127.0.0.1"]
-if os.environ.get("BACKEND_HOSTNAME") is not None:
-    ALLOWED_HOSTS.append(os.environ.get("BACKEND_HOSTNAME"))
+ALLOWED_HOSTS = [os.environ.get("BACKEND_HOSTNAME", ".localhost")]
 
-DJANGO_CORS_ALLOWED_HOSTS = ["http://localhost:4200"]
+DJANGO_CORS_ALLOWED_HOSTS = [
+    os.environ.get("FRONTEND_URL", "http://localhost:4200")
+]
 
 # Application definition
 

@@ -8,8 +8,8 @@ services:
     networks:
       - fregepoc-main
     ports:
-      - "16379:${DOCKER_REDIS_PORT}"
-    profiles: [ "services", "application-dev", "application-prod" ]
+      - "${DOCKER_REDIS_PORT}:16379"
+    profiles: [ "dev", "prod" ]
     restart: on-failure
 
   fregepoc-postgres:
@@ -23,8 +23,8 @@ services:
     networks:
       - fregepoc-main
     ports:
-      - "15432:${DOCKER_POSTGRES_PORT}"
-    profiles: [ "services", "application-dev", "application-prod" ]
+      - "${DOCKER_POSTGRES_PORT}:15432"
+    profiles: [ "dev", "prod" ]
     restart: on-failure
     volumes:
       - fregepoc_postgresql_data:/var/lib/postgresql/data
@@ -49,7 +49,7 @@ services:
       - fregepoc_tmp:${DJANGO_DOWNLOAD_PATH}
     networks:
       - fregepoc-main
-    profiles: [ "application-dev" ]
+    profiles: [ "dev" ]
     restart: on-failure
     env_file:
       - .env
@@ -82,7 +82,7 @@ services:
       - fregepoc-main
     env_file:
       - .env
-    profiles: [ "application-dev" ]
+    profiles: [ "dev" ]
 
   fregepoc-celery-worker:
     <<: *backend
@@ -114,7 +114,7 @@ services:
     volumes:
       - fregepoc_tmp:${DJANGO_DOWNLOAD_PATH}
       - fregepoc_static_files:/app/static
-    profiles: [ "application-prod" ]
+    profiles: [ "prod" ]
 
   fregepoc-backend-nginx:
     image: nginx:1.21
@@ -137,7 +137,7 @@ services:
     environment:
       - VIRTUAL_HOST=${BACKEND_HOSTNAME}
       - LETSENCRYPT_HOST=${BACKEND_HOSTNAME}
-    profiles: [ "application-prod" ]
+    profiles: [ "prod" ]
 
   fregepoc-grafana-prod:
     <<: *grafana
@@ -146,7 +146,7 @@ services:
       - GF_USERS_ALLOW_SIGN_UP=true
       - GF_USERS_ALLOW_ORG_CREATE=false
       - GF_AUTH_ANONYMOUS_ENABLED=false
-    profiles: [ "application-prod" ]
+    profiles: [ "prod" ]
 
   fregepoc-proxy:
     image: nginxproxy/nginx-proxy:1.0
@@ -164,7 +164,7 @@ services:
       - fregepoc_proxy_vhost:/etc/nginx/vhost.d
       - fregepoc_proxy_html:/usr/share/nginx/html
       - fregepoc_proxy_certs:/etc/nginx/certs:ro
-    profiles: [ "application-prod" ]
+    profiles: [ "prod" ]
 
   fregepoc-proxy-acme:
     image: nginxproxy/acme-companion:2.2
@@ -182,7 +182,7 @@ services:
     environment:
       - DEFAULT_EMAIL=${LETSENCRYPT_EMAIL}
       - NGINX_PROXY_CONTAINER=fregepoc-proxy
-    profiles: [ "application-prod" ]
+    profiles: [ "prod" ]
 
 networks:
   fregepoc-main:
