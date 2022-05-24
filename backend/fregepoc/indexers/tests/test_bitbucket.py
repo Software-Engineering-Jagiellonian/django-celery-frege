@@ -3,12 +3,11 @@ from pathlib import Path
 
 import pytest
 import requests
-from django.conf import settings
 from pytest_mock import MockerFixture
 
 from fregepoc.indexers.models import BitbucketIndexer
 
-MOCK_PATH = settings.BASE_DIR / "fregepoc" / "indexers" / "tests" / "__mock__"
+from .constants import MOCK_PATH
 
 
 def mocked_requests_get(repositories, forks, commits):
