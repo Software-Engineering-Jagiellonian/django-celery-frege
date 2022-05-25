@@ -23,14 +23,14 @@ class SourceforgeProject:
     description: str = "Unknown"
 
 
-def _extract_code_url(soup: BeautifulSoup) -> Optional[str]:
+def extract_code_url(soup: BeautifulSoup) -> Optional[str]:
     for span in soup.find_all("span"):
         if span.text == "Code":
             return span.find_parents("a")[0]["href"][1:]
     return None
 
 
-def _extract_description(soup: BeautifulSoup) -> Optional[str]:
+def extract_description(soup: BeautifulSoup) -> Optional[str]:
     p = soup.find("p", {"class": "description"})
     if p is None:
         return None
@@ -64,7 +64,7 @@ class SourceforgeProjectExtractor:
             return None
 
         project_page = BeautifulSoup(response.text, "html.parser")
-        main_project_code_url = _extract_code_url(project_page)
+        main_project_code_url = extract_code_url(project_page)
         if main_project_code_url is not None:
             project_code = self.project_code_extractor.extract(
                 main_project_code_url
@@ -73,7 +73,7 @@ class SourceforgeProjectExtractor:
             project_code = None
 
         subprojects = self.subprojects_extractor.extract(project_page)
-        description = _extract_description(project_page)
+        description = extract_description(project_page)
 
         return SourceforgeProject(
             name=project_name,
