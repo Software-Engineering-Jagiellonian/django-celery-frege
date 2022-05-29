@@ -1,10 +1,10 @@
 from fregepoc import settings
 
-MOCKED_SOURCEFORGE_FILES = (
+MOCKED_JAVA_FILES = (
     settings.BASE_DIR
     / "fregepoc"
-    / "indexers"
+    / "analyzers"
     / "tests"
-    / "sourceforge"
+    / "java"
     / "__mock__"
 )
