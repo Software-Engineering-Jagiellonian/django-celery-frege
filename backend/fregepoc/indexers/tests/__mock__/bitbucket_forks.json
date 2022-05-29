@@ -1,0 +1,7 @@
+{
+	"pagelen": 0,
+	"size": 2,
+	"values": [],
+	"page": 1,
+	"next": "https://api.bitbucket.org/2.0/repositories/jwalton/git-scripts/forks?pagelen=0&page=2"
+}

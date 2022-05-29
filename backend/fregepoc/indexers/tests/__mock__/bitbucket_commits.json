@@ -1,0 +1,111 @@
+{
+	"pagelen": 1,
+	"values": [
+		{
+			"rendered": {
+				"message": {
+					"raw": "Merged in pietmarcus/git-scripts/fix-for-windows-line-endings (pull request #3)\n\nfix so script can handle files with Windows-style line-endings\n",
+					"markup": "markdown",
+					"html": "<p>Merged in <a href=\"https://bitbucket.org/pietmarcus/git-scripts\" rel=\"nofollow\" class=\"ap-connect-link\">pietmarcus/git-scripts</a>/fix-for-windows-line-endings (<a href=\"https://bitbucket.org/jwalton/git-scripts/pull-requests/3/fix-so-script-can-handle-files-with\" rel=\"nofollow\" class=\"ap-connect-link\">pull request #3</a>)</p>\n<p>fix so script can handle files with Windows-style line-endings</p>",
+					"type": "rendered"
+				}
+			},
+			"hash": "b1129dedc99ed09faf74ef3c0a88e55685c637b2",
+			"repository": {
+				"links": {
+					"self": {
+						"href": "https://api.bitbucket.org/2.0/repositories/jwalton/git-scripts"
+					},
+					"html": {
+						"href": "https://bitbucket.org/jwalton/git-scripts"
+					},
+					"avatar": {
+						"href": "https://bytebucket.org/ravatar/%7B9a355a32-dad9-4efd-9828-ccce80dd3109%7D?ts=default"
+					}
+				},
+				"type": "repository",
+				"name": "git-scripts",
+				"full_name": "jwalton/git-scripts",
+				"uuid": "{9a355a32-dad9-4efd-9828-ccce80dd3109}"
+			},
+			"links": {
+				"self": {
+					"href": "https://api.bitbucket.org/2.0/repositories/jwalton/git-scripts/commit/b1129dedc99ed09faf74ef3c0a88e55685c637b2"
+				},
+				"comments": {
+					"href": "https://api.bitbucket.org/2.0/repositories/jwalton/git-scripts/commit/b1129dedc99ed09faf74ef3c0a88e55685c637b2/comments"
+				},
+				"html": {
+					"href": "https://bitbucket.org/jwalton/git-scripts/commits/b1129dedc99ed09faf74ef3c0a88e55685c637b2"
+				},
+				"diff": {
+					"href": "https://api.bitbucket.org/2.0/repositories/jwalton/git-scripts/diff/b1129dedc99ed09faf74ef3c0a88e55685c637b2"
+				},
+				"approve": {
+					"href": "https://api.bitbucket.org/2.0/repositories/jwalton/git-scripts/commit/b1129dedc99ed09faf74ef3c0a88e55685c637b2/approve"
+				},
+				"statuses": {
+					"href": "https://api.bitbucket.org/2.0/repositories/jwalton/git-scripts/commit/b1129dedc99ed09faf74ef3c0a88e55685c637b2/statuses"
+				}
+			},
+			"author": {
+				"raw": "Piet Marcus van der Meulen <p.m.van.der.meulen@dictu.nl>",
+				"type": "author",
+				"user": {
+					"display_name": "Piet Marcus van der Meulen",
+					"uuid": "{2ddcfb51-facc-437e-84df-f28084ad0722}",
+					"links": {
+						"self": {
+							"href": "https://api.bitbucket.org/2.0/users/%7B2ddcfb51-facc-437e-84df-f28084ad0722%7D"
+						},
+						"html": {
+							"href": "https://bitbucket.org/%7B2ddcfb51-facc-437e-84df-f28084ad0722%7D/"
+						},
+						"avatar": {
+							"href": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/557058:ab84e20d-7be5-4b53-a944-82c9ea173248/b8172063-bcee-4037-a2c6-5b433263cfab/128"
+						}
+					},
+					"type": "user",
+					"nickname": "pietmarcus",
+					"account_id": "557058:ab84e20d-7be5-4b53-a944-82c9ea173248"
+				}
+			},
+			"summary": {
+				"raw": "Merged in pietmarcus/git-scripts/fix-for-windows-line-endings (pull request #3)\n\nfix so script can handle files with Windows-style line-endings\n",
+				"markup": "markdown",
+				"html": "<p>Merged in <a href=\"https://bitbucket.org/pietmarcus/git-scripts\" rel=\"nofollow\" class=\"ap-connect-link\">pietmarcus/git-scripts</a>/fix-for-windows-line-endings (<a href=\"https://bitbucket.org/jwalton/git-scripts/pull-requests/3/fix-so-script-can-handle-files-with\" rel=\"nofollow\" class=\"ap-connect-link\">pull request #3</a>)</p>\n<p>fix so script can handle files with Windows-style line-endings</p>",
+				"type": "rendered"
+			},
+			"parents": [
+				{
+					"hash": "0498d2ea1f8e446e19c5fde2769cca570567afd1",
+					"type": "commit",
+					"links": {
+						"self": {
+							"href": "https://api.bitbucket.org/2.0/repositories/jwalton/git-scripts/commit/0498d2ea1f8e446e19c5fde2769cca570567afd1"
+						},
+						"html": {
+							"href": "https://bitbucket.org/jwalton/git-scripts/commits/0498d2ea1f8e446e19c5fde2769cca570567afd1"
+						}
+					}
+				},
+				{
+					"hash": "93c760045beefc12723b2d62b3339f37ffed60bf",
+					"type": "commit",
+					"links": {
+						"self": {
+							"href": "https://api.bitbucket.org/2.0/repositories/jwalton/git-scripts/commit/93c760045beefc12723b2d62b3339f37ffed60bf"
+						},
+						"html": {
+							"href": "https://bitbucket.org/jwalton/git-scripts/commits/93c760045beefc12723b2d62b3339f37ffed60bf"
+						}
+					}
+				}
+			],
+			"date": "2017-03-19T16:09:28+00:00",
+			"message": "Merged in pietmarcus/git-scripts/fix-for-windows-line-endings (pull request #3)\n\nfix so script can handle files with Windows-style line-endings\n",
+			"type": "commit"
+		}
+	],
+	"next": "https://api.bitbucket.org/2.0/repositories/jwalton/git-scripts/commits?pagelen=1&ctx=5073f418ee0109f820592c0e96902223&page=2"
+}
