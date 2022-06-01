@@ -218,4 +218,5 @@ fabric.properties
 *.sqlite3
 data/*
 *.json
+!fregepoc/indexers/tests/__mock__/*.json
 venv/
