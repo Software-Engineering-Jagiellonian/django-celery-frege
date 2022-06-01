@@ -220,3 +220,4 @@ data/*
 *.json
 !fregepoc/indexers/tests/__mock__/*.json
 venv/
+.DS_Store
