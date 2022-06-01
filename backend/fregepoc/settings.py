@@ -23,9 +23,11 @@ SECRET_KEY = (
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DJANGO_DEBUG", "true").lower() == "true"
 
-ALLOWED_HOSTS = [".localhost", "127.0.0.1"]
+ALLOWED_HOSTS = [os.environ.get("BACKEND_HOSTNAME", ".localhost")]
 
-DJANGO_CORS_ALLOWED_HOSTS = ["http://localhost:4200"]
+DJANGO_CORS_ALLOWED_HOSTS = [
+    os.environ.get("FRONTEND_URL", "http://localhost:4200")
+]
 
 # Application definition
 
@@ -125,6 +127,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "static"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
