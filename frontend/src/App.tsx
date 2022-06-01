@@ -4,7 +4,9 @@ import { Routes, Route } from 'react-router-dom';
 import Home from './components/pages/home/Home';
 import About from './components/pages/about/About';
 import { SideMenu } from './components/sideMenu/SideMenu';
-import TopBar from './components/topBar/TopBar';
+import { TopBar } from './components/topBar/TopBar';
+import '../node_modules/react-grid-layout/css/styles.css';
+import '../node_modules/react-resizable/css/styles.css';
 
 function App() {
   const [isMenuCollapsed, setIsMenuCollapsed] = useState(false);
