@@ -13,15 +13,15 @@ class TestPhpAnalyzerLinesOfCode:
         [
             (
                 {"repo_relative_file_path": "main.php"},
-                7.31,
+                1.71,
             ),
             (
                 {"repo_relative_file_path": "User.php"},
-                6.26,
+                4.61,
             ),
             (
                 {"repo_relative_file_path": "UserController.php"},
-                8.15,
+                5.0,
             ),
         ],
     )

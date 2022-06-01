@@ -13,15 +13,15 @@ class TestPhpAnalyzerAverageCount:
         [
             (
                 {"repo_relative_file_path": "main.php"},
-                0.73,
+                0.0,
             ),
             (
                 {"repo_relative_file_path": "UserController.php"},
-                1.87,
+                1.0,
             ),
             (
                 {"repo_relative_file_path": "UserRepository.php"},
-                1.15,
+                1.0,
             ),
         ],
     )
