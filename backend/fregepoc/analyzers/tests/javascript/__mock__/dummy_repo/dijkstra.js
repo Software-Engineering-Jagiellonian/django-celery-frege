@@ -1,6 +1,6 @@
 function buildGraphFromInput(N, input) {
     var graph = { vertices: [] };
-    
+
     for (var i = 0; i < N; i++) {
         graph.vertices.push({edges: [], edgeLength: [], visited: false, distance: 0});
     }
@@ -64,8 +64,8 @@ function processData(input) {
         index += 1;
         var graph = buildGraphFromInput(N, graphInput);
         console.log(findShortestReach(graph, S));
-    }  
-} 
+    }
+}
 
 process.stdin.resume();
 process.stdin.setEncoding("ascii");

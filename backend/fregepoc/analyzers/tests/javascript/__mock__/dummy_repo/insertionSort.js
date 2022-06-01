@@ -2,15 +2,15 @@ function processData(input) {
     //Enter your code here
     var input_arr = input.split('\n');
     var tests = parseInt(input_arr[0],10);
-    
+
     for (var i = 1; i < tests*2; i+=2) {
         var n = parseInt(input_arr[i], 10);
         var arr = input_arr[i+1].split(' ');
         var count = countInversions(arr);
-        
+
         process.stdout.write(count + '\n');
     }
-};         
+};
 
 function countInversions(arr) {
   var count = 0;

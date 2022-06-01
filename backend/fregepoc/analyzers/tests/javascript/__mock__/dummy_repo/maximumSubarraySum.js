@@ -9,7 +9,7 @@ function computeMax(data, modulo) {
     }
     // Sort the array by sum value.
     sums.sort(function(a,b){return a[1]-b[1];});
-    
+
     for (var i=1; i<sums.length; i++) {
         var origIndex = sums[i][0],
             curSum = sums[i][1];

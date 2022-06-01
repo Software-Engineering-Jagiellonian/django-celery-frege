@@ -1,7 +1,9 @@
 import pytest
 
 from fregepoc.analyzers.core import AnalyzerFactory
-from fregepoc.analyzers.tests.javascript.constants import MOCKED_JAVASCRIPT_FILES
+from fregepoc.analyzers.tests.javascript.constants import (
+    MOCKED_JAVASCRIPT_FILES,
+)
 from fregepoc.repositories.constants import ProgrammingLanguages
 from fregepoc.repositories.factories import RepositoryFileFactory
 
@@ -13,23 +15,23 @@ class TestJavascriptAnalyzerLinesOfCode:
         [
             (
                 {"repo_relative_file_path": "insertionSort.js"},
-                460,
+                49,
             ),
             (
                 {"repo_relative_file_path": "palindrome.js"},
-                460,
+                190,
             ),
             (
                 {"repo_relative_file_path": "stringSimilarity.js"},
-                460,
+                71,
             ),
             (
                 {"repo_relative_file_path": "maximumSubarraySum.js"},
-                460,
+                39,
             ),
             (
                 {"repo_relative_file_path": "dijkstra.js"},
-                460,
+                71,
             ),
         ],
     )

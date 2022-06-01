@@ -14,5 +14,3 @@ datasources:
      sslmode: disable
   version: 1
   editable: true
-
-
