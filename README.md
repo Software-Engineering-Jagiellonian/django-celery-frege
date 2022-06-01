@@ -1,6 +1,6 @@
 # Fregepoc
 
-## Perequisites
+## Prerequisites
 
 Docker & docker-compose is required to be available on the host system.
 
@@ -16,16 +16,22 @@ and then editing the `.env` file optionally (although the unchanged configuratio
 
 >The following commands should be run from the **root** of the application
 
-To run the application, you need to use the following command:
-
-```bash
-docker compose --profile application up
-```
-
 If the containers were not built yet, you can do so by running the following command:
 
 ```bash
-docker compose --profile application build
+docker compose --profile dev build
+```
+
+To run the application, you need to use the following command:
+
+```bash
+docker compose --profile dev up
+```
+
+For the production environment, use the following instead:
+
+```bash
+docker compose --profile prod up -d
 ```
 
 >On older versions of Docker, you may need to substitute `docker compose` with `docker-compose`.
@@ -40,6 +46,8 @@ in order to improve the overall DX.
 Also, to prevent common mistakes from being committed and pushed
 to the origin, it is required to register the git hooks configured via `pre-commit`:
 
+>One might want to create a virtual environment (e.g. `venv`, `virtualenv`, conda) before executing commands below.
+
 ```bash
 pip install -r backend/requirements.txt
 pre-commit install
@@ -48,6 +56,12 @@ pre-commit install
 Moreover, to explicitly run the linters and formatters over the entire codebase with `pre-commit`, execute the following command:
 ```bash
 pre-commit run --all-files
+```
+
+### Testing
+To run tests from the docker container, execute the following command:
+```bash
+docker compose exec -T fregepoc-backend-dev pytest
 ```
 
 ### Commit messages convention

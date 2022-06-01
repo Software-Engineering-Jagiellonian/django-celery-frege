@@ -12,3 +12,4 @@ env/
 
 # pyenv
 .python-version
+.DS_Store
