@@ -14,3 +14,21 @@ datasources:
      sslmode: disable
   version: 1
   editable: true
+- name: Prometheus-ds
+  type: prometheus
+  uid: PEBC2E3263E2CA5B6
+  url: http://fregepoc-prometheus:9090
+- name: Redis
+  type: redis-datasource
+  access: proxy
+  orgId: 1
+  isDefault: false
+  version: 1
+  url: redis://fregepoc-redis:6379
+  jsonData:
+    client: standalone
+    poolSize: 5
+    timeout: 10
+    pingInterval: 0
+    pipelineWindow: 0
+  editable: true
