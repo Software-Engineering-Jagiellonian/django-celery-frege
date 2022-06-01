@@ -22,17 +22,23 @@ class JavascriptFileAnalysisResult(TypedDict):
 class JavascriptAnalyzer(BaseAnalyzer[JavascriptFileAnalysisResult]):
     def analyze(self, repo_file_obj):
         with repo_file_content(repo_file_obj) as file_content:
-            analysis_result = lizard.analyze_file.analyze_source_code(
+            result = lizard.analyze_file.analyze_source_code(
                 ".js", file_content
             )
 
             return {
-                "lines_of_code": analysis_result.nloc,
-                "token_count": analysis_result.token_count,
-                "average_lines_of_code": analysis_result.average_nloc,
-                "average_token_count": analysis_result.average_token_count,
-                "average_cyclomatic_complexity": analysis_result.average_cyclomatic_complexity,
-                "average_parameter_count": analysis_result.functions_average(
+                "lines_of_code": result.nloc,
+                "token_count": result.token_count,
+                "average_lines_of_code": result.average_nloc,
+                "average_token_count": result.average_token_count,
+                "average_cyclomatic_complexity": result.average_cyclomatic_complexity,
+                "average_parameter_count": result.functions_average(
                     "parameter_count"
+                ),
+                "average_nesting_depth": result.functions_average(
+                    "max_nesting_depth"
+                ),
+                "max_nesting_depth": max(
+                    fun.max_nesting_depth for fun in result.function_list
                 ),
             }
