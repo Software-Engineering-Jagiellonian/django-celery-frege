@@ -18,7 +18,7 @@ class TestAnalyzers:
             ),
             (
                 ProgrammingLanguages.JAVA,
-                {"repo_relative_file_path": "binary_tree.php"},
+                {"repo_relative_file_path": "binary_tree.java"},
             ),
             (
                 ProgrammingLanguages.PHP,
