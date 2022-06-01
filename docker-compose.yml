@@ -4,32 +4,32 @@ services:
   fregepoc-redis:
     container_name: fregepoc-redis
     hostname: fregepoc-redis
-    image: redis:latest
+    image: redis:7.0
     networks:
       - fregepoc-main
     ports:
-      - "16379:${DOCKER_REDIS_PORT}"
-    profiles: ["services", "application"]
+      - "${DOCKER_REDIS_PORT}:16379"
+    profiles: [ "dev", "prod" ]
     restart: on-failure
 
   fregepoc-postgres:
     container_name: fregepoc-postgres
     hostname: fregepoc-postgres
-    image: postgres:latest
+    image: postgres:14.2
     environment:
-       - POSTGRES_USER=${DJANGO_DATABASE_USER}
-       - POSTGRES_PASSWORD=${DJANGO_DATABASE_PASSWORD}
-       - POSTGRES_DB=${DJANGO_DATABASE_NAME}
+      - POSTGRES_USER=${DJANGO_DATABASE_USER}
+      - POSTGRES_PASSWORD=${DJANGO_DATABASE_PASSWORD}
+      - POSTGRES_DB=${DJANGO_DATABASE_NAME}
     networks:
       - fregepoc-main
     ports:
-      - "15432:${DOCKER_POSTGRES_PORT}"
-    profiles: ["services", "application"]
+      - "${DOCKER_POSTGRES_PORT}:15432"
+    profiles: [ "dev", "prod" ]
     restart: on-failure
     volumes:
       - fregepoc_postgresql_data:/var/lib/postgresql/data
 
-  fregepoc-backend: &backend
+  fregepoc-backend-dev: &backend
     container_name: fregepoc-backend
     image: fregepoc-backend-image
     build: ./backend
@@ -49,13 +49,13 @@ services:
       - fregepoc_tmp:${DJANGO_DOWNLOAD_PATH}
     networks:
       - fregepoc-main
-    profiles: [ "application" ]
+    profiles: [ "dev" ]
     restart: on-failure
     env_file:
       - .env
 
   fregepoc-prometheus:
-    image: prom/prometheus
+    image: prom/prometheus:v2.35.0
     container_name: fregepoc-prometheus
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
@@ -64,15 +64,16 @@ services:
     networks:
       - fregepoc-main
 
-  fregepoc-grafana:
-    image: grafana/grafana
+  fregepoc-grafana-dev: &grafana
+    image: grafana/grafana:8.5.2
     container_name: fregepoc-grafana
     depends_on:
       - fregepoc-prometheus
+      - fregepoc-postgres
     volumes:
       - fregepoc_grafana_storage:/var/lib/grafana
-      - ./backend/fregepoc/observability/datasources:/etc/grafana/provisioning/datasources/
-      - ./backend/fregepoc/observability/dashboards:/etc/grafana/provisioning/dashboards/
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
     environment:
       - GF_USERS_DEFAULT_THEME=dark
       - GF_USERS_ALLOW_SIGN_UP=false
@@ -84,11 +85,12 @@ services:
       - fregepoc-main
     env_file:
       - .env
+    profiles: [ "dev" ]
 
   fregepoc-celery-worker:
     <<: *backend
     container_name: fregepoc-celery-worker
-    ports: []
+    ports: [ ]
     command: >
       sh -c "python3 manage.py celery_dev_autoreload"
 
@@ -105,6 +107,86 @@ services:
       - fregepoc-celery-worker
       - fregepoc-redis
 
+  fregepoc-backend-prod:
+    <<: *backend
+    command: >
+      sh -c "python manage.py migrate --noinput
+      && python manage.py initadmin
+      && python manage.py collectstatic --noinput
+      && gunicorn fregepoc.wsgi:application --bind 0.0.0.0:${DOCKER_BACKEND_PORT}"
+    volumes:
+      - fregepoc_tmp:${DJANGO_DOWNLOAD_PATH}
+      - fregepoc_static_files:/app/static
+    profiles: [ "prod" ]
+
+  fregepoc-backend-nginx:
+    image: nginx:1.21
+    container_name: fregepoc-backend-nginx
+    hostname: fregepoc-backend-nginx
+    restart: on-failure
+    volumes:
+      - ./nginx:/etc/nginx/templates
+      - fregepoc_static_files:/var/www/static
+    networks:
+      - fregepoc-main
+    ports:
+      - "8080:80"
+    expose:
+      - 8080
+    depends_on:
+      - fregepoc-backend-prod
+    env_file:
+      - .env
+    environment:
+      - VIRTUAL_HOST=${BACKEND_HOSTNAME}
+      - LETSENCRYPT_HOST=${BACKEND_HOSTNAME}
+    profiles: [ "prod" ]
+
+  fregepoc-grafana-prod:
+    <<: *grafana
+    environment:
+      - GF_USERS_DEFAULT_THEME=dark
+      - GF_USERS_ALLOW_SIGN_UP=true
+      - GF_USERS_ALLOW_ORG_CREATE=false
+      - GF_AUTH_ANONYMOUS_ENABLED=false
+    profiles: [ "prod" ]
+
+  fregepoc-proxy:
+    image: nginxproxy/nginx-proxy:1.0
+    container_name: fregepoc-proxy
+    hostname: fregepoc-proxy
+    restart: on-failure
+    networks:
+      - fregepoc-main
+    ports:
+      - "${DOCKER_EGRESS_IP}:80:80"
+      - "${DOCKER_EGRESS_IP}:443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - fregepoc_proxy_conf:/etc/nginx/conf.d
+      - fregepoc_proxy_vhost:/etc/nginx/vhost.d
+      - fregepoc_proxy_html:/usr/share/nginx/html
+      - fregepoc_proxy_certs:/etc/nginx/certs:ro
+    profiles: [ "prod" ]
+
+  fregepoc-proxy-acme:
+    image: nginxproxy/acme-companion:2.2
+    container_name: fregepoc-proxy-acme
+    hostname: fregepoc-proxy-acme
+    restart: on-failure
+    networks:
+      - fregepoc-main
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - fregepoc_proxy_conf:/etc/nginx/conf.d
+      - fregepoc_proxy_vhost:/etc/nginx/vhost.d
+      - fregepoc_proxy_html:/usr/share/nginx/html
+      - fregepoc_proxy_certs:/etc/nginx/certs:rw
+    environment:
+      - DEFAULT_EMAIL=${LETSENCRYPT_EMAIL}
+      - NGINX_PROXY_CONTAINER=fregepoc-proxy
+    profiles: [ "prod" ]
+
 networks:
   fregepoc-main:
 
@@ -112,3 +194,10 @@ volumes:
   fregepoc_postgresql_data:
   fregepoc_tmp:
   fregepoc_grafana_storage:
+
+  # Production
+  fregepoc_static_files:
+  fregepoc_proxy_conf:
+  fregepoc_proxy_vhost:
+  fregepoc_proxy_html:
+  fregepoc_proxy_certs:

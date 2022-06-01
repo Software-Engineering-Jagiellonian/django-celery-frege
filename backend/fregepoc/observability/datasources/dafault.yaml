@@ -1,5 +1,0 @@
-datasources:
-  - name: Prometheus-ds
-    type: prometheus
-    uid: PEBC2E3263E2CA5B6
-    url: http://fregepoc-prometheus:9090

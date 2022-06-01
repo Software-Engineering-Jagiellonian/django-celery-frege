@@ -11,7 +11,7 @@ class GitCloneInfo:
     commit_hash: str
 
 
-def _extract_commit(soup: BeautifulSoup) -> Optional[str]:
+def extract_commit(soup: BeautifulSoup) -> Optional[str]:
     for h2 in soup.find_all("h2"):
         if "Tree" in h2.text:
             link = h2.find("a")
@@ -21,13 +21,13 @@ def _extract_commit(soup: BeautifulSoup) -> Optional[str]:
             return link["href"].split("/")[-2]
 
 
-def _extract_clone_url(soup: BeautifulSoup) -> Optional[GitCloneInfo]:
+def extract_clone_url(soup: BeautifulSoup) -> Optional[GitCloneInfo]:
     value = soup.find("input", {"id": "access_url"})
     if value:
         value = value.get("value")
         if value.startswith("git clone"):
             git_link = value.split()[2]
-            commit_hash = _extract_commit(soup)
+            commit_hash = extract_commit(soup)
 
             if commit_hash is None:
                 return None
@@ -45,4 +45,4 @@ class SourceforgeProjectCodeExtractor:
             return None
 
         soup = BeautifulSoup(response.text, "html.parser")
-        return _extract_clone_url(soup)
+        return extract_clone_url(soup)

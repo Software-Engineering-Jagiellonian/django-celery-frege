@@ -28,6 +28,10 @@ class TestAnalyzers:
                 ProgrammingLanguages.PYTHON,
                 {"repo_relative_file_path": "hello_world.py"},
             ),
+            (
+                ProgrammingLanguages.KOTLIN,
+                {"repo_relative_file_path": "windows_cpu_serial_number.kt"},
+            ),
         ],
     )
     def test_analyzers_make_some_analysis(
