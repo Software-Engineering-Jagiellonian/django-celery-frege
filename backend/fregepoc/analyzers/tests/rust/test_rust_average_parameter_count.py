@@ -1,27 +1,27 @@
 import pytest
 
 from fregepoc.analyzers.core import AnalyzerFactory
-from fregepoc.analyzers.tests.php.constans import MOCKED_PHP_FILES
+from fregepoc.analyzers.tests.rust.constants import MOCKED_RUST_FILES
 from fregepoc.repositories.constants import ProgrammingLanguages
 from fregepoc.repositories.factories import RepositoryFileFactory
 
 
 @pytest.mark.django_db
-class TestPhpAnalyzerAverageCount:
+class TestRustAnalyzerAverageCount:
     @pytest.mark.parametrize(
         ["repo_file_params", "expected_average_parameter_count"],
         [
             (
-                {"repo_relative_file_path": "main.php"},
-                0.0,
+                {"repo_relative_file_path": "iban.rs"},
+                0.5,
             ),
             (
-                {"repo_relative_file_path": "UserController.php"},
-                1.0,
+                {"repo_relative_file_path": "perlin_noise.rs"},
+                2.2,
             ),
             (
-                {"repo_relative_file_path": "UserRepository.php"},
-                1.0,
+                {"repo_relative_file_path": "radix_search.rs"},
+                1.33,
             ),
         ],
     )
@@ -32,11 +32,11 @@ class TestPhpAnalyzerAverageCount:
         settings,
         dummy_repo,
     ):
-        settings.DOWNLOAD_PATH = MOCKED_PHP_FILES
-        analyzers = AnalyzerFactory.make_analyzers(ProgrammingLanguages.PHP)
+        settings.DOWNLOAD_PATH = MOCKED_RUST_FILES
+        analyzers = AnalyzerFactory.make_analyzers(ProgrammingLanguages.RUST)
         repo_file = RepositoryFileFactory(
             repository=dummy_repo,
-            language=ProgrammingLanguages.PHP,
+            language=ProgrammingLanguages.RUST,
             **repo_file_params,
         )
         for analyzer in analyzers:

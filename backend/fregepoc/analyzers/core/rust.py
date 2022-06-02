@@ -2,28 +2,27 @@ from typing import TypedDict
 
 import lizard
 
-from fregepoc.analyzers.core.base import AnalyzerFactory, BaseAnalyzer
+from fregepoc.analyzers.core import AnalyzerFactory
+from fregepoc.analyzers.core.base import BaseAnalyzer
 from fregepoc.repositories.constants import ProgrammingLanguages
 from fregepoc.repositories.utils.analyzers import repo_file_content
 
 
-class PhpFileAnalysisResult(TypedDict):
+class RustFileAnalysisResult(TypedDict):
     lines_of_code: int
     token_count: int
     average_lines_of_code: int
     average_token_count: int
     average_cyclomatic_complexity: int
     average_parameter_count: int
-    average_nesting_depth: int
-    max_nesting_depth: int
 
 
-@AnalyzerFactory.register(ProgrammingLanguages.PHP)
-class PhpAnalyzer(BaseAnalyzer[PhpFileAnalysisResult]):
+@AnalyzerFactory.register(ProgrammingLanguages.RUST)
+class RustAnalyzer(BaseAnalyzer[RustFileAnalysisResult]):
     def analyze(self, repo_file_obj):
         with repo_file_content(repo_file_obj) as file_content:
             analysis_result = lizard.analyze_file.analyze_source_code(
-                ".php", file_content
+                ".rs", file_content
             )
 
             return {

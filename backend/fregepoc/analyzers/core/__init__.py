@@ -4,3 +4,4 @@ from .kotlin import *  # noqa
 from .php import *  # noqa
 from .python import *  # noqa
 from .ruby import *  # noqa
+from .rust import *  # noqa
