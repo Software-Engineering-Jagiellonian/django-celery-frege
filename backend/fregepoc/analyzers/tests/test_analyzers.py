@@ -32,6 +32,10 @@ class TestAnalyzers:
                 ProgrammingLanguages.KOTLIN,
                 {"repo_relative_file_path": "windows_cpu_serial_number.kt"},
             ),
+            (
+                ProgrammingLanguages.RUST,
+                {"repo_relative_file_path": "dijkstra.rs"},
+            ),
         ],
     )
     def test_analyzers_make_some_analysis(

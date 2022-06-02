@@ -14,6 +14,7 @@ class ProgrammingLanguages(models.TextChoices):
     PHP = "PHP"
     RUBY = "Ruby"
     KOTLIN = "Kotlin"
+    RUST = "Rust"
 
 
 file_extensions_registry: dict[ProgrammingLanguages, list[str]] = {}
@@ -64,3 +65,4 @@ register_extension("JS", [".js"])
 register_extension("PHP", [".php"])
 register_extension("RUBY", [".rb"])
 register_extension("KOTLIN", [".kt"])
+register_extension("RUST", [".rs"])

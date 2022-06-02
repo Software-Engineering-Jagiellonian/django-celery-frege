@@ -1,20 +1,20 @@
 import pytest
 
 from fregepoc.analyzers.core import AnalyzerFactory
-from fregepoc.analyzers.tests.php.constans import MOCKED_PHP_FILES
+from fregepoc.analyzers.tests.rust.constants import MOCKED_RUST_FILES
 from fregepoc.repositories.constants import ProgrammingLanguages
 from fregepoc.repositories.factories import RepositoryFileFactory
 
 
 @pytest.mark.django_db
-class TestPhpAnalyzerEmpty:
+class TestRustAnalyzerEmpty:
     def test_count_loc(self, settings, dummy_repo):
-        settings.DOWNLOAD_PATH = MOCKED_PHP_FILES
-        analyzers = AnalyzerFactory.make_analyzers(ProgrammingLanguages.PHP)
+        settings.DOWNLOAD_PATH = MOCKED_RUST_FILES
+        analyzers = AnalyzerFactory.make_analyzers(ProgrammingLanguages.RUST)
         repo_file = RepositoryFileFactory(
             repository=dummy_repo,
-            language=ProgrammingLanguages.PHP,
-            **{"repo_relative_file_path": "EmptyFile.php"},
+            language=ProgrammingLanguages.RUST,
+            **{"repo_relative_file_path": "empty.rs"},
         )
         for analyzer in analyzers:
             actual = analyzer.analyze(repo_file)
