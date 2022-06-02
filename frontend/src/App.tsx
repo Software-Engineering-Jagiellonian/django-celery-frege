@@ -4,7 +4,7 @@ import { Routes, Route } from 'react-router-dom';
 import Home from './components/pages/home/Home';
 import About from './components/pages/about/About';
 import { SideMenu } from './components/sideMenu/SideMenu';
-import { TopBar } from './components/topBar/TopBar';
+import { Navbar } from './components/navbar/Navbar';
 import '../node_modules/react-grid-layout/css/styles.css';
 import '../node_modules/react-resizable/css/styles.css';
 
@@ -13,7 +13,7 @@ function App() {
 
   return (
     <div className={styles.App}>
-      <TopBar onMenuClick={() => setIsMenuCollapsed(!isMenuCollapsed)} />
+      <Navbar onMenuClick={() => setIsMenuCollapsed(!isMenuCollapsed)} />
       <div className={styles.ContentNav}>
         <SideMenu className={isMenuCollapsed ? styles.hidden : undefined} />
         <div className={styles.mainContent}>
