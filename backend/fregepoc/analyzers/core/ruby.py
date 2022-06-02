@@ -1,7 +1,4 @@
 from fregepoc.analyzers.core import AnalyzerFactory
-from fregepoc.analyzers.core.generic import GenericAnalyzer
-from fregepoc.repositories.constants import PrProgrammingLanguagesogrammingLanguages
-from fregepoc.repositories.utils.analyzers import FileInformationDict
 
 
 class RubyFileAnalysisResult(TypedDict):
