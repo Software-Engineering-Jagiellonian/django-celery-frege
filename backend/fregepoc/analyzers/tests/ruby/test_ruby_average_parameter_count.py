@@ -17,11 +17,11 @@ class TestRubyAnalyzerAverageCount:
             ),
             (
                 {"repo_relative_file_path": "file_read.rb"},
-                1.2,
+                0.0,
             ),
             (
                 {"repo_relative_file_path": "expand_path.rb"},
-                1.3,
+                0,0,
             ),
         ],
     )

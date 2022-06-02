@@ -13,15 +13,15 @@ class TestRubyAnalyzerLinesOfCode:
         [
             (
                 {"repo_relative_file_path": "data_mapper.rb"},
-                1.91,
+                4.5,
             ),
             (
                 {"repo_relative_file_path": "file_read.rb"},
-                4.60,
+                0.0,
             ),
             (
                 {"repo_relative_file_path": "expand_path.rb"},
-                4.0,
+                0.0,
             ),
         ],
     )
