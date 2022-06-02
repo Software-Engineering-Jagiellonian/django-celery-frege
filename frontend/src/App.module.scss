@@ -21,8 +21,25 @@
 .mainContent {
   flex: 1;
   padding: 10px;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+    border-radius: 3px;
+    background: $background-color;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $main-borders-color;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: $frege-color;
+  }
 }
 
 .hidden {
   display: none !important;
 }
+
