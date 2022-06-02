@@ -55,19 +55,6 @@ class AnalyzeResult:
             "max_nesting_depth": int(self.max_nesting_depth),
         }
 
-    def __str__(self):
-        return (
-            f"AnalyzeResult of {self.filename} =\n"
-            f"[lines_of_code = {self.nloc}, "
-            f"token_count = {self.token_count}, "
-            f"average_lines_of_code = {self.average_lines_of_code}, "
-            f"average_token_count = {self.average_token_count}, "
-            f"average_cyclomatic_complexity = {self.average_cyclomatic_complexity}, "  # noqa: E501
-            f"average_parameter_count = {self.average_parameter_count}, "
-            f"average_nesting_depth = {self.average_nesting_depth}, "
-            f"max_nesting_depth = {self.max_nesting_depth}]"
-        )
-
 
 class CppFileAnalysisResult(TypedDict):
     lines_of_code: int
