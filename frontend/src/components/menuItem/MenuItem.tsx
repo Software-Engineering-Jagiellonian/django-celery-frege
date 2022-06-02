@@ -41,7 +41,7 @@ export const MenuItem: FC<MenuItemProps> = ({ presentationProps, isActive, handl
           )}
         </Link>
       ) : (
-        <button className={styles.menuItem}>
+        <div className={styles.menuItem}>
           <div className={styles.iconContainer}>{presentationProps.icon}</div>
           <div className={styles.label}>{presentationProps.label}</div>
           {presentationProps.subNodes && presentationProps.subNodes.length > 0 && (
@@ -49,7 +49,7 @@ export const MenuItem: FC<MenuItemProps> = ({ presentationProps, isActive, handl
               {isExpanded ? <ArrowUpShort /> : <ArrowDownShort />}
             </button>
           )}
-        </button>
+        </div>
       )}
       {isExpanded && presentationProps.subNodes && presentationProps.subNodes.length > 0 && (
         <div className={styles.subNodes}>
