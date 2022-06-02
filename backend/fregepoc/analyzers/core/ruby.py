@@ -1,4 +1,10 @@
-from fregepoc.analyzers.core import AnalyzerFactory
+from typing import TypedDict
+
+import lizard
+
+from fregepoc.analyzers.core.base import AnalyzerFactory, BaseAnalyzer
+from fregepoc.repositories.constants import ProgrammingLanguages
+from fregepoc.repositories.utils.analyzers import repo_file_content
 
 
 class RubyFileAnalysisResult(TypedDict):
