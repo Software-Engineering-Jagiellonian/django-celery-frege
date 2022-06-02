@@ -36,6 +36,10 @@ class TestAnalyzers:
                 ProgrammingLanguages.RUST,
                 {"repo_relative_file_path": "dijkstra.rs"},
             ),
+            (
+              ProgrammingLanguages.GOLANG,
+              {"repo_relative_file_path": "avl_tree.go"}
+            ),
         ],
     )
     def test_analyzers_make_some_analysis(
