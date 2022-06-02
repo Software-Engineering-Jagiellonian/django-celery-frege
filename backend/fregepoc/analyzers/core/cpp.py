@@ -2,30 +2,13 @@ import contextlib
 from typing import TypedDict
 
 import lizard
-from lizard_ext import auto_read
+from lizard import analyze_file
 
 from fregepoc.analyzers.core.base import AnalyzerFactory, BaseAnalyzer
 from fregepoc.analyzers.core.exceptions import LizardException
 from fregepoc.repositories.constants import ProgrammingLanguages
+from fregepoc.repositories.utils.analyzers import repo_file_content
 from fregepoc.repositories.utils.paths import get_file_abs_path
-
-
-class CustomFileAnalyzer(lizard.FileAnalyzer):
-    def __call__(self, filename):
-        try:
-            return self.analyze_source_code(filename, auto_read(filename))
-        except UnicodeDecodeError as ue:
-            raise LizardException(
-                f"Error: doesnt support none utf encoding {filename}"
-            ) from ue
-        except IOError as ioe:
-            raise LizardException(
-                f"Error: Fail to read source file {filename}"
-            ) from ioe
-        except IndexError as ie:
-            raise LizardException(
-                f"Error: Fail to parse file {filename}"
-            ) from ie
 
 
 class AnalyzeResult:
@@ -100,9 +83,9 @@ class CppFileAnalysisResult(TypedDict):
 @AnalyzerFactory.register(ProgrammingLanguages.CPP)
 class CppAnalyzer(BaseAnalyzer[CppFileAnalysisResult]):
     def analyze(self, repo_file_obj):
-        result = {}
-        file_path = str(get_file_abs_path(repo_file_obj))
         with contextlib.suppress(LizardException):
-            analyze_file = CustomFileAnalyzer(lizard.get_extensions(["nd"]))
-            result = AnalyzeResult(vars(analyze_file(file_path))).as_dict()
-        return result
+            lizard.get_extensions(["nd"])
+            with repo_file_content(repo_file_obj) as source_code:
+                return AnalyzeResult(vars(analyze_file.analyze_source_code(
+                    str(get_file_abs_path(repo_file_obj)), source_code
+                ))).as_dict()
