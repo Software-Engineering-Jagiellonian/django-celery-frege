@@ -5,3 +5,4 @@ from .php import *  # noqa
 from .python import *  # noqa
 from .ruby import *  # noqa
 from .rust import *  # noqa
+from .golang import * # noqa
