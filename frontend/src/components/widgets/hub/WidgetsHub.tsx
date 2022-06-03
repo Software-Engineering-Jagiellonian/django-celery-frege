@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, {FC, useEffect, useState} from 'react';
 import { Layouts, Responsive, WidthProvider } from 'react-grid-layout';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from './widgetsHub.module.scss';
@@ -52,13 +52,16 @@ export const WidgetsHub: FC<WidgetsHubProps> = ({ widgets, hubId }) => {
 
   const [showSaveModal, setShowSaveModal] = useState<boolean>(false);
   const [showResetModal, setShowResetModal] = useState<boolean>(false);
-  const [visibleWidgets, setVisibleWidgets] = useState<Record<string, WidgetRetrieveData>>(
-    getInitialVisibleWidgets()
-  );
+  const [visibleWidgets, setVisibleWidgets] = useState<Record<string, WidgetRetrieveData>>({});
   const [showPinModal, setShowPinModal] = useState<boolean>(false);
-  const [layout, setLayout] = useState<Layouts>({
-    md: getInitialLayout(hubId, widgets)
-  });
+  const [layout, setLayout] = useState<Layouts>({});
+
+  useEffect(() => {
+    setVisibleWidgets(getInitialVisibleWidgets());
+    setLayout({
+      md: getInitialLayout(hubId, widgets)
+    });
+  }, [widgets])
 
   const resetLayout = () => {
     setLayout({
@@ -114,7 +117,7 @@ export const WidgetsHub: FC<WidgetsHubProps> = ({ widgets, hubId }) => {
               </div>
               <div className={styles.widgetContent}>
                 <iframe
-                  src={`http://localhost:3000/d-solo/${widget.dashboardId}/dashboard-1?orgId=1&from=1653655032721&to=1653676632721&panelId=${widget.widgetId}`}
+                  src={`http://localhost:3000/d-solo/${widget.dashboardId}/dashboard-1?orgId=1&panelId=${widget.widgetId}`}
                   width="100%"
                   height="100%"
                   frameBorder="0"></iframe>
