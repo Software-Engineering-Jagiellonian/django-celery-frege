@@ -3,8 +3,6 @@ from dataclasses import dataclass
 
 import requests
 
-from fregepoc.repositories.models import Repository
-
 __all__ = [
     "Client",
     "RateLimitExceededException",
@@ -21,24 +19,35 @@ class RateLimitExceededException(Exception):
 @dataclass
 class Client:
     """Class for communication with the GitLab REST API"""
-    ratelimit_remaining: int = 1000
+    _ratelimit_remaining: int = 1000
     token: str = None
     after_id: int = 0
     min_forks: int = 0
     min_stars: int = 0
 
+    @property
+    def ratelimit_remaining(self) -> int:
+        return self._ratelimit_remaining
+
+    @ratelimit_remaining.setter
+    def ratelimit_remaining(self, v: str) -> None:
+        self._ratelimit_remaining = int(v)
+
     def repositories(self):
         """Returns repository and the projects id"""
         for project in chain.from_iterable(self._projects()):
             if project['star_count'] >= self.min_stars and project['forks_count'] >= self.min_forks:
+                commit_hash = self._commit_hash(project['id'])
+                if not commit_hash:
+                    continue
+
                 repo_data = dict(
                     name=project['name'],
                     description=project['description'],
                     git_url=project['http_url_to_repo'],
                     repo_url=project['web_url'],
-                    commit_hash=self._commit_hash(project['id'])
+                    commit_hash=commit_hash
                 )
-
                 yield repo_data, project['id']
 
     def _get(self, *args, **kwargs):
@@ -46,6 +55,7 @@ class Client:
         if self.ratelimit_remaining <= 0:
             raise RateLimitExceededException()
 
+        headers = {}
         if self.token:
             headers = {"PRIVATE-TOKEN": self.token}
 
@@ -63,15 +73,19 @@ class Client:
         if self.ratelimit_remaining <= 0:
             raise RateLimitExceededException()
 
-        next_page = projects_response.headers.get('Link')
+        next_page = projects_response.links.get('next', {}).get('url')
         while next_page:
             projects_response = self._get(next_page)
-            next_page = projects_response.headers.get('Link')
+            next_page = projects_response.links.get('next', {}).get('url')
             yield projects_response.json()
 
     def _commit_hash(self, project_id: int):
         """Gets the latest commit hash in the default branch"""
         project_commits = self._get(f"{BASE_ENDPOINT}/{project_id}/repository/commits")
-        return project_commits.json()[0]['id']
+        json_result = project_commits.json()
+        if json_result:
+            return project_commits.json()[0]['id']
+
+        return None
 
 
