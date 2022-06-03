@@ -82,10 +82,9 @@ class Client:
     def _commit_hash(self, project_id: int):
         """Gets the latest commit hash in the default branch"""
         project_commits = self._get(f"{BASE_ENDPOINT}/{project_id}/repository/commits")
-        json_result = project_commits.json()
-        if json_result:
+        try:
             return project_commits.json()[0]['id']
-
-        return None
+        except KeyError:
+            return None
 
 
