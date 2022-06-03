@@ -66,7 +66,7 @@ class Client:
     def _projects(self):
         """Lists JSON array with projects"""
         params = PARAMS
-        params['after_id'] = self.after_id
+        params['id_after'] = self.after_id
 
         projects_response = self._get(BASE_ENDPOINT, params=params)
 
