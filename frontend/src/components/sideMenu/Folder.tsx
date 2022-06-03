@@ -1,8 +1,8 @@
-import {FolderDetails} from "./FolderDetails";
+import { FolderDetails } from './FolderDetails';
 
 export type Folder = {
-    id: number;
-    uid: string;
-    title: string;
-    folderDetails: FolderDetails[];
-}
+  id: number;
+  uid: string;
+  title: string;
+  folderDetails: FolderDetails[];
+};

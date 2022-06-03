@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './App.module.scss';
 import { Routes, Route } from 'react-router-dom';
 import Home from './components/pages/home/Home';
@@ -11,9 +11,15 @@ import '../node_modules/react-resizable/css/styles.css';
 function App() {
   const [isMenuCollapsed, setIsMenuCollapsed] = useState(false);
 
+  useEffect(() => {
+    document.title = 'Frege';
+  }, []);
+
   return (
     <div className={styles.App}>
-      <Navbar onMenuClick={() => setIsMenuCollapsed(!isMenuCollapsed)} />
+      <Navbar
+        onMenuClick={() => setIsMenuCollapsed(!isMenuCollapsed)}
+      />
       <div className={styles.ContentNav}>
         <SideMenu className={isMenuCollapsed ? styles.hidden : undefined} />
         <div className={styles.mainContent}>

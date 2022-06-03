@@ -18,14 +18,16 @@
 
 
   &:hover {
-    background: $button-hover;
+    background: $frege-color;
+    color: $button-font-color;
+
   }
 }
 
 .expandButton {
   background: none;
-  color: $frege-color;
-  border: 1px $frege-color solid;
+  color: $main-color;
+  border: 1px $main-color solid;
   width: 30px;
   height: 30px;
   border-radius: 3px;
@@ -65,6 +67,11 @@
 .active {
   color: $frege-color;
   font-weight: bold;
+
+
+  &:hover {
+    color: $main-color;
+  }
 }
 
 .subNodes {

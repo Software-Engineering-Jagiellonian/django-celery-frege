@@ -26,14 +26,14 @@ export const MenuItem: FC<MenuItemProps> = ({ presentationProps, isActive, handl
   return (
     <>
       {presentationProps.href ? (
-        <Link className={styles.menuItem} to={presentationProps.href} onClick={onNavigate}>
+        <Link
+          className={`${styles.menuItem} ${
+            isActive(presentationProps.href) ? styles.active : styles.inactive
+          }`}
+          to={presentationProps.href}
+          onClick={onNavigate}>
           <div className={styles.iconContainer}>{presentationProps.icon}</div>
-          <div
-            className={`${styles.label} ${
-              isActive(presentationProps.href) ? styles.active : styles.inactive
-            }`}>
-            {presentationProps.label}
-          </div>
+          <div className={styles.label}>{presentationProps.label}</div>
           {presentationProps.subNodes && presentationProps.subNodes.length > 0 && (
             <button onClick={onExpandClick} type="button" className={styles.expandButton}>
               {isExpanded ? <ArrowUpShort /> : <ArrowDownShort />}
