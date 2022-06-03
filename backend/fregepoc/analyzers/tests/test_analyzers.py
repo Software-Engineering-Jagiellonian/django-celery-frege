@@ -36,6 +36,10 @@ class TestAnalyzers:
                 ProgrammingLanguages.RUST,
                 {"repo_relative_file_path": "dijkstra.rs"},
             ),
+            (
+                ProgrammingLanguages.C_SHARP,
+                {"repo_relative_file_path": "factorial.cs"},
+            ),
         ],
     )
     def test_analyzers_make_some_analysis(
