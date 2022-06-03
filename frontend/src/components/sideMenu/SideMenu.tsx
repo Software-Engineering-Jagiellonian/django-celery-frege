@@ -5,6 +5,7 @@ import { MenuItem } from '../menuItem/MenuItem';
 import axios from "axios";
 import {Folder} from "./Folder";
 import {FolderDetails} from "./FolderDetails";
+import {Box, CardList} from "react-bootstrap-icons";
 
 export const SideMenu: FC<{ className: string }> = ({ className }) => {
   const [structure, setStructure] = useState<SideMenuItemDTO[]>([]);
@@ -32,9 +33,11 @@ export const SideMenu: FC<{ className: string }> = ({ className }) => {
                           subNodes: folder.folderDetails.map(details => {
                               return {
                                   label: details.title,
-                                  href: `/${details.uid}`
+                                  href: `/${details.uid}`,
+                                  icon: <Box />
                               }
-                          })
+                          }),
+                          icon: <CardList />
                       } as SideMenuItemDTO
                   }
                   return {
