@@ -9,7 +9,7 @@ from github import Github
 
 from fregepoc.indexers.base import BaseIndexer
 from fregepoc.indexers.sourceforge import SourceforgeProjectsExtractor
-from fregepoc.indexers.utils import bitbucket
+from fregepoc.indexers.utils import bitbucket, gitlab
 from fregepoc.repositories.models import Repository
 
 
@@ -180,4 +180,43 @@ class BitbucketIndexer(BaseIndexer):
 
     class Meta:
         verbose_name = _("Bitbucket Indexer")
+        verbose_name_plural = verbose_name
+
+
+class GitLabIndexer(BaseIndexer):
+    min_forks = models.PositiveIntegerField(
+        _("min forks"),
+        default=1,
+    )
+    min_stars = models.PositiveIntegerField(
+        _("min stars"),
+        default=0,
+    )
+
+    last_project_id = models.PositiveIntegerField(
+        _("last project id"),
+        default=0,
+        help_text=_("The last processed project id."),
+    )
+
+    def __iter__(self):
+        gitlab_client = gitlab.Client(
+            token=os.environ.get("GITLAB_TOKEN"),
+            after_id=self.last_project_id,
+            min_forks=self.min_forks,
+            min_stars=self.min_stars,
+        )
+
+        try:
+            for repo_data, _id in gitlab_client.repositories():
+                self.last_project_id = _id
+                self.save(update_fields=["last_project_id"])
+                repo_to_process = Repository.objects.create(**repo_data)
+
+                yield [repo_to_process]
+        except gitlab.RateLimitExceededException:
+            self.rate_limit_exceeded = True
+
+    class Meta:
+        verbose_name = _("GitLab Indexer")
         verbose_name_plural = verbose_name
