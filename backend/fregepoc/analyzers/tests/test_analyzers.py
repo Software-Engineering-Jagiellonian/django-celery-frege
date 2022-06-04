@@ -40,6 +40,10 @@ class TestAnalyzers:
                 ProgrammingLanguages.C_SHARP,
                 {"repo_relative_file_path": "factorial.cs"},
             ),
+            (
+              ProgrammingLanguages.GOLANG,
+              {"repo_relative_file_path": "avl_tree.go"}
+            ),
         ],
     )
     def test_analyzers_make_some_analysis(
