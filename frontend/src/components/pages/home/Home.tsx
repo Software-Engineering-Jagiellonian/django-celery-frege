@@ -1,29 +1,21 @@
 import React from 'react';
-import { WidgetsHub } from '../../widgets/hub/WidgetsHub';
+import ContributorsList from '../../authorsList/ContributorsList';
+import styles from './home.module.scss';
 
 function Home() {
   return (
     <div>
-      <h2>Home</h2>
-      <WidgetsHub
-        widgets={[
-          {
-            widgetId: '2',
-            dashboardId: 'RRj1M49nz',
-            widgetName: 'widget2',
-            dashboardName: 'dashboard'
-          },
-          {
-            widgetId: '4',
-            dashboardId: 'RRj1M49nz',
-            widgetName: 'widget2',
-            dashboardName: 'dashboard'
-          }
-        ]}
-        hubId={'general/RRj1M49nz'}
-      />
+      <div className={styles.coordinators}>
+        <h3>Project Coordinators</h3>
+        <ul>
+          <li>Jarek Hryszko</li>
+          <li>Michał Piotrowski</li>
+          <li>Adam Roman</li>
+        </ul>
+      </div>
+      <h3>Project Contributors</h3>
+      <ContributorsList />
     </div>
   );
 }
-
 export default Home;

@@ -1,4 +1,4 @@
-import React, {FC, useEffect, useState} from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { Layouts, Responsive, WidthProvider } from 'react-grid-layout';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from './widgetsHub.module.scss';
@@ -61,7 +61,7 @@ export const WidgetsHub: FC<WidgetsHubProps> = ({ widgets, hubId }) => {
     setLayout({
       md: getInitialLayout(hubId, widgets)
     });
-  }, [widgets])
+  }, [widgets]);
 
   const resetLayout = () => {
     setLayout({
