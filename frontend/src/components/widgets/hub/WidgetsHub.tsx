@@ -117,10 +117,11 @@ export const WidgetsHub: FC<WidgetsHubProps> = ({ widgets, hubId }) => {
               </div>
               <div className={styles.widgetContent}>
                 <iframe
-                  src={`http://localhost:3000/d-solo/${widget.dashboardId}/dashboard-1?orgId=1&panelId=${widget.widgetId}`}
+                  src={`/grafana/d-solo/${widget.dashboardId}/dashboard-1?orgId=1&panelId=${widget.widgetId}`}
                   width="100%"
                   height="100%"
-                  frameBorder="0"></iframe>
+                  frameBorder="0"
+                  className={styles.graphFrame}></iframe>
               </div>
             </div>
           ))}

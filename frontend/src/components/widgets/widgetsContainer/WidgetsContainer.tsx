@@ -10,7 +10,7 @@ function WidgetsContainer() {
   const [dashboardName, setDashboardName] = useState('');
 
   useEffect(() => {
-    axios.get(`api/dashboards/uid/${dashboardId}`).then((response) => {
+    axios.get(`/grafana/api/dashboards/uid/${dashboardId}`).then((response) => {
       const widgetsTemp: WidgetRetrieveData[] = response.data.dashboard.panels.map(
         (panel: { id: string; title: string }) => {
           return {

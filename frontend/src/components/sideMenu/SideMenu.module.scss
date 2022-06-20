@@ -8,6 +8,47 @@
   align-items: stretch;
   background: $sideMenu-background-color;
   border-right: 1px solid $main-borders-color;
-  padding: 2px;
-  padding-top: 20px;
+  padding: 20px 2px 2px 2px;
+}
+
+.menuContainer {
+  flex: 1;
+}
+
+.manualAdd {
+  height: 50px;
+  width: auto;
+  justify-self: end;
+  align-self: stretch;
+  margin: 10px;
+}
+
+.pinningListItem{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 60px;
+  border: $main-color 1px solid;
+  border-radius: 7px;
+  padding: 0 10px;
+  margin: 3px 0;
+
+  .listStyledButton{
+    width: 80px;
+    height: 40px;
+  }
+}
+
+.textInput {
+  background-color: $background-color;
+  border: $main-color 1px solid;
+  height: 40px;
+  border-radius: 7px;
+  padding: 8px;
+  margin: 0 0 10px 0;
+  color: $button-font-color;
+}
+
+.errorMsg {
+  color: $error;
 }

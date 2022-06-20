@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import styles from './navbar.module.scss';
-import { ArrowBarLeft, List } from 'react-bootstrap-icons';
+import { List } from 'react-bootstrap-icons';
 import { Link } from 'react-router-dom';
 
 interface TopBarProps {
