@@ -84,7 +84,8 @@ export const SideMenu: FC<{ className: string }> = ({ className }) => {
             setShowAtLeastOne(false);
             setAddModalVisible(true);
           }}
-          className={styles.manualAdd}>
+          className={styles.manualAdd}
+        >
           Add manual dashboard
         </StyledButton>
       </div>
@@ -112,7 +113,8 @@ export const SideMenu: FC<{ className: string }> = ({ className }) => {
               ]);
             } else setShowNameUsed(true);
           }
-        }}>
+        }}
+      >
         <input
           type="text"
           placeholder="Name"
@@ -141,7 +143,8 @@ export const SideMenu: FC<{ className: string }> = ({ className }) => {
                   else updatedDashboards.add(node.id);
 
                   setChosenDashboard(updatedDashboards);
-                }}>
+                }}
+              >
                 {chosenDashboards.has(node.id) ? 'Unpin' : 'Pin'}
               </StyledButton>
             </div>

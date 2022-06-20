@@ -31,7 +31,8 @@ export const MenuItem: FC<MenuItemProps> = ({ presentationProps, isActive, handl
             isActive(presentationProps.href) ? styles.active : styles.inactive
           }`}
           to={presentationProps.href}
-          onClick={onNavigate}>
+          onClick={onNavigate}
+        >
           <div className={styles.iconContainer}>{presentationProps.icon}</div>
           <div className={styles.label}>{presentationProps.label}</div>
           {presentationProps.subNodes && presentationProps.subNodes.length > 0 && (
