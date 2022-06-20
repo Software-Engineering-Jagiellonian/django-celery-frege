@@ -110,20 +110,41 @@ services:
       - fregepoc-celery-worker
       - fregepoc-redis
 
-  fregepoc-frontend:
-    command : npm start
-    container_name: fregepoc-frontend
-    hostname: fregepoc-frontend
+  fregepoc-frontend-dev:
+    command: npm start
+    container_name: fregepoc-frontend-dev
+    hostname: fregepoc-frontend-dev
+    build: ./frontend
+    ports:
+      - 3030:3000
+    stdin_open: true
+    depends_on:
+      - fregepoc-grafana-dev
+    networks:
+      - fregepoc-main
+    environment:
+      - REACT_APP_DOCKER_GRAFANA_HOST=fregepoc-grafana
+      - REACT_APP_DOCKER_GRAFANA_PORT=3000
+    profiles: [ "dev" ]
+
+  fregepoc-frontend-prod:
+    command: npm start
+    container_name: fregepoc-frontend-prod
+    hostname: fregepoc-frontend-prod
     build: ./frontend
     ports:
       - "3030:3000"
     stdin_open: true
     depends_on:
-      - fregepoc-grafana
+      - fregepoc-grafana-prod
+    environment:
+      - REACT_APP_DOCKER_GRAFANA_HOST=fregepoc-grafana
+      - REACT_APP_DOCKER_GRAFANA_PORT=3000
+      - NODE_ENV=production
     networks:
       - fregepoc-main
-    env_file:
-      - .env
+    profiles: [ "prod" ]
+
   fregepoc-backend-prod:
     <<: *backend
     command: >
@@ -163,9 +184,12 @@ services:
     <<: *grafana
     environment:
       - GF_USERS_DEFAULT_THEME=dark
-      - GF_USERS_ALLOW_SIGN_UP=true
+      - GF_USERS_ALLOW_SIGN_UP=false
       - GF_USERS_ALLOW_ORG_CREATE=false
-      - GF_AUTH_ANONYMOUS_ENABLED=false
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_SECURITY_ALLOW_EMBEDDING=true
+      - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/grafana/
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true
     profiles: [ "prod" ]
 
   fregepoc-proxy:
