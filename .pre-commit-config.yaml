@@ -25,12 +25,13 @@ repos:
             'flake8-bugbear==21.11.29',
             'flake8-no-pep420==2.0.0',
         ]
-        args: ["--config=.flake8"]
+        args: ["--config=backend/.flake8"]
   - repo: https://github.com/PyCQA/isort
     rev: 5.10.1
     hooks:
       - id: isort
         args: ["--settings-file=backend/pyproject.toml"]
+        exclude: '/(migrations|\.direnv|\.eggs|\.git|\.hg|\.mypy_cache|\.nox|\.tox|\.venv|venv|\.env|env|\.svn|_build|buck-out|build|dist)/'
   - repo: https://github.com/ambv/black
     rev: 22.3.0
     hooks:
