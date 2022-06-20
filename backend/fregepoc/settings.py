@@ -23,18 +23,22 @@ SECRET_KEY = (
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DJANGO_DEBUG", "true").lower() == "true"
 
-ALLOWED_HOSTS = [".localhost", "127.0.0.1"]
+ALLOWED_HOSTS = [os.environ.get("BACKEND_HOSTNAME", ".localhost")]
 
-DJANGO_CORS_ALLOWED_HOSTS = ["http://localhost:4200"]
+DJANGO_CORS_ALLOWED_HOSTS = [
+    os.environ.get("FRONTEND_URL", "http://localhost:4200")
+]
 
 # Application definition
 
 PROJECT_APPS = [
+    "fregepoc",
     "fregepoc.repositories.apps.RepositoriesConfig",
     "fregepoc.indexers.apps.IndexersConfig",
+    "fregepoc.analyzers.apps.AnalyzersConfig",
 ]
 
-INSTALLED_APPS = [
+EXTERNAL_APPS = [
     "jazzmin",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -43,12 +47,19 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django_extensions",
-    "fregepoc",
-] + PROJECT_APPS
+    "rest_framework",
+    "rest_framework_api_key",
+    "corsheaders",
+    "django_filters",
+    "channels",
+]
+
+INSTALLED_APPS = EXTERNAL_APPS + PROJECT_APPS
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -75,6 +86,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "fregepoc.wsgi.application"
+ASGI_APPLICATION = "fregepoc.asgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
@@ -115,6 +127,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "static"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
@@ -130,26 +143,65 @@ DATABASES = {
         "USER": os.environ.get("DJANGO_DATABASE_USER", "frege"),
         "PASSWORD": os.environ.get("DJANGO_DATABASE_PASSWORD", "admin"),
         "HOST": os.environ.get("DJANGO_DATABASE_HOST", "127.0.0.1"),
-        "PORT": os.environ.get("DJANGO_DATABASE_PORT", "15432"),
+        "PORT": os.environ.get("DOCKER_POSTGRES_PORT", "15432"),
     }
 }
 
+REDIS_HOST = os.environ.get("DJANGO_REDIS_HOST", "127.0.0.1")
+REDIS_PORT = os.environ.get("DJANGO_REDIS_PORT", "16379")
+
 # CELERY STUFF
-CELERY_BROKER_URL = (
-    f"redis://{os.environ.get('DJANGO_REDIS_HOST', '127.0.0.1')}:"
-    + f"{os.environ.get('DJANGO_REDIS_PORT', '16379')}"
-)
+CELERY_BROKER_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/"
 CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_TASK_SERIALIZER = "json"
 # CELERY_IMPORTS = ("fregepoc.repositories.celery_tasks",)
 
-# TODO: cleanup
-REDIS_HOST = os.environ.get("DJANGO_REDIS_HOST", "fregepoc-redis")
-REDIS_PORT = os.environ.get("DJANGO_REDIS_PORT", "6379")
-
 CELERY_RESULT_BACKEND = f"redis://{REDIS_HOST}:{REDIS_PORT}/"
 CELERY_CACHE_BACKEND = f"redis://{REDIS_HOST}:{REDIS_PORT}/"
 
+# CACHE
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": f"redis://{REDIS_HOST}:{REDIS_PORT}/",
+    }
+}
+
 # MISC
 
-DOWNLOAD_PATH = os.environ.get("DJANGO_DOWNLOAD_PATH", "/usr/fregepoc-tmp/")
+DOWNLOAD_PATH = os.environ.get("DJANGO_DOWNLOAD_PATH", "/var/tmp/frege/")
+
+# REST FRAMEWORK
+
+REST_FRAMEWORK = {
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": 100,
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated"
+    ],
+    "DEFAULT_FILTER_BACKENDS": [
+        "django_filters.rest_framework.DjangoFilterBackend"
+    ],
+    "DEFAULT_THROTTLE_CLASSES": [
+        "fregepoc.utils.throttling.ApiKeyRateThrottle"
+    ],
+    "DEFAULT_THROTTLE_RATES": {"apikey": "500/minute"},
+}
+
+# CORS
+
+CORS_ALLOWED_ORIGINS = [
+    # set for production
+]
+
+# CHANNELS
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [(REDIS_HOST, REDIS_PORT)],
+        },
+    },
+}
