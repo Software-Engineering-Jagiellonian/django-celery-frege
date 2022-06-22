@@ -1,0 +1,36 @@
+@import "../../colors.module";
+
+.navbar {
+  width: 100%;
+  height: 65px;
+  background: $navbar-background-color;
+  border-bottom: 1px solid $main-borders-color;
+  display: flex;
+  align-items: center;
+}
+
+.leftAligned {
+  display: flex;
+  margin: 0;
+  width: 235px;
+  align-items: center;
+  justify-content: center;
+
+  .logo {
+    margin-right: 12px;
+    margin-left: 12px;
+  }
+}
+
+.navbarButton {
+  background-color: $navbar-background-color;
+  width: 35px;
+  height: 37px;
+  border: 0;
+
+
+  path {
+    color: $main-color;
+  }
+}
+
