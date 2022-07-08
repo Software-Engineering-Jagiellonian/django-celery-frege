@@ -1,6 +1,9 @@
 version: "3.9"
 
 services:
+
+  # === [General] ===
+
   fregepoc-redis:
     container_name: fregepoc-redis
     hostname: fregepoc-redis
@@ -29,6 +32,38 @@ services:
     volumes:
       - fregepoc_postgresql_data:/var/lib/postgresql/data
 
+  fregepoc-prometheus:
+    image: prom/prometheus:v2.35.0
+    container_name: fregepoc-prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090
+    networks:
+      - fregepoc-main
+
+  fregepoc-flower:
+    <<: *backend
+    container_name: fregepoc-flower
+    command: celery -A fregepoc flower
+    ports:
+      - 5555:5555
+    environment:
+      CELERY_BROKER_URL: redis://fregepoc-redis
+      CELERY_RESULT_BACKEND: redis://fregepoc-redis
+    depends_on:
+      - fregepoc-celery-worker
+      - fregepoc-redis
+
+  fregepoc-celery-worker:
+    <<: *backend
+    container_name: fregepoc-celery-worker
+    ports: [ ]
+    command: >
+      sh -c "python3 manage.py celery_dev_autoreload"
+
+  # === [Dev] ===
+
   fregepoc-backend-dev: &backend
     container_name: fregepoc-backend
     image: fregepoc-backend-image
@@ -53,16 +88,6 @@ services:
     restart: on-failure
     env_file:
       - .env
-
-  fregepoc-prometheus:
-    image: prom/prometheus:v2.35.0
-    container_name: fregepoc-prometheus
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    ports:
-      - 9090:9090
-    networks:
-      - fregepoc-main
 
   fregepoc-grafana-dev: &grafana
     image: grafana/grafana:8.5.2
@@ -90,26 +115,6 @@ services:
       - .env
     profiles: [ "dev" ]
 
-  fregepoc-celery-worker:
-    <<: *backend
-    container_name: fregepoc-celery-worker
-    ports: [ ]
-    command: >
-      sh -c "python3 manage.py celery_dev_autoreload"
-
-  fregepoc-flower:
-    <<: *backend
-    container_name: fregepoc-flower
-    command: celery -A fregepoc flower
-    ports:
-      - 5555:5555
-    environment:
-      CELERY_BROKER_URL: redis://fregepoc-redis
-      CELERY_RESULT_BACKEND: redis://fregepoc-redis
-    depends_on:
-      - fregepoc-celery-worker
-      - fregepoc-redis
-
   fregepoc-frontend-dev:
     command: npm start
     container_name: fregepoc-frontend-dev
@@ -126,6 +131,8 @@ services:
       - REACT_APP_DOCKER_GRAFANA_HOST=fregepoc-grafana
       - REACT_APP_DOCKER_GRAFANA_PORT=3000
     profiles: [ "dev" ]
+
+  # === [Prod] ===
 
   fregepoc-frontend-prod:
     command: npm start
