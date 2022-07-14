@@ -1,5 +1,30 @@
 version: "3.9"
 
+x-backend: &backend
+  container_name: fregepoc-backend
+  image: fregepoc-backend-image
+  build: ./backend
+  hostname: backend
+  command: >
+    sh -c "python manage.py migrate --noinput
+    && python manage.py initadmin
+    && python manage.py runserver
+    0.0.0.0:${DOCKER_BACKEND_PORT}"
+  ports:
+    - "${DOCKER_EGRESS_IP}:${DOCKER_BACKEND_PORT}:${DOCKER_BACKEND_PORT}"
+  depends_on:
+    - fregepoc-postgres
+    - fregepoc-redis
+  volumes:
+    - ./backend:/app
+    - fregepoc_tmp:${DJANGO_DOWNLOAD_PATH}
+  networks:
+    - fregepoc-main
+  profiles: [ "dev" ]
+  restart: on-failure
+  env_file:
+    - .env
+
 services:
 
   # === [General] ===
@@ -64,30 +89,8 @@ services:
 
   # === [Dev] ===
 
-  fregepoc-backend-dev: &backend
-    container_name: fregepoc-backend
-    image: fregepoc-backend-image
-    build: ./backend
-    hostname: backend
-    command: >
-      sh -c "python manage.py migrate --noinput
-      && python manage.py initadmin
-      && python manage.py runserver
-      0.0.0.0:${DOCKER_BACKEND_PORT}"
-    ports:
-      - "${DOCKER_EGRESS_IP}:${DOCKER_BACKEND_PORT}:${DOCKER_BACKEND_PORT}"
-    depends_on:
-      - fregepoc-postgres
-      - fregepoc-redis
-    volumes:
-      - ./backend:/app
-      - fregepoc_tmp:${DJANGO_DOWNLOAD_PATH}
-    networks:
-      - fregepoc-main
-    profiles: [ "dev" ]
-    restart: on-failure
-    env_file:
-      - .env
+  fregepoc-backend-dev: 
+    <<: *backend
 
   fregepoc-grafana-dev: &grafana
     image: grafana/grafana:8.5.2
