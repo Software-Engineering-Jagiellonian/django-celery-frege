@@ -35,8 +35,8 @@ services:
     image: redis:7.0
     networks:
       - fregepoc-main
-    ports:
-      - "${DOCKER_REDIS_PORT}:16379"
+    expose:
+      - "${DOCKER_REDIS_PORT}"
     profiles: [ "dev", "prod" ]
     restart: on-failure
 
@@ -50,8 +50,8 @@ services:
       - POSTGRES_DB=${DJANGO_DATABASE_NAME}
     networks:
       - fregepoc-main
-    ports:
-      - "${DOCKER_POSTGRES_PORT}:15432"
+    expose:
+      - "${DOCKER_POSTGRES_PORT}"
     profiles: [ "dev", "prod" ]
     restart: on-failure
     volumes:

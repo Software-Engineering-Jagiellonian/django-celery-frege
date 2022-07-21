@@ -23,7 +23,7 @@ SECRET_KEY = (
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DJANGO_DEBUG", "true").lower() == "true"
 
-ALLOWED_HOSTS = [os.environ.get("BACKEND_HOSTNAME", ".localhost")]
+ALLOWED_HOSTS = [os.environ.get("BACKEND_HOSTNAME"), ".localhost"]
 
 DJANGO_CORS_ALLOWED_HOSTS = [
     os.environ.get("FRONTEND_URL", "http://localhost:4200")
