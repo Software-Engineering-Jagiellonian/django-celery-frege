@@ -161,6 +161,7 @@ services:
 
   fregepoc-backend-prod:
     <<: *backend
+    container_name: fregepoc-backend-prod
     command: >
       sh -c "python manage.py migrate --noinput
       && python manage.py initadmin
