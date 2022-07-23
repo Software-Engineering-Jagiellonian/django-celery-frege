@@ -62,30 +62,34 @@ services:
     container_name: fregepoc-prometheus
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    ports:
-      - 9090:9090
+    expose:
+      - 9090
     networks:
       - fregepoc-main
+    profiles: [ "dev", "prod" ]
 
   fregepoc-flower:
     <<: *backend
     container_name: fregepoc-flower
     command: celery -A fregepoc flower
-    ports:
-      - 5555:5555
+    ports: []
+    expose:
+      - 5555
     environment:
       CELERY_BROKER_URL: redis://fregepoc-redis
       CELERY_RESULT_BACKEND: redis://fregepoc-redis
     depends_on:
       - fregepoc-celery-worker
       - fregepoc-redis
+    profiles: [ "dev", "prod" ]
 
   fregepoc-celery-worker:
     <<: *backend
     container_name: fregepoc-celery-worker
-    ports: [ ]
+    ports: []
     command: >
       sh -c "python3 manage.py celery_dev_autoreload"
+    profiles: [ "dev", "prod" ]
 
 # === [Dev] ===
 
@@ -126,7 +130,7 @@ services:
     working_dir: /home/node/app
     environment:
       - PORT=${DOCKER_FRONTEND_PORT}
-      - REACT_APP_DOCKER_GRAFANA_HOST=fregepoc-grafana
+      - REACT_APP_DOCKER_GRAFANA_HOST=fregepoc-grafana-dev
       - REACT_APP_DOCKER_GRAFANA_PORT=3000
     volumes:
       - ./frontend:/home/node/app
@@ -150,14 +154,14 @@ services:
       - ${DOCKER_FRONTEND_PORT}
     environment:
       - PORT=${DOCKER_FRONTEND_PORT}
-      - REACT_APP_DOCKER_GRAFANA_HOST=fregepoc-grafana
+      - REACT_APP_DOCKER_GRAFANA_HOST=fregepoc-grafana-prod
       - REACT_APP_DOCKER_GRAFANA_PORT=3000
       - NODE_ENV=production
       - VIRTUAL_HOST=${FRONTEND_HOSTNAME}
       - LETSENCRYPT_HOST=${FRONTEND_HOSTNAME}
     depends_on:
       - fregepoc-grafana-prod
-    profiles: [ "prod" ]
+    profiles: [ "frontend-prod" ]
 
   fregepoc-backend-prod:
     <<: *backend
@@ -185,12 +189,19 @@ services:
       - GF_USERS_DEFAULT_THEME=dark
       - GF_USERS_ALLOW_SIGN_UP=false
       - GF_USERS_ALLOW_ORG_CREATE=false
-      - GF_AUTH_ANONYMOUS_ENABLED=true
-      - GF_SECURITY_ALLOW_EMBEDDING=true
-      - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/grafana/
-      - GF_SERVER_SERVE_FROM_SUB_PATH=true
+      - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
+      # - GF_AUTH_ANONYMOUS_ENABLED=true
+      # - GF_SECURITY_ALLOW_EMBEDDING=true
+      # - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/grafana/
+      # - GF_SERVER_SERVE_FROM_SUB_PATH=true
+      - VIRTUAL_HOST=${FRONTEND_HOSTNAME}
+      - LETSENCRYPT_HOST=${FRONTEND_HOSTNAME}
     profiles: [ "prod" ]
+    expose:
+      - ${DOCKER_FRONTEND_PORT}
     ports: []
+    env_file: []
 
   nginx-proxy:
     image: nginx
@@ -207,7 +218,7 @@ services:
       - fregepoc_proxy_certs:/etc/nginx/certs:ro
       # TODO: this is a hack to get the nginx proxy to work with the django
       #       static files (currently there exists a blanket "api_static"
-      #       location rule in egress.ngins.conf)
+      #       location rule in egress.ngins.conf) - should be fixed
       - fregepoc_static_files:/var/www/backend/static
     restart: always
     profiles: [ "prod" ]
