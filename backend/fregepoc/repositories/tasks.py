@@ -39,11 +39,10 @@ def _finalize_repo_analysis(repo_obj):
         )
 
 
-def _delete_file(file: Path, repo_path: Path):
-    path = repo_path / file
-    logger.info(f"Deleting file {path} for repository {repo_path}")
+def _delete_file(path: Path, repo: str):
+    logger.info(f"Deleting file {path} for repository {repo}")
     path.unlink(missing_ok=True)
-    logger.info(f"File {path} deleted for repository {repo_path}")
+    logger.info(f"File {path} deleted for repository {repo}")
 
 
 def _clone_repo(repo: Repository, local_path: Path) -> Optional[git.Repo]:
@@ -196,46 +195,33 @@ def process_repo_task(repo_pk):
         return
 
     with closing(repo_obj) as cloned_repo:
-        # TODO improve this logic (maybe replace with just a loop)
-        all_repo_files_and_languages = [
-            (
-                RepositoryFile(
-                    repository=repo,
-                    repo_relative_file_path=relative_file_path,
-                    language=language,
-                    analyzed=False,
-                ),
-                language,
+        repo_path = get_repo_local_path(repo)
+        files = []
+        for relative_file_path, language in get_repo_files(cloned_repo):
+            absolute_file_path = repo_path / relative_file_path
+
+            if not AnalyzerFactory.has_analyzers(language):
+                _delete_file(absolute_file_path, repo.name)
+
+            file = RepositoryFile(
+                repository=repo,
+                repo_relative_file_path=relative_file_path,
+                absolute_file_path=absolute_file_path,
+                language=language,
+                analyzed=False,
             )
-            for relative_file_path, language in get_repo_files(cloned_repo)
-        ]
+            files.append(file)
 
-        repo_files_with_analyzers = [
-            (file, language)
-            for file, language in all_repo_files_and_languages
-            if AnalyzerFactory.has_analyzers(language)
-        ]
-        repo_files_without_analyzers = [
-            (file, language)
-            for file, language in all_repo_files_and_languages
-            if not AnalyzerFactory.has_analyzers(language)
-        ]
+        RepositoryFile.objects.bulk_create(files)
 
-        repo_files = [file for file, _ in repo_files_with_analyzers]
-        RepositoryFile.objects.bulk_create(repo_files)
-
-    repo_path = get_repo_local_path(repo)
-    for repo_file in repo_files:
-        analyze_file_task.apply_async(args=(repo_file.pk, str(repo_path)))
-
-    for file, _ in repo_files_without_analyzers:
-        _delete_file(Path(file.repo_relative_file_path), repo_path)
+    for repo_file in files:
+        analyze_file_task.apply_async(args=(repo_file.pk,))
 
     _finalize_repo_analysis(repo)
 
 
 @shared_task
-def analyze_file_task(repo_file_pk, repo_path: str):
+def analyze_file_task(repo_file_pk):
     # TODO: docstring & cleanup
 
     try:
@@ -257,7 +243,7 @@ def analyze_file_task(repo_file_pk, repo_path: str):
             # This should use more specific exception but some analyzer is
             # raising undocumented exceptions
             logger.error(
-                f"Failed to analize {repo_file.repository.git_url} for "
+                f"Failed to analyze {repo_file.repository.git_url} for "
                 f"analyzer {analyzer}"
             )
 
@@ -268,5 +254,5 @@ def analyze_file_task(repo_file_pk, repo_path: str):
         repo_file.save(update_fields=["metrics", "analyzed", "analyzed_time"])
 
     logger.info(f"repo_file {repo_file.repository.git_url} analyzed")
-    _delete_file(Path(repo_file.repo_relative_file_path), Path(repo_path))
+    _delete_file(Path(repo_file.absolute_file_path), repo_file.repository.name)
     _finalize_repo_analysis(repo_file.repository)
