@@ -79,6 +79,12 @@ class RepositoryFile(models.Model):
         null=True,
         help_text=_("File path, relative to the repository root."),
     )
+    absolute_file_path = models.CharField(  # noqa: DJ01
+        max_length=512,
+        blank=True,
+        null=True,
+        help_text=_("Absolute file path"),
+    )
     metrics = models.JSONField(
         _("metrics"),
         blank=True,
