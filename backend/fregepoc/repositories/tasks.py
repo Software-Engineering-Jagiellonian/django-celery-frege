@@ -140,6 +140,8 @@ def crawl_repos_task(indexer_class_name):
         # Trigger Celery auto retry by re-raising exception
         logger.info("Download queue too big. Retrying")
         raise ex
+    except ValueError:
+        logger.info("Failed to inspect queue")
 
     try:
         _check_download_folder_size()
