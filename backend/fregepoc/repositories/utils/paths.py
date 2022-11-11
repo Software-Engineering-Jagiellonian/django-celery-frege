@@ -1,5 +1,6 @@
 from collections.abc import Generator
 from pathlib import Path
+from typing import Tuple
 
 from django.conf import settings
 from github import Repository as GitHubRepository
@@ -19,7 +20,7 @@ def get_repo_local_path(repo: models.Repository) -> Path:
 
 def get_repo_files(
     repo_obj: GitHubRepository,
-) -> Generator[tuple[str, ProgrammingLanguages]]:
+) -> Generator[Tuple[str, ProgrammingLanguages]]:
     # TODO: docstring
     for file_path in repo_obj.git.ls_files().split("\n"):
         extension = Path(file_path).suffix

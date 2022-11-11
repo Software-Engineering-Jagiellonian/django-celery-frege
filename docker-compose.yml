@@ -68,33 +68,50 @@ services:
       - fregepoc-main
     profiles: [ "dev", "prod" ]
 
-  fregepoc-flower:
+# === [Dev] ===
+
+  fregepoc-backend-dev:
     <<: *backend
-    container_name: fregepoc-flower
+
+  fregepoc-flower-dev:
+    <<: *backend
+    container_name: fregepoc-flower-dev
     command: celery -A fregepoc flower
-    ports: []
+    ports:
+      - 5555:5555
     expose:
       - 5555
     environment:
       CELERY_BROKER_URL: redis://fregepoc-redis
       CELERY_RESULT_BACKEND: redis://fregepoc-redis
     depends_on:
-      - fregepoc-celery-worker
+      - fregepoc-celery-worker-dev
+      # - fregepoc-celery-downloads-worker-dev
+      # - fregepoc-celery-crawl-worker-dev
       - fregepoc-redis
-    profiles: [ "dev", "prod" ]
+    profiles: [ "dev" ]
 
-  fregepoc-celery-worker:
+  # fregepoc-celery-crawl-worker-dev:
+  #   <<: *backend
+  #   container_name: fregepoc-celery-crawl-worker-dev
+  #   ports: []
+  #   command: celery -A fregepoc worker -Q crawl -l info --concurrency=1 -n worker_crawl
+  #   profiles: [ "dev", "prod" ]
+
+  # fregepoc-celery-downloads-worker-dev:
+  #   <<: *backend
+  #   container_name: fregepoc-celery-downloads-worker-dev
+  #   ports: []
+  #   command: celery -A fregepoc worker -Q downloads -l info --concurrency=3 -n worker_downloads
+  #   profiles: [ "dev", "prod" ]
+
+  fregepoc-celery-worker-dev:
     <<: *backend
-    container_name: fregepoc-celery-worker
+    container_name: fregepoc-celery-worker-dev
     ports: []
-    command: >
-      sh -c "python3 manage.py celery_dev_autoreload"
-    profiles: [ "dev", "prod" ]
-
-# === [Dev] ===
-
-  fregepoc-backend-dev: 
-    <<: *backend
+    # command: celery -A fregepoc worker -Q celery -l info --concurrency=6 -n worker_celery
+    command: sh -c "python3 manage.py celery_dev_autoreload"
+    profiles: [ "dev" ]
 
   fregepoc-grafana-dev: &grafana
     image: grafana/grafana:8.5.2
@@ -203,6 +220,45 @@ services:
     ports: []
     env_file: []
 
+  fregepoc-flower-prod:
+    <<: *backend
+    container_name: fregepoc-flower-prod
+    command: celery -A fregepoc flower
+    ports:
+      - 5555:5555
+    expose:
+      - 5555
+    environment:
+      CELERY_BROKER_URL: redis://fregepoc-redis
+      CELERY_RESULT_BACKEND: redis://fregepoc-redis
+    depends_on:
+      - fregepoc-celery-worker-prod
+      - fregepoc-celery-downloads-worker-prod
+      - fregepoc-celery-crawl-worker-prod
+      - fregepoc-redis
+    profiles: [ "prod" ]
+
+  fregepoc-celery-crawl-worker-prod:
+      <<: *backend
+      container_name: fregepoc-celery-crawl-worker-prod
+      ports: []
+      command: celery -A fregepoc worker -Q crawl -l info --concurrency=1 -n worker_crawl
+      profiles: [ "prod" ]
+
+  fregepoc-celery-downloads-worker-prod:
+    <<: *backend
+    container_name: fregepoc-celery-downloads-worker-prod
+    ports: []
+    command: celery -A fregepoc worker -Q downloads -l info --concurrency=3 -n worker_downloads
+    profiles: [ "prod" ]
+
+  fregepoc-celery-worker-prod:
+    <<: *backend
+    container_name: fregepoc-celery-worker-prod
+    ports: []
+    command: celery -A fregepoc worker -Q celery -l info --concurrency=6 -n worker_celery
+    profiles: [ "prod" ]
+
   nginx-proxy:
     image: nginx
     # TODO: field below should be changed, but will require docker-gen
@@ -229,7 +285,7 @@ services:
     image: nginxproxy/docker-gen
     container_name: fregepoc-nginx-proxy-gen
     command: >
-      -notify-sighup nginx-proxy 
+      -notify-sighup nginx-proxy
       -watch /etc/docker-gen/templates/nginx.tmpl /etc/nginx/conf.d/default.conf
     volumes_from:
       - nginx-proxy

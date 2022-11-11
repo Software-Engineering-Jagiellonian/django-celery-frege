@@ -159,6 +159,12 @@ CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_BACKEND = f"redis://{REDIS_HOST}:{REDIS_PORT}/"
 CELERY_CACHE_BACKEND = f"redis://{REDIS_HOST}:{REDIS_PORT}/"
 
+CELERY_TASK_ROUTES = {
+    "fregepoc.repositories.tasks.process_repo_task": {"queue": "downloads"},
+    "fregepoc.repositories.tasks.crawl_repos_task": {"queue": "crawl"},
+}
+
+
 # CACHE
 
 CACHES = {
@@ -171,6 +177,15 @@ CACHES = {
 # MISC
 
 DOWNLOAD_PATH = os.environ.get("DJANGO_DOWNLOAD_PATH", "/var/tmp/frege/")
+DOWNLOAD_DIR_MAX_SIZE_BYTES = int(
+    os.environ.get("DOWNLOAD_DIR_MAX_SIZE_BYTES", "2000000000")
+)
+DOWNLOAD_TASK_NAME = os.environ.get(
+    "DOWNLOAD_TASK_NAME", "celery@worker_downloads"
+)
+MAX_DOWNLOAD_TASKS_COUNT = int(
+    os.environ.get("MAX_DOWNLOAD_TASKS_COUNT", "24")
+)
 
 # REST FRAMEWORK
 
