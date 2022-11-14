@@ -16,6 +16,10 @@ from fregepoc import settings
 from fregepoc.analyzers.core import AnalyzerFactory
 from fregepoc.celery_app import app
 from fregepoc.indexers.base import BaseIndexer, indexers
+from fregepoc.repositories.exceptions import (
+    DownloadDirectoryFullException,
+    DownloadQueueTooBigException,
+)
 from fregepoc.repositories.models import Repository, RepositoryFile
 from fregepoc.repositories.utils.paths import (
     get_repo_files,
@@ -66,11 +70,6 @@ def _clone_repo(repo: Repository, local_path: Path) -> Optional[git.Repo]:
             return None
 
 
-class DownloadDirectoryFullException(Exception):
-    def __init__(self, message: str):
-        super(DownloadDirectoryFullException, self).__init__(message)
-
-
 def _check_download_folder_size():
     """
     Check if the size of downloads folder < DOWNLOAD_DIR_MAX_SIZE_BYTES.
@@ -86,11 +85,6 @@ def _check_download_folder_size():
         raise DownloadDirectoryFullException(
             f"Current temp file too big. Size = {size}"
         )
-
-
-class DownloadQueueTooBigException(Exception):
-    def __init__(self, count: int):
-        super().__init__(f"Download queue too big, reserved tasks = {count}")
 
 
 def _check_queued_tasks_number():
