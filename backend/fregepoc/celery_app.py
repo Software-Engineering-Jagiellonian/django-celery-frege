@@ -7,9 +7,9 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "fregepoc.settings")
 
 app = Celery(
     "frege",
-    # worker_max_tasks_per_child=os.getenv(
-    #     "CELERY_WORKER_MAX_TASKS_PER_CHILD", default=4
-    # ),
+    worker_max_tasks_per_child=os.getenv(
+        "CELERY_WORKER_MAX_TASKS_PER_CHILD", default=4
+    ),
 )
 
 # Using a string here means the worker doesn't have to serialize
