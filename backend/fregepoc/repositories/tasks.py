@@ -206,7 +206,6 @@ def process_repo_task(repo_pk):
             file = RepositoryFile(
                 repository=repo,
                 repo_relative_file_path=relative_file_path,
-                absolute_file_path=absolute_file_path,
                 language=language,
                 analyzed=False,
             )
@@ -254,5 +253,11 @@ def analyze_file_task(repo_file_pk):
         repo_file.save(update_fields=["metrics", "analyzed", "analyzed_time"])
 
     logger.info(f"repo_file {repo_file.repository.git_url} analyzed")
-    _delete_file(Path(repo_file.absolute_file_path), repo_file.repository.name)
+
+    absolute_file_path = (
+        get_repo_local_path(repo_file.repository)
+        / repo_file.repo_relative_file_path
+    )
+    _delete_file(Path(absolute_file_path), repo_file.repository.name)
+
     _finalize_repo_analysis(repo_file.repository)
