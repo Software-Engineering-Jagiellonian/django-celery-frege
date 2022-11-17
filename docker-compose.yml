@@ -225,21 +225,21 @@ services:
       <<: *backend
       container_name: fregepoc-celery-crawl-worker-prod
       ports: []
-      command: celery -A fregepoc worker -Q crawl -l info --concurrency=1 -n worker_crawl
+      command: celery -A fregepoc worker -Q crawl -l info --concurrency=${CELERY_WORKER_CRAWL_CONCURRENCY} -n worker_crawl
       profiles: [ "prod" ]
 
   fregepoc-celery-downloads-worker-prod:
     <<: *backend
     container_name: fregepoc-celery-downloads-worker-prod
     ports: []
-    command: celery -A fregepoc worker -Q downloads -l info --concurrency=3 -n worker_downloads
+    command: celery -A fregepoc worker -Q downloads -l info --concurrency=${CELERY_WORKER_DOWNLOADS_CONCURRENCY} -n worker_downloads
     profiles: [ "prod" ]
 
   fregepoc-celery-worker-prod:
     <<: *backend
     container_name: fregepoc-celery-worker-prod
     ports: []
-    command: celery -A fregepoc worker -Q celery -l info --concurrency=6 -n worker_celery
+    command: celery -A fregepoc worker -Q celery -l info --concurrency=${CELERY_WORKER_BASE_CONCURRENCY} -n worker_celery
     profiles: [ "prod" ]
 
   nginx-proxy:
