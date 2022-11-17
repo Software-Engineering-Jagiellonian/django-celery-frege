@@ -86,30 +86,13 @@ services:
       CELERY_RESULT_BACKEND: redis://fregepoc-redis
     depends_on:
       - fregepoc-celery-worker-dev
-      # - fregepoc-celery-downloads-worker-dev
-      # - fregepoc-celery-crawl-worker-dev
       - fregepoc-redis
     profiles: [ "dev" ]
-
-  # fregepoc-celery-crawl-worker-dev:
-  #   <<: *backend
-  #   container_name: fregepoc-celery-crawl-worker-dev
-  #   ports: []
-  #   command: celery -A fregepoc worker -Q crawl -l info --concurrency=1 -n worker_crawl
-  #   profiles: [ "dev", "prod" ]
-
-  # fregepoc-celery-downloads-worker-dev:
-  #   <<: *backend
-  #   container_name: fregepoc-celery-downloads-worker-dev
-  #   ports: []
-  #   command: celery -A fregepoc worker -Q downloads -l info --concurrency=3 -n worker_downloads
-  #   profiles: [ "dev", "prod" ]
 
   fregepoc-celery-worker-dev:
     <<: *backend
     container_name: fregepoc-celery-worker-dev
     ports: []
-    # command: celery -A fregepoc worker -Q celery -l info --concurrency=6 -n worker_celery
     command: sh -c "python3 manage.py celery_dev_autoreload"
     profiles: [ "dev" ]
 
