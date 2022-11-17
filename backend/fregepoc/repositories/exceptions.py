@@ -1,6 +1,6 @@
 class DownloadDirectoryFullException(Exception):
     def __init__(self, message: str):
-        super(DownloadDirectoryFullException, self).__init__(message)
+        super().__init__(message)
 
 
 class DownloadQueueTooBigException(Exception):
