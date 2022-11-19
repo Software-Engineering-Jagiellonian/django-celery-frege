@@ -207,10 +207,8 @@ services:
     <<: *backend
     container_name: fregepoc-flower-prod
     command: celery -A fregepoc flower
-    ports:
-      - 5555:5555
     expose:
-      - 5555
+      - ${DOCKER_FLOWER_PORT}
     environment:
       CELERY_BROKER_URL: redis://fregepoc-redis
       CELERY_RESULT_BACKEND: redis://fregepoc-redis
