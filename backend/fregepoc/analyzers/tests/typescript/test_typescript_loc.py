@@ -19,7 +19,7 @@ class TestTypescriptAnalyzerLinesOfCode:
             ),
             (
                 {"repo_relative_file_path": "bubble_sort.ts"},
-                21,
+                22,
             ),
             (
                 {"repo_relative_file_path": "empty.ts"},

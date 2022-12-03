@@ -9,13 +9,13 @@ from fregepoc.repositories.factories import RepositoryFileFactory
 
 
 @pytest.mark.django_db
-class TestTypescriptAnalyzerAvarageNestingDepth:
+class TestTypescriptAnalyzerTokenCount:
     @pytest.mark.parametrize(
-        ["repo_file_params", "expected_avg_nesting_depth"],
+        ["repo_file_params", "expected_token_count"],
         [
             (
                 {"repo_relative_file_path": "bst.ts"},
-                3,
+                305,
             ),
             (
                 {"repo_relative_file_path": "empty.ts"},
@@ -23,18 +23,18 @@ class TestTypescriptAnalyzerAvarageNestingDepth:
             ),
             (
                 {"repo_relative_file_path": "bubble_sort.ts"},
-                4,
+                205,
             ),
             (
                 {"repo_relative_file_path": "fast_fibbonaci.ts"},
-                2,
+                167,
             ),
         ],
     )
     def test_count_loc(
         self,
         repo_file_params,
-        expected_avg_nesting_depth,
+        expected_token_count,
         settings,
         dummy_repo,
     ):
@@ -49,6 +49,4 @@ class TestTypescriptAnalyzerAvarageNestingDepth:
         )
         for analyzer in analyzers:
             actual = analyzer.analyze(repo_file)
-            assert (
-                actual["average_nesting_depth"] == expected_avg_nesting_depth
-            )
+            assert actual["token_count"] == expected_token_count

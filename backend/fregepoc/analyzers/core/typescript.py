@@ -10,35 +10,26 @@ from fregepoc.repositories.utils.analyzers import repo_file_content
 class TypescriptFileAnalysisResult(TypedDict):
     lines_of_code: int
     token_count: int
-    average_lines_of_code: int
-    average_token_count: int
-    average_cyclomatic_complexity: int
-    average_parameter_count: int
-    average_nesting_depth: int
-    max_nesting_depth: int
+    average_lines_of_code: float
+    average_token_count: float
+    average_cyclomatic_complexity: float
 
 
 @AnalyzerFactory.register(ProgrammingLanguages.TYPESCRIPT)
 class JavascriptAnalyzer(BaseAnalyzer[TypescriptFileAnalysisResult]):
+    def get_analisys_results(self, res):
+        return {
+            "lines_of_code": res.nloc,
+            "token_count": res.token_count,
+            "average_lines_of_code": res.average_nloc,
+            "average_token_count": res.average_token_count,
+            "average_cyclomatic_complexity": res.average_cyclomatic_complexity,
+        }
+
     def analyze(self, repo_file_obj):
         with repo_file_content(repo_file_obj) as file_content:
             result = lizard.analyze_file.analyze_source_code(
                 ".ts", file_content
             )
 
-            return {
-                "lines_of_code": result.nloc,
-                "token_count": result.token_count,
-                "average_lines_of_code": result.average_nloc,
-                "average_token_count": result.average_token_count,
-                "average_cyclomatic_complexity": result.average_cyclomatic_complexity,
-                "average_parameter_count": result.functions_average(
-                    "parameter_count"
-                ),
-                "average_nesting_depth": result.functions_average(
-                    "max_nesting_depth"
-                ),
-                "max_nesting_depth": max(
-                    fun.max_nesting_depth for fun in result.function_list
-                ),
-            }
+            return self.get_analisys_results(result)

@@ -15,11 +15,19 @@ class TestTypescriptAnalyzerAvarageLinesOfCode:
         [
             (
                 {"repo_relative_file_path": "bst.ts"},
-                8,
+                3.0,
             ),
             (
                 {"repo_relative_file_path": "empty.ts"},
-                0,
+                0.0,
+            ),
+            (
+                {"repo_relative_file_path": "bubble_sort.ts"},
+                5.66,
+            ),
+            (
+                {"repo_relative_file_path": "fast_fibbonaci.ts"},
+                10.0,
             ),
         ],
     )
@@ -37,4 +45,6 @@ class TestTypescriptAnalyzerAvarageLinesOfCode:
         )
         for analyzer in analyzers:
             actual = analyzer.analyze(repo_file)
-            assert actual["average_lines_of_code"] == expected_avarage_loc
+            assert actual["average_lines_of_code"] == pytest.approx(
+                expected_avarage_loc, 0.01
+            )

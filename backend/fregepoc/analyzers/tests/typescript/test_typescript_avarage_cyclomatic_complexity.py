@@ -15,19 +15,19 @@ class TestTypescriptAnalyzerAvarageCyclomaticComplexity:
         [
             (
                 {"repo_relative_file_path": "bst.ts"},
-                3.25,
+                1.0,
             ),
             (
                 {"repo_relative_file_path": "empty.ts"},
-                0,
+                0.0,
             ),
             (
                 {"repo_relative_file_path": "bubble_sort.ts"},
-                2,
+                2.0,
             ),
             (
                 {"repo_relative_file_path": "fast_fibbonaci.ts"},
-                4,
+                2.5,
             ),
         ],
     )
@@ -49,7 +49,6 @@ class TestTypescriptAnalyzerAvarageCyclomaticComplexity:
         )
         for analyzer in analyzers:
             actual = analyzer.analyze(repo_file)
-            assert (
-                actual["average_cyclomatic_complexity"]
-                == expected_avg_cyclomatic_complexity
+            assert actual["average_cyclomatic_complexity"] == pytest.approx(
+                expected_avg_cyclomatic_complexity, 0.01
             )

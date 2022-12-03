@@ -9,32 +9,32 @@ from fregepoc.repositories.factories import RepositoryFileFactory
 
 
 @pytest.mark.django_db
-class TestTypescriptAnalyzerAvarageParameterCount:
+class TestTypescriptAnalyzerAvarageTokenCount:
     @pytest.mark.parametrize(
-        ["repo_file_params", "expected_avg_parameter_count"],
+        ["repo_file_params", "expected_avg_token_count"],
         [
             (
                 {"repo_relative_file_path": "bst.ts"},
-                0.75,
+                13.0,
             ),
             (
                 {"repo_relative_file_path": "empty.ts"},
-                0,
+                0.0,
             ),
             (
                 {"repo_relative_file_path": "bubble_sort.ts"},
-                1,
+                49.0,
             ),
             (
                 {"repo_relative_file_path": "fast_fibbonaci.ts"},
-                2,
+                51.0,
             ),
         ],
     )
     def test_count_loc(
         self,
         repo_file_params,
-        expected_avg_parameter_count,
+        expected_avg_token_count,
         settings,
         dummy_repo,
     ):
@@ -49,7 +49,6 @@ class TestTypescriptAnalyzerAvarageParameterCount:
         )
         for analyzer in analyzers:
             actual = analyzer.analyze(repo_file)
-            assert (
-                actual["average_parameter_count"]
-                == expected_avg_parameter_count
+            assert actual["average_token_count"] == pytest.approx(
+                expected_avg_token_count, 0.01
             )
