@@ -16,7 +16,7 @@ class TypescriptFileAnalysisResult(TypedDict):
 
 
 @AnalyzerFactory.register(ProgrammingLanguages.TYPESCRIPT)
-class JavascriptAnalyzer(BaseAnalyzer[TypescriptFileAnalysisResult]):
+class TypescriptAnalyzer(BaseAnalyzer[TypescriptFileAnalysisResult]):
     def get_analisys_results(self, res):
         return {
             "lines_of_code": res.nloc,
