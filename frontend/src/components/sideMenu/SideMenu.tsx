@@ -11,7 +11,10 @@ import {
 } from './DashboardsClient';
 import { StyledButton } from '../styledButton/StyledButton';
 import { StyledModal } from '../styledModal/StyledModal';
-import { Box, Boxes } from 'react-bootstrap-icons';
+import { Box, Boxes, Plus } from 'react-bootstrap-icons';
+import PresentationMode from '../menuItem/PresentationMode';
+import DataTableView from '../menuItem/DataTableView';
+import Logs from '../menuItem/Logs';
 
 interface UnwrappedType {
   id: string;
@@ -47,7 +50,17 @@ export const SideMenu: FC<{ className: string }> = ({ className }) => {
       {
         label: 'Manual',
         icon: <Boxes />,
-        subNodes: retrieveManualDashboards()
+        subNodes: retrieveManualDashboards(),
+        structOptions: [<Plus key={1}
+          onClick={e => {
+            e.stopPropagation();
+            setDashboardName('');
+            setChosenDashboard(new Set());
+            setShowNameUsed(false);
+            setShowAtLeastOne(false);
+            setAddModalVisible(true);
+          }}
+        />]
       }
     ]);
   }, [grafanaData]);
@@ -76,18 +89,19 @@ export const SideMenu: FC<{ className: string }> = ({ className }) => {
           ))}
         </div>
 
-        <StyledButton
-          onClick={() => {
-            setDashboardName('');
-            setChosenDashboard(new Set());
-            setShowNameUsed(false);
-            setShowAtLeastOne(false);
-            setAddModalVisible(true);
-          }}
-          className={styles.manualAdd}
-        >
-          Add manual dashboard
-        </StyledButton>
+        <hr />
+
+        <div className={styles.menuContainer}>
+          <PresentationMode />
+          <DataTableView />
+        </div>
+
+        <hr />
+
+        <div className={styles.menuContainer}>
+          <Logs />
+        </div>
+
       </div>
       <StyledModal
         show={addModalVisible}

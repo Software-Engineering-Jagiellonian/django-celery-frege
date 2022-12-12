@@ -33,7 +33,7 @@ export const PinningModal: FC<PinningModalProps> = ({
             const dashboardsCmp = x.dashboardName.localeCompare(y.dashboardName);
             return dashboardsCmp !== 0
               ? dashboardsCmp
-              : x.widgetName.localeCompare(y.dashboardName);
+              : x.widgetName?.localeCompare(y.dashboardName);
           })
           .map((widget) => {
             const widgetId = getId(widget.dashboardId, widget.widgetId);
