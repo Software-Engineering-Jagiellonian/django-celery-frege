@@ -35,6 +35,7 @@ export const MenuItem: FC<MenuItemProps> = ({ presentationProps, isActive, handl
         >
           <div className={styles.iconContainer}>{presentationProps.icon}</div>
           <div className={styles.label}>{presentationProps.label}</div>
+          {presentationProps.structOptions?.map((el, i) => <button key={i} type="button" className={styles.optionButton}>{el}</button>)}
           {presentationProps.subNodes && presentationProps.subNodes.length > 0 && (
             <button onClick={onExpandClick} type="button" className={styles.expandButton}>
               {isExpanded ? <ArrowUpShort /> : <ArrowDownShort />}
@@ -42,9 +43,10 @@ export const MenuItem: FC<MenuItemProps> = ({ presentationProps, isActive, handl
           )}
         </Link>
       ) : (
-        <div className={styles.menuItem}>
+        <div className={styles.menuItem} onClick={onExpandClick}>
           <div className={styles.iconContainer}>{presentationProps.icon}</div>
           <div className={styles.label}>{presentationProps.label}</div>
+          {presentationProps.structOptions?.map((el, i) => <button key={i} type="button" className={styles.optionButton}>{el}</button>)}
           {presentationProps.subNodes && presentationProps.subNodes.length > 0 && (
             <button onClick={onExpandClick} type="button" className={styles.expandButton}>
               {isExpanded ? <ArrowUpShort /> : <ArrowDownShort />}
