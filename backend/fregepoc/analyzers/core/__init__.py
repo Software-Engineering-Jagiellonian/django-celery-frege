@@ -1,9 +1,9 @@
-from .cpp import *  # noqa
-from .java import *  # noqa
-from .kotlin import *  # noqa
-from .php import *  # noqa
-from .python import *  # noqa
-from .ruby import *  # noqa
-from .rust import *  # noqa
-from .golang import * # noqa
-from .scala import * #noqa
+from fregepoc.analyzers.core.cpp import *
+from fregepoc.analyzers.core.golang import *
+from fregepoc.analyzers.core.java import *
+from fregepoc.analyzers.core.kotlin import *
+from fregepoc.analyzers.core.php import *
+from fregepoc.analyzers.core.python import *
+from fregepoc.analyzers.core.ruby import *
+from fregepoc.analyzers.core.rust import *
+from fregepoc.analyzers.core.scala import *
