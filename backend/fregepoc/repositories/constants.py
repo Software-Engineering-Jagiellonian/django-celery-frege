@@ -16,6 +16,7 @@ class ProgrammingLanguages(models.TextChoices):
     KOTLIN = "Kotlin"
     RUST = "Rust"
     GOLANG = "Golang"
+    SCALA = "Scala"
     TYPESCRIPT = "TypeScript"
 
 
@@ -69,4 +70,5 @@ register_extension("RUBY", [".rb"])
 register_extension("KOTLIN", [".kt"])
 register_extension("RUST", [".rs"])
 register_extension("GOLANG", [".go"])
+register_extension("SCALA", [".scala"])
 register_extension("TYPESCRIPT", [".ts"])
