@@ -7,8 +7,8 @@ datasources:
   url: fregepoc-postgres:5432
   password: admin
   user: frege
-  database: dashboard
-  basicAuth: false
+  database: frege
+  basicAuth: true
   isDefault: true
   jsonData:
      sslmode: disable

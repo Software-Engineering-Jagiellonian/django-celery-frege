@@ -9,18 +9,22 @@
   background: $sideMenu-background-color;
   border-right: 1px solid $main-borders-color;
   padding: 20px 2px 2px 2px;
+  overflow-y: auto;
 }
 
 .menuContainer {
-  flex: 1;
+  padding: 0 5px;
 }
 
 .manualAdd {
   height: 50px;
   width: auto;
+  background: transparent;
+  display: inline-grid;
   justify-self: end;
   align-self: stretch;
   margin: 10px;
+  padding: 0 1rem;
 }
 
 .pinningListItem{

@@ -17,6 +17,7 @@ class ProgrammingLanguages(models.TextChoices):
     RUST = "Rust"
     GOLANG = "Golang"
     SCALA = "Scala"
+    TYPESCRIPT = "TypeScript"
 
 
 file_extensions_registry: dict[ProgrammingLanguages, list[str]] = {}
@@ -70,3 +71,4 @@ register_extension("KOTLIN", [".kt"])
 register_extension("RUST", [".rs"])
 register_extension("GOLANG", [".go"])
 register_extension("SCALA", [".scala"])
+register_extension("TYPESCRIPT", [".ts"])
