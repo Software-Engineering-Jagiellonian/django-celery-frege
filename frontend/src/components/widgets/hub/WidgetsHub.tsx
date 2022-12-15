@@ -20,7 +20,7 @@ export const columnsAmount = 20;
 export const widgetWidth = 4;
 export const getId = (dashboardId: string, widgetId: string): string =>
   `${dashboardId}-${widgetId}`;
-const ResponsiveGridLayout = WidthProvider(Responsive);
+export const ResponsiveGridLayout = WidthProvider(Responsive);
 
 export interface WidgetsHubProps {
   widgets: WidgetRetrieveData[];

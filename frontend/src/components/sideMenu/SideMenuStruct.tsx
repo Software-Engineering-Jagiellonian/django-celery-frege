@@ -5,4 +5,5 @@ export type SideMenuItemDTO = {
   href?: string;
   subNodes?: SideMenuItemDTO[];
   icon?: ReactNode;
+  structOptions?: Array<ReactNode>;
 };
