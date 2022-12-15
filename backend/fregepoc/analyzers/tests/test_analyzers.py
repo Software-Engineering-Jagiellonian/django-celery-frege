@@ -40,6 +40,10 @@ class TestAnalyzers:
               ProgrammingLanguages.GOLANG,
               {"repo_relative_file_path": "avl_tree.go"}
             ),
+            (
+              ProgrammingLanguages.SCALA,
+              {"repo_relative_file_path": "InsertionSort.scala"}
+            ),
         ],
     )
     def test_analyzers_make_some_analysis(
