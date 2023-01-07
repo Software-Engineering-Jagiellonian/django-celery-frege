@@ -21,7 +21,7 @@ OutputType = TypeVar("OutputType", bound=TypedDict)
 @runtime_checkable
 class BaseAnalyzer(Protocol[OutputType]):
     """
-    The base protocol class for all the analyzers present in the system.
+    The util protocol class for all the analyzers present in the system.
     """
 
     @abstractmethod
