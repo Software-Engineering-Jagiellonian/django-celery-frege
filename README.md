@@ -1,69 +1,118 @@
-# Fregepoc
+<div align="center">
+
+![Alt text](documentation/FREGE_SIMPLE_LOGO.png)
+</div>
+
+<div align="center">
+  <a href="https://github.com/Software-Engineering-Jagiellonian/django-celery-frege/issues">Check Current Tasks</a>
+  ·
+  <a href="https://github.com/Software-Engineering-Jagiellonian/django-celery-frege/issues/new?assignees=&labels=bug&&title=bug%3A+">Report a Bug</a>
+  ·
+  <a href="https://github.com/Software-Engineering-Jagiellonian/django-celery-frege/compare">Create a Pull Request</a>
+</div>
+<br>
+<div align="center">
+
+  ![issues](https://img.shields.io/github/issues/Software-Engineering-Jagiellonian/django-celery-frege?style=flat-square)
+  ![pull-requests](https://img.shields.io/github/issues-pr/Software-Engineering-Jagiellonian/django-celery-frege?style=flat-square)
+
+  ![license](https://img.shields.io/github/license/Software-Engineering-Jagiellonian/django-celery-frege?style=flat-square)
+
+</div>
+
+<details open = "open">
+<summary>Table of Contents</summary>
+
+- [About](#about)
+- [Getting Started](#getting-started)
+    - [Prerequisites](#prerequisites)
+    - [Installation](#installation)
+    - [Usage](#usage)
+- [Contributing](#contributing)
+    - [Linters](#linters)
+    - [Commit message convention](#commit-message-convention)
+
+</details>
+
+# About
+FREGE is an open-source application dedicated to analyzing other open-source repositories available on Github, Gitlab ect. for various metrics like average number of lines of code, average cyclomatic complexity, token count or number of devs per project.
+
+The main goal is to gather largest database of code metrics in order to analyze them (with little help of ML) to extract hidden patterns to what makes successful project overall.
+
+# Getting Started
 
 ## Prerequisites
+Docker Desktop for your preferred system ([Linux](https://docs.docker.com/desktop/install/linux-install/)/[Windows](https://docs.docker.com/desktop/install/windows-install/)/[Mac](https://docs.docker.com/desktop/install/mac-install/)) is recommended way to get [Docker](https://docs.docker.com) with [Compose plugin](https://docs.docker.com/compose/) which are only prerequisites to run Frege project.
 
-Docker & docker-compose is required to be available on the host system.
+## Installation
+> :warning: **Every command** needs to be run from the **root** of the project!
+
+Follow these simple instruction to set up a development environment:
+
+1. Create `.env` file by following `.env.template` template. Simply run:
+
+        cp .env.template .env
+
+
+2. Build Docker container with following command:
+    > :warning: On older versions of Docker, you may need to substitute docker compose with docker-compose.
+
+        docker compose --profile dev build
+
 
 ## Usage
+Running application in **dev** environment:
 
-Initially, you need to create an `.env` file following the `.env.template` template. This can be done via
-
-```bash
-cp .env.template .env
 ```
-
-and then editing the `.env` file optionally (although the unchanged configuration should suffice). The former is a one-time operation.
-
->The following commands should be run from the **root** of the application
-
-If the containers were not built yet, you can do so by running the following command:
-
-```bash
-docker compose --profile dev build
-```
-
-To run the application, you need to use the following command:
-
-```bash
 docker compose --profile dev up
 ```
 
-For the production environment, use the following instead:
+After running application in dev profile, check these sites:
+* `localhost:3030` - front-end application
+* `localhost:3000` - Grana site (use search to find dashboards)
+* `localhost:5555` - Flower site
+* `localhost:8000` - back-end application
 
-```bash
-docker compose --profile prod up -d
+
+Running **tests** for the application:
 ```
-
->On older versions of Docker, you may need to substitute `docker compose` with `docker-compose`.
-
-There exists a number of docker-compose profiles in the project, consult `docker-compose.yml` for more information.
-
-### Linters and Formatters
-
-The project employs a number of linters and formatters such as `flake8`, `isort`, or `black`
-in order to improve the overall DX.
-
-Also, to prevent common mistakes from being committed and pushed
-to the origin, it is required to register the git hooks configured via `pre-commit`:
-
->One might want to create a virtual environment (e.g. `venv`, `virtualenv`, conda) before executing commands below.
-
-```bash
-pip install -r backend/requirements.txt
-pre-commit install
-```
-
-Moreover, to explicitly run the linters and formatters over the entire codebase with `pre-commit`, execute the following command:
-```bash
-pre-commit run --all-files
-```
-
-### Testing
-To run tests from the docker container, execute the following command:
-```bash
 docker compose exec -T fregepoc-backend-dev pytest
 ```
 
-### Commit messages convention
+Running application in **prod** environment (use with caution):
+```
+docker compose --profile prod up -d
+```
 
-In order to unify the commit messages creation strategy, we strongly recommend adhering to [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/).
+# Contributing
+## Linters
+This project employs a number of linters and formatters for overall DX.
+
+> :warning: To prevent common mistakes from being committed and pushed to the origin it is **highly recommended** to register git hooks configured via `pre-commit`. For this operation [pip](https://pip.pypa.io/en/stable/installation/) and [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) will be needed. \
+Alternatively, you can use **extensions** (such as prettier or black) to format your code in your IDE without installing anything more. However, with pip and npm already installed, pre-commit approached is more recommended.
+
+There are three linters/formatters for Python: `flake8`, `isort`, `black`; and there are two for Javascript/TypeScript: `prettier`, `eslint`.
+
+In order to install pre-commit git-hook, run commands (recommended with [venv](https://docs.python.org/3/library/venv.html) previously created):
+1. Install python packages:
+
+        pip install -r backend/requirements.txt
+
+2. Install npm packages:
+
+        cd frontend
+        npm install
+
+3. Install pre-commit git hook:
+
+        pre-commit install
+
+Now, every commit will be formatted automatically. On rare occasions (such as line length) manual adjustments might be needed.
+
+To run the linters and formatters over the entire codebase with `pre-commit`, execute the following command:
+```
+pre-commit run --all-files
+```
+
+## Commit message convention
+In order to unify the commit messages creation strategy, it is strongly recommended adhering to [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/).
