@@ -1,5 +1,12 @@
 version: "3.9"
 
+x-celery-healthcheck: &celery-healthcheck
+  healthcheck:
+    test: "celery -b redis://${DOCKER_REDIS_HOST}:${DOCKER_REDIS_PORT} inspect ping"
+    interval: 10s
+    timeout: 10s
+    retries: 2
+
 x-backend: &backend
   container_name: fregepoc-backend
   image: fregepoc-backend-image
@@ -39,6 +46,11 @@ services:
       - "${DOCKER_REDIS_PORT}"
     profiles: [ "dev", "prod" ]
     restart: on-failure
+    healthcheck:
+      test: "redis-cli ping || exit 1"
+      interval: 10s
+      timeout: 10s
+      retries: 2
 
   fregepoc-postgres:
     container_name: fregepoc-postgres
@@ -56,6 +68,11 @@ services:
     restart: on-failure
     volumes:
       - fregepoc_postgresql_data:/var/lib/postgresql/data
+    healthcheck:
+      test: "pg_isready -p ${DOCKER_POSTGRES_PORT}"
+      interval: 10s
+      timeout: 10s
+      retries: 2
 
   fregepoc-prometheus:
     image: prom/prometheus:v2.35.0
@@ -63,15 +80,25 @@ services:
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     expose:
-      - 9090
+      - ${DOCKER_PROMETHEUS_PORT}
     networks:
       - fregepoc-main
     profiles: [ "dev", "prod" ]
+    healthcheck:
+      test: "wget -nv -t1 --spider http://localhost:${DOCKER_PROMETHEUS_PORT}"
+      interval: 10s
+      timeout: 10s
+      retries: 2
 
 # === [Dev] ===
 
   fregepoc-backend-dev:
     <<: *backend
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/healthchecks" ]
+      interval: 10s
+      timeout: 10s
+      retries: 1
 
   fregepoc-flower-dev:
     <<: *backend
@@ -88,13 +115,24 @@ services:
       - fregepoc-celery-worker-dev
       - fregepoc-redis
     profiles: [ "dev" ]
+    healthcheck:
+      test: "curl -f http://localhost:5555"
+      interval: 10s
+      timeout: 10s
+      retries: 2
 
   fregepoc-celery-worker-dev:
     <<: *backend
+    <<: *celery-healthcheck
     container_name: fregepoc-celery-worker-dev
     ports: []
     command: sh -c "python3 manage.py celery_dev_autoreload"
     profiles: [ "dev" ]
+#    healthcheck:
+#      test: "celery -b redis://${DOCKER_REDIS_HOST}:${DOCKER_REDIS_PORT} inspect ping"
+#      interval: 10s
+#      timeout: 10s
+#      retries: 2
 
   fregepoc-grafana-dev: &grafana
     image: grafana/grafana:8.5.2
@@ -115,12 +153,17 @@ services:
       - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/grafana/
       - GF_SERVER_SERVE_FROM_SUB_PATH=true
     ports:
-      - 3000:3000
+      - ${DOCKER_GRAFANA_PORT}:${DOCKER_GRAFANA_PORT}
     networks:
       - fregepoc-main
     env_file:
       - .env
     profiles: [ "dev" ]
+    healthcheck:
+      test: "wget -nv -t1 --spider http://localhost:${DOCKER_GRAFANA_PORT}/api/health"
+      interval: 10s
+      timeout: 10s
+      retries: 2
 
   fregepoc-frontend-dev: &frontend
     container_name: fregepoc-frontend-dev
@@ -221,6 +264,7 @@ services:
 
   fregepoc-celery-crawl-worker-prod:
       <<: *backend
+      <<: *celery-healthcheck
       container_name: fregepoc-celery-crawl-worker-prod
       ports: []
       command: celery -A fregepoc worker -Q crawl -l info --concurrency=${CELERY_WORKER_CRAWL_CONCURRENCY} -n worker_crawl
@@ -228,6 +272,7 @@ services:
 
   fregepoc-celery-downloads-worker-prod:
     <<: *backend
+    <<: *celery-healthcheck
     container_name: fregepoc-celery-downloads-worker-prod
     ports: []
     command: celery -A fregepoc worker -Q downloads -l info --concurrency=${CELERY_WORKER_DOWNLOADS_CONCURRENCY} -n worker_downloads
@@ -235,6 +280,7 @@ services:
 
   fregepoc-celery-worker-prod:
     <<: *backend
+    <<: *celery-healthcheck
     container_name: fregepoc-celery-worker-prod
     ports: []
     command: celery -A fregepoc worker -Q celery -l info --concurrency=${CELERY_WORKER_BASE_CONCURRENCY} -n worker_celery
