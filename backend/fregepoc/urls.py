@@ -32,6 +32,7 @@ router.register(
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include(router.urls)),
+    path("ht/", include('health_check.urls')),
 ]
 
 websocket_urlpatterns = [path("ws/", LiveStatusConsumer.as_asgi())]
