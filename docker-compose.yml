@@ -84,6 +84,7 @@ services:
     networks:
       - fregepoc-main
     profiles: [ "dev", "prod" ]
+    restart: on-failure
     healthcheck:
       test: "wget -nv -t1 --spider http://localhost:${DOCKER_PROMETHEUS_PORT} || exit 1"
       interval: 10s
@@ -154,6 +155,7 @@ services:
     env_file:
       - .env
     profiles: [ "dev" ]
+    restart: on-failure
     healthcheck:
       test: "wget -nv -t1 --spider http://localhost:${DOCKER_GRAFANA_PORT}/api/health || exit 1"
       interval: 10s
@@ -180,6 +182,7 @@ services:
     networks:
       - fregepoc-main
     profiles: [ "dev" ]
+    restart: on-failure
     healthcheck:
       test: "wget -nv -t1 --spider http://localhost:${DOCKER_FRONTEND_PORT} || exit 1"
       interval: 10s
