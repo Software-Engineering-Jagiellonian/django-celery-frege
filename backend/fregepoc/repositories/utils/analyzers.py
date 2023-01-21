@@ -1,7 +1,6 @@
+import statistics
 from contextlib import contextmanager
-from typing import TypedDict
 
-from lizard import FileInformation, analyze_file
 from lizard_ext import auto_read
 
 from fregepoc.repositories.models import RepositoryFile
@@ -15,32 +14,7 @@ def repo_file_content(repo_file_obj: RepositoryFile) -> str:
     yield auto_read(file_abs_path)
 
 
-class FileInformationDict(TypedDict):
-    average_nloc: int
-    average_token_count: int
-    average_cyclomatic_complexity: int
-    CCN: int
-    ND: int
-
-
-def lizard_file_information_to_dict(
-    file_information: FileInformation,
-) -> FileInformationDict:
+def average_func_name_len(function_list):
     # TODO: docstring
-    return {
-        key: getattr(file_information, key)
-        for key in FileInformationDict.__annotations__
-        if hasattr(file_information, key)
-    }
-
-
-def generic_source_code_analysis(
-    repo_file_obj: RepositoryFile,
-) -> FileInformationDict:
-    # TODO: docstring
-    with repo_file_content(repo_file_obj) as source_code:
-        return lizard_file_information_to_dict(
-            analyze_file.analyze_source_code(
-                str(get_file_abs_path(repo_file_obj)), source_code
-            )
-        )
+    func_name_lengths = [len(func.name) for func in function_list]
+    return statistics.fmean(func_name_lengths) if func_name_lengths else 0.0
