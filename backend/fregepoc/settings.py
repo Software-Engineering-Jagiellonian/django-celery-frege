@@ -52,6 +52,15 @@ EXTERNAL_APPS = [
     "corsheaders",
     "django_filters",
     "channels",
+    'health_check',                             # required
+    'health_check.db',                          # stock Django health checkers
+    'health_check.cache',
+    'health_check.storage',
+    'health_check.contrib.migrations',
+    'health_check.contrib.celery',              # requires celery
+    'health_check.contrib.celery_ping',         # requires celery
+    'health_check.contrib.psutil',              # disk and memory utilization; requires psutil
+    'health_check.contrib.redis',               # requires Redis broker
 ]
 
 INSTALLED_APPS = EXTERNAL_APPS + PROJECT_APPS
@@ -220,3 +229,17 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+
+# HEALTHCHECK
+
+HEALTH_CHECK = {
+    'DISK_USAGE_MAX': 70,  # percent
+    'MEMORY_MIN': 100,    # in MB
+}
+REDIS_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/"
+# CELERY_BROKER_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/"
+# CELERY_RESULT_BACKEND = f"redis://{REDIS_HOST}:{REDIS_PORT}/"
+HEALTHCHECK_CELERY_TIMEOUT = 1
+HEALTHCHECK_CELERY_PING_TIMEOUT = 1
+HEALTHCHECK_CELERY_QUEUE_TIMEOUT = 1
