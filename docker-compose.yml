@@ -68,6 +68,30 @@ services:
       - fregepoc-main
     profiles: [ "dev", "prod" ]
 
+  fregepoc-loki:
+    image: grafana/loki:2.6.1
+    container_name: fregepoc-loki
+    ports:
+      - 3100:3100
+    volumes:
+      - ./loki:/loki
+    networks:
+      - fregepoc-main
+    profiles: [ "dev", "prod" ]
+
+  fregepoc-promtail:
+    image: grafana/promtail:2.6.1
+    container_name: fregepoc-promtail
+    depends_on:
+      - fregepoc-loki
+    volumes:
+      - ./loki/promtail-config.yaml:/etc/promtail/config.yml
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/containers:/var/lib/docker/containers
+    networks:
+      - fregepoc-main
+    profiles: [ "dev", "prod" ]
+
 # === [Dev] ===
 
   fregepoc-backend-dev:
@@ -102,6 +126,8 @@ services:
     depends_on:
       - fregepoc-prometheus
       - fregepoc-postgres
+      - fregepoc-loki
+      - fregepoc-promtail
     volumes:
       - fregepoc_grafana_storage:/var/lib/grafana
       - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
