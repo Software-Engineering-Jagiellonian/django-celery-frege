@@ -191,7 +191,9 @@ services:
   fregepoc-frontend-dev: &frontend
     container_name: fregepoc-frontend-dev
     hostname: fregepoc-frontend-dev
-    image: "node:current-alpine"
+    build:
+      context: frontend
+      dockerfile: Dockerfile
     user: "node"
     working_dir: /home/node/app
     environment:
