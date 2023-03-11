@@ -194,14 +194,14 @@ services:
     build:
       context: frontend
       dockerfile: Dockerfile
-    user: "node"
-    working_dir: /home/node/app
     environment:
       - PORT=${DOCKER_FRONTEND_PORT}
       - REACT_APP_DOCKER_GRAFANA_HOST=fregepoc-grafana-dev
       - REACT_APP_DOCKER_GRAFANA_PORT=3000
+      - CHOKIDAR_USEPOLLING=true
     volumes:
-      - ./frontend:/home/node/app
+      - /app/node_modules
+      - ./frontend:/app
     command: npm start
     ports:
       - ${DOCKER_FRONTEND_PORT}:${DOCKER_FRONTEND_PORT}
