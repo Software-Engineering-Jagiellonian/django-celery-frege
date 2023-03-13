@@ -31,3 +31,6 @@ language = "en"
 
 html_theme = "alabaster"
 html_static_path = ["_static"]
+
+# line below is required for HTML documentation generation
+master_doc = "modules"

@@ -44,6 +44,8 @@ The main goal is to gather largest database of code metrics in order to analyze 
 ## Prerequisites
 Docker Desktop for your preferred system ([Linux](https://docs.docker.com/desktop/install/linux-install/)/[Windows](https://docs.docker.com/desktop/install/windows-install/)/[Mac](https://docs.docker.com/desktop/install/mac-install/)) is recommended way to get [Docker](https://docs.docker.com) with [Compose plugin](https://docs.docker.com/compose/) which are only prerequisites to run Frege project.
 
+> :warning: When installing on Linux, please remember of [post-installation steps](https://docs.docker.com/engine/install/linux-postinstall/)!
+
 ## Installation
 > :warning: **Every command** needs to be run from the **root** of the project!
 
@@ -51,14 +53,16 @@ Follow these simple instruction to set up a development environment:
 
 1. Create `.env` file by following `.env.template` template. Simply run:
 
-        cp .env.template .env
-
+```
+cp .env.template .env
+```
 
 2. Build Docker container with following command:
-    > :warning: On older versions of Docker, you may need to substitute docker compose with docker-compose.
+> :warning: On older versions of Docker, you may need to substitute docker compose with docker-compose.
 
-        docker compose --profile dev build
-
+```
+docker compose --profile dev build
+```
 
 ## Usage
 Running application in **dev** environment:
@@ -69,10 +73,9 @@ docker compose --profile dev up
 
 After running application in dev profile, check these sites:
 * `localhost:3030` - front-end application
-* `localhost:3000` - Grana site (use search to find dashboards)
-* `localhost:5555` - Flower site
+* `localhost:3000` - [Grafana](https://grafana.com/) (use search to find dashboards)
+* `localhost:5555` - [Flower](https://flower.readthedocs.io/en/latest/)
 * `localhost:8000` - back-end application
-
 
 Running **tests** for the application:
 ```
@@ -96,23 +99,36 @@ There are three linters/formatters for Python: `flake8`, `isort`, `black`; and t
 In order to install pre-commit git-hook, run commands (recommended with [venv](https://docs.python.org/3/library/venv.html) previously created):
 1. Install python packages:
 
-        pip install -r backend/requirements.txt
+pip install -r backend/requirements.txt
 
 2. Install npm packages:
 
-        cd frontend
-        npm install
+```
+cd frontend
+npm install
+```
 
 3. Install pre-commit git hook:
 
-        pre-commit install
+```
+pre-commit install
+```
 
 Now, every commit will be formatted automatically. On rare occasions (such as line length) manual adjustments might be needed.
 
 To run the linters and formatters over the entire codebase with `pre-commit`, execute the following command:
+
 ```
 pre-commit run --all-files
 ```
 
 ## Commit message convention
 In order to unify the commit messages creation strategy, it is strongly recommended adhering to [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/).
+
+# Documentation
+
+:warning: For in-depth description of the tool please refer to the [Design Document](./documentation/DESIGNDOC.md).
+
+Some information also can be found in:
+* [FrontEnd readme](./frontend/README.md)
+* [Documentation readme](./documentation/README.md)

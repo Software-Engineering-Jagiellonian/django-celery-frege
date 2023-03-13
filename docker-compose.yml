@@ -68,11 +68,13 @@ services:
     restart: on-failure
     volumes:
       - fregepoc_postgresql_data:/var/lib/postgresql/data
-    healthcheck:
-      test: "pg_isready -p ${DOCKER_POSTGRES_PORT} || exit 1"
-      interval: 10s
-      timeout: 10s
-      retries: 2
+    # Removing code below is a workaround for 'role "root" does not exist' error.
+    # TODO: modification of healthcheck code below to error-free form.
+    #healthcheck:
+    #  test: "pg_isready -p ${DOCKER_POSTGRES_PORT} || exit 1"
+    #  interval: 10s
+    #  timeout: 10s
+    #  retries: 2
 
   fregepoc-prometheus:
     image: prom/prometheus:v2.35.0
