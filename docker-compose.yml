@@ -140,6 +140,8 @@ services:
       CELERY_RESULT_BACKEND: redis://fregepoc-redis
     depends_on:
       - fregepoc-celery-worker-dev
+      - fregepoc-celery-downloads-worker-dev
+      - fregepoc-celery-crawl-worker-dev
       - fregepoc-redis
     profiles: [ "dev" ]
     healthcheck:
@@ -148,12 +150,38 @@ services:
       timeout: 10s
       retries: 2
 
+  # Autoreload on code change won't work without this setup
+  #
+  # fregepoc-celery-worker-dev:
+  #   <<: *backend
+  #   <<: *celery-healthcheck
+  #   container_name: fregepoc-celery-worker-dev
+  #   ports: []
+  #   command: sh -c "python3 manage.py celery_dev_autoreload"
+  #   profiles: [ "dev" ]
+
+  fregepoc-celery-crawl-worker-dev:
+      <<: *backend
+      <<: *celery-healthcheck
+      container_name: fregepoc-celery-crawl-worker-dev
+      ports: []
+      command: celery -A fregepoc worker -Q crawl -l info --concurrency=${CELERY_WORKER_CRAWL_CONCURRENCY} -n worker_crawl
+      profiles: [ "dev" ]
+
+  fregepoc-celery-downloads-worker-dev:
+    <<: *backend
+    <<: *celery-healthcheck
+    container_name: fregepoc-celery-downloads-worker-dev
+    ports: []
+    command: celery -A fregepoc worker -Q downloads -l info --concurrency=${CELERY_WORKER_DOWNLOADS_CONCURRENCY} -n worker_downloads
+    profiles: [ "dev" ]
+
   fregepoc-celery-worker-dev:
     <<: *backend
     <<: *celery-healthcheck
     container_name: fregepoc-celery-worker-dev
     ports: []
-    command: sh -c "python3 manage.py celery_dev_autoreload"
+    command: celery -A fregepoc worker -Q celery -l info --concurrency=${CELERY_WORKER_BASE_CONCURRENCY} -n worker_celery
     profiles: [ "dev" ]
 
   fregepoc-grafana-dev: &grafana
