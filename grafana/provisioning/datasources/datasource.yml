@@ -4,7 +4,7 @@ datasources:
 - name: postgres
   type: postgres
   access: proxy
-  url: fregepoc-postgres:5432
+  url: frege-postgres:5432
   password: admin
   user: frege
   database: frege
@@ -17,14 +17,14 @@ datasources:
 - name: Prometheus-ds
   type: prometheus
   uid: PEBC2E3263E2CA5B6
-  url: http://fregepoc-prometheus:9090
+  url: http://frege-prometheus:9090
 - name: Redis
   type: redis-datasource
   access: proxy
   orgId: 1
   isDefault: false
   version: 1
-  url: redis://fregepoc-redis:6379
+  url: redis://frege-redis:6379
   jsonData:
     client: standalone
     poolSize: 5

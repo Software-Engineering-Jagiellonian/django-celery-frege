@@ -79,7 +79,7 @@ After running application in dev profile, check these sites:
 
 Running **tests** for the application:
 ```
-docker compose exec -T fregepoc-backend-dev pytest
+docker compose exec -T frege-backend-dev pytest
 ```
 
 Running application in **prod** environment (use with caution):
