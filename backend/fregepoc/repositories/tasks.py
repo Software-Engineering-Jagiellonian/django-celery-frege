@@ -158,6 +158,8 @@ def crawl_repos_task(indexer_class_name):
         )
         return
 
+    crawl_repos_task.apply_async(args=(indexer_class_name,))
+
     batch = next(iter(indexer), [])
     for repo in batch:
         repo.refresh_from_db()
@@ -194,14 +196,14 @@ def process_repo_task(repo_pk):
 
             if not AnalyzerFactory.has_analyzers(language):
                 _delete_file(absolute_file_path, repo.name)
-
-            file = RepositoryFile(
-                repository=repo,
-                repo_relative_file_path=relative_file_path,
-                language=language,
-                analyzed=False,
-            )
-            files.append(file)
+            else:
+                file = RepositoryFile(
+                    repository=repo,
+                    repo_relative_file_path=relative_file_path,
+                    language=language,
+                    analyzed=False,
+                )
+                files.append(file)
 
         RepositoryFile.objects.bulk_create(files)
 
@@ -223,7 +225,9 @@ def analyze_file_task(repo_file_pk):
 
     analyzers = AnalyzerFactory.make_analyzers(repo_file.language)
     if not analyzers:
+        repository = repo_file.repository
         repo_file.delete()
+        _finalize_repo_analysis(repository)
         return
 
     metrics_dict = {}
