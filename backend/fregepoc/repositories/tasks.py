@@ -196,14 +196,14 @@ def process_repo_task(repo_pk):
 
             if not AnalyzerFactory.has_analyzers(language):
                 _delete_file(absolute_file_path, repo.name)
-            else:
-                file = RepositoryFile(
-                    repository=repo,
-                    repo_relative_file_path=relative_file_path,
-                    language=language,
-                    analyzed=False,
-                )
-                files.append(file)
+
+            file = RepositoryFile(
+                repository=repo,
+                repo_relative_file_path=relative_file_path,
+                language=language,
+                analyzed=False,
+            )
+            files.append(file)
 
         RepositoryFile.objects.bulk_create(files)
 
