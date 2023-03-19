@@ -158,8 +158,6 @@ def crawl_repos_task(indexer_class_name):
         )
         return
 
-    crawl_repos_task.apply_async(args=(indexer_class_name,))
-
     batch = next(iter(indexer), [])
     for repo in batch:
         repo.refresh_from_db()
