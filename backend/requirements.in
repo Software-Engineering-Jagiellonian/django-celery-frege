@@ -28,13 +28,6 @@ psutil
 # django-celery-beat
 # django-celery-results
 # websockets
-# Development tools:
-black
-isort
-flake8
-pre-commit
-pyupgrade
-gitlint
 
 # Testing
 pytest

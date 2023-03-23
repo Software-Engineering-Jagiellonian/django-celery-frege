@@ -1,0 +1,7 @@
+# Development tools:
+black
+isort
+flake8
+pre-commit
+pyupgrade
+gitlint

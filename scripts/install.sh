@@ -1,19 +1,22 @@
-if [[ $* == *-v* ]]
+#check if verbose flag is used
+if [[ $* == -v ]]
 then
-
 set -o xtrace
-
 fi
 
-python -m venv ../backend/env
-source ../backend/env/Scripts/activate
-which python
-pip install pip-tools
-pip-compile ../backend/requirements.in
-pip-sync ../backend/requirements.txt
+#create and activate virtual enviroment
+python -m venv backend/env
+source backend/env/Scripts/activate
 
+#install dependencies
+pip install pip-tools
+pip-compile --output-file backend/requirements.txt backend/requirements.in backend/formatters.in
+pip-sync backend/requirements.txt
+
+#install pre-commit hook
 pre-commit install
 
-cd ../frontend
+#install npm packages
+cd frontend
 npm install
-cd ../scripts
+cd ..
