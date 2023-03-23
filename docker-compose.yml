@@ -94,7 +94,8 @@ services:
       retries: 2
 
   fregepoc-loki:
-    image: grafana/loki:2.6.1
+    image: grafana/loki:2.7.4
+    user: "1000"
     container_name: fregepoc-loki
     ports:
       - 3100:3100
