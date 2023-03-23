@@ -5,6 +5,7 @@ env/
 
 *.csv
 *.sh
+!scripts/*.sh
 *crt
 *.py.old
 # nginx
@@ -13,3 +14,5 @@ env/
 # pyenv
 .python-version
 .DS_Store
+
+requirements.txt

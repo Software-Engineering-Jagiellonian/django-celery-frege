@@ -1,0 +1,44 @@
+# Project dependencies:
+Django~=4.0.4
+django-extensions
+celery[redis]
+psycopg2~=2.9.3
+Faker
+GitPython~=3.1.27
+radon~=5.1.0
+flower~=1.0.0
+django-jazzmin
+PyGithub
+lizard~=1.17.10
+factory-boy~=3.2.1
+django-filter
+requests
+beautifulsoup4
+django-cors-headers
+djangorestframework-api-key
+channels
+channels-redis
+djangochannelsrestframework
+django-health-check
+psutil
+
+# Currently unused/useful for later:
+# django-redis
+
+# django-celery-beat
+# django-celery-results
+# websockets
+# Development tools:
+black
+isort
+flake8
+pre-commit
+pyupgrade
+gitlint
+
+# Testing
+pytest
+pytest-mock
+pytest-unordered
+pytest-django
+pytest-asyncio
