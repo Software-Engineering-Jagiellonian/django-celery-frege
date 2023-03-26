@@ -30,7 +30,7 @@ router.register(
 )
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
+    path("", admin.site.urls),
     path("api/", include(router.urls)),
     path("ht/", include('health_check.urls')),
 ]
