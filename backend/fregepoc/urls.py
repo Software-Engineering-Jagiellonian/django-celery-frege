@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from django.views.generic import RedirectView
 from rest_framework import routers
 
 from fregepoc.repositories.consumers import LiveStatusConsumer
@@ -30,7 +31,8 @@ router.register(
 )
 
 urlpatterns = [
-    path("", admin.site.urls),
+    path("", RedirectView.as_view(url='/admin')),
+    path("admin/", admin.site.urls),
     path("api/", include(router.urls)),
     path("ht/", include('health_check.urls')),
 ]
