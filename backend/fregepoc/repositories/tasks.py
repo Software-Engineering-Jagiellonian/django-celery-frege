@@ -225,7 +225,9 @@ def analyze_file_task(repo_file_pk):
 
     analyzers = AnalyzerFactory.make_analyzers(repo_file.language)
     if not analyzers:
+        repository = repo_file.repository
         repo_file.delete()
+        _finalize_repo_analysis(repository)
         return
 
     metrics_dict = {}

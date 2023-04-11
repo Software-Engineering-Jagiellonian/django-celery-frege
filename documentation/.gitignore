@@ -2,3 +2,6 @@
 
 _build
 *.rst
+
+# cache files
+__pycache__

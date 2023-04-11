@@ -94,7 +94,8 @@ services:
       retries: 2
 
   fregepoc-loki:
-    image: grafana/loki:2.6.1
+    image: grafana/loki:2.7.4
+    user: "1000"
     container_name: fregepoc-loki
     ports:
       - 3100:3100
@@ -153,32 +154,28 @@ services:
   # Autoreload on code change won't work without this setup
   #
   # fregepoc-celery-worker-dev:
-  #   <<: *backend
-  #   <<: *celery-healthcheck
+  #   <<: [*backend, *celery-healthcheck]
   #   container_name: fregepoc-celery-worker-dev
   #   ports: []
   #   command: sh -c "python3 manage.py celery_dev_autoreload"
   #   profiles: [ "dev" ]
 
   fregepoc-celery-crawl-worker-dev:
-      <<: *backend
-      <<: *celery-healthcheck
+      <<: [*backend, *celery-healthcheck]
       container_name: fregepoc-celery-crawl-worker-dev
       ports: []
       command: celery -A fregepoc worker -Q crawl -l info --concurrency=${CELERY_WORKER_CRAWL_CONCURRENCY} -n worker_crawl
       profiles: [ "dev" ]
 
   fregepoc-celery-downloads-worker-dev:
-    <<: *backend
-    <<: *celery-healthcheck
+    <<: [*backend, *celery-healthcheck]
     container_name: fregepoc-celery-downloads-worker-dev
     ports: []
     command: celery -A fregepoc worker -Q downloads -l info --concurrency=${CELERY_WORKER_DOWNLOADS_CONCURRENCY} -n worker_downloads
     profiles: [ "dev" ]
 
   fregepoc-celery-worker-dev:
-    <<: *backend
-    <<: *celery-healthcheck
+    <<: [*backend, *celery-healthcheck]
     container_name: fregepoc-celery-worker-dev
     ports: []
     command: celery -A fregepoc worker -Q celery -l info --concurrency=${CELERY_WORKER_BASE_CONCURRENCY} -n worker_celery
@@ -335,24 +332,21 @@ services:
       retries: 2
 
   fregepoc-celery-crawl-worker-prod:
-      <<: *backend
-      <<: *celery-healthcheck
+      <<: [*backend, *celery-healthcheck]
       container_name: fregepoc-celery-crawl-worker-prod
       ports: []
       command: celery -A fregepoc worker -Q crawl -l info --concurrency=${CELERY_WORKER_CRAWL_CONCURRENCY} -n worker_crawl
       profiles: [ "prod" ]
 
   fregepoc-celery-downloads-worker-prod:
-    <<: *backend
-    <<: *celery-healthcheck
+    <<: [*backend, *celery-healthcheck]
     container_name: fregepoc-celery-downloads-worker-prod
     ports: []
     command: celery -A fregepoc worker -Q downloads -l info --concurrency=${CELERY_WORKER_DOWNLOADS_CONCURRENCY} -n worker_downloads
     profiles: [ "prod" ]
 
   fregepoc-celery-worker-prod:
-    <<: *backend
-    <<: *celery-healthcheck
+    <<: [*backend, *celery-healthcheck]
     container_name: fregepoc-celery-worker-prod
     ports: []
     command: celery -A fregepoc worker -Q celery -l info --concurrency=${CELERY_WORKER_BASE_CONCURRENCY} -n worker_celery
