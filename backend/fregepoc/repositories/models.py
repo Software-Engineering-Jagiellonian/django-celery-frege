@@ -90,6 +90,46 @@ class RepositoryFile(models.Model):
         auto_now_add=True,
         help_text=_("The time when the file was analyzed."),
     )
+    lines_of_code = models.FloatField(
+        blank=True,
+        null=True,
+        help_text=_("Total lines of code in file"),
+    )
+    token_count = models.FloatField(
+        blank=True,
+        null=True,
+        help_text=_("token count in file"),
+    )
+    function_count = models.FloatField(
+        blank=True,
+        null=True,
+        help_text=_("number of functions in file"),
+    )
+    average_function_name_length = models.FloatField(
+        blank=True,
+        null=True,
+        help_text=_("average function name length in file"),
+    )
+    average_lines_of_code = models.FloatField(
+        blank=True,
+        null=True,
+        help_text=_("average lines of code"),
+    )
+    average_token_count = models.FloatField(
+        blank=True,
+        null=True,
+        help_text=_("average token count"),
+    )
+    average_cyclomatic_complexity = models.FloatField(
+        blank=True,
+        null=True,
+        help_text=_("average cyclomatic complexity of file"),
+    )
+    average_parameter_count = models.FloatField(
+        blank=True,
+        null=True,
+        help_text=_("average parameter count"),
+    )
 
     def __str__(self):
         return f"file: {self.repository.name}/{self.repo_relative_file_path}"
