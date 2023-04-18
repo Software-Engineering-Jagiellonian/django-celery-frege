@@ -50,7 +50,7 @@ Prometheus & Grafana (or [ELK](https://www.elastic.co/what-is/elk-stack) stack) 
 
 ![Data-flow](./data-flow.svg "dataflow")
 
-The data flow is mostly similar to the one employed by the current solution, with the exception of services merged by Frege- (`downloader` + `extractor` were combined in `process_repo_task`).
+The data flow is mostly similar to the one employed by the current solution, with the exception of services merged by Frege (`downloader` + `extractor` were combined in `process_repo_task`).
 
 ## System overview
 
