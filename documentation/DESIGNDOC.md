@@ -1,4 +1,4 @@
-# Frege- design document
+# Frege design document
 
 ## Problem statement
 
