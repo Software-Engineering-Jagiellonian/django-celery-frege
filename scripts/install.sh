@@ -3,6 +3,7 @@ if [[ $* == -v ]]
 then
 set -o xtrace
 fi
+set -e
 
 #create and activate virtual enviroment
 python -m venv backend/env

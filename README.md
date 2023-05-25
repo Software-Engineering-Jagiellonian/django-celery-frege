@@ -100,6 +100,7 @@ In order to install pre-commit git-hook, run command
 ```
 scripts/install.sh
 ```
+> :warning: install.sh script requires venv to be installed, to function properly
 Alternatively you can run individual commands (recommended with [venv](https://docs.python.org/3/library/venv.html) previously created):
 1. Install python packages:
 

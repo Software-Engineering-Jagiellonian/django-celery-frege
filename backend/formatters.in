@@ -5,3 +5,4 @@ flake8
 pre-commit
 pyupgrade
 gitlint
+sh~=1.14.0
