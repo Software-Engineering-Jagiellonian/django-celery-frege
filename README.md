@@ -96,10 +96,19 @@ Alternatively, you can use **extensions** (such as prettier or black) to format 
 
 There are three linters/formatters for Python: `flake8`, `isort`, `black`; and there are two for Javascript/TypeScript: `prettier`, `eslint`.
 
-In order to install pre-commit git-hook, run commands (recommended with [venv](https://docs.python.org/3/library/venv.html) previously created):
+In order to install pre-commit git-hook, run command
+```
+scripts/install.sh
+```
+> :warning: install.sh script requires venv to be installed, to function properly
+Alternatively you can run individual commands (recommended with [venv](https://docs.python.org/3/library/venv.html) previously created):
 1. Install python packages:
 
-pip install -r backend/requirements.txt
+```
+pip install pip-tools
+pip-compile --output-file backend/requirements.txt backend/requirements.in backend/formatters.in
+pip-sync backend/requirements.txt
+```
 
 2. Install npm packages:
 
