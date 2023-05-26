@@ -7,6 +7,7 @@
   border-bottom: 1px solid $main-borders-color;
   display: flex;
   align-items: center;
+  justify-content: space-between;
 }
 
 .leftAligned {
@@ -20,6 +21,13 @@
     margin-right: 12px;
     margin-left: 12px;
   }
+}
+
+.rightAligned{
+  margin-left: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 .navbarButton {

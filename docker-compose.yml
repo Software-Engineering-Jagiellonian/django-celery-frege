@@ -100,7 +100,9 @@ services:
     ports:
       - 3100:3100
     volumes:
-      - ./loki:/loki
+      - ./loki/data:/loki
+      # - ./loki/loki-config.yaml:/etc/loki/local-config.yaml
+    # command: -config.file=/etc/loki/local-config.yaml
     networks:
       - fregepoc-main
     profiles: [ "dev", "prod" ]
@@ -225,6 +227,10 @@ services:
       - PORT=${DOCKER_FRONTEND_PORT}
       - REACT_APP_DOCKER_GRAFANA_HOST=fregepoc-grafana-dev
       - REACT_APP_DOCKER_GRAFANA_PORT=3000
+      - DOCKER_FLOWER_HOST=fregepoc-flower-dev
+      - DOCKER_FLOWER_PORT=5555
+      - DJANGO_SUPERUSER_USERNAME=django_admin
+      - DJANGO_SUPERUSER_PASSWORD=pass
       - CHOKIDAR_USEPOLLING=true
     volumes:
       - /app/node_modules
@@ -258,6 +264,8 @@ services:
       - PORT=${DOCKER_FRONTEND_PORT}
       - REACT_APP_DOCKER_GRAFANA_HOST=fregepoc-grafana-prod
       - REACT_APP_DOCKER_GRAFANA_PORT=3000
+      - DOCKER_FLOWER_HOST=fregepoc-flower-dev
+      - DOCKER_FLOWER_PORT=5555
       - NODE_ENV=production
       - VIRTUAL_HOST=${FRONTEND_HOSTNAME}
       - LETSENCRYPT_HOST=${FRONTEND_HOSTNAME}

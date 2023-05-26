@@ -5,7 +5,8 @@ datasources:
   type: postgres
   access: proxy
   url: fregepoc-postgres:5432
-  password: admin
+  secureJsonData:
+    password: admin
   user: frege
   database: frege
   basicAuth: true
