@@ -15,6 +15,8 @@ import { Box, Boxes, Plus } from 'react-bootstrap-icons';
 import PresentationMode from '../menuItem/PresentationMode';
 import DataTableView from '../menuItem/DataTableView';
 import Logs from '../menuItem/Logs';
+import Users from '../menuItem/Users';
+import Services from '../menuItem/Services';
 
 interface UnwrappedType {
   id: string;
@@ -100,6 +102,18 @@ export const SideMenu: FC<{ className: string }> = ({ className }) => {
 
         <div className={styles.menuContainer}>
           <Logs />
+        </div>
+
+        <hr />
+
+        <div className={styles.menuContainer}>
+          <Services />
+        </div>
+
+        <hr />
+
+        <div className={styles.menuContainer}>
+          <Users />
         </div>
 
       </div>

@@ -1,12 +1,15 @@
-import axios from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 import React, { useState, useEffect } from 'react';
 import { ArrowRepeat } from 'react-bootstrap-icons';
 import styles from './Flower.module.scss';
 import { FlowerLog } from './utils/FlowerLog';
 
+export const targetFlower = process.env.DOCKER_FLOWER_HOST || 'localhost';
+export const portFlower = process.env.DOCKER_FLOWER_PORT || '5555';
+
 export const getFlowerLogs = async (): Promise<FlowerLog[]> => {
     let logsData: FlowerLog[] = [];
-    await axios.get(`/flower/api/tasks`).then(async (response) => {
+    await axios.get(`http://${targetFlower}:${portFlower}/api/tasks`).then(async (response) => {
         logsData = Object.values(response.data)
         return response.data;
     });
@@ -103,6 +106,7 @@ const Flower = () => {
                 {logs
                     .filter(e => filterByState(e, filterState))
                     .filter(e => filterByType(e, filterType))
+                    .slice(0, 100)
                     .map(log => <tr key={log.uuid} className={styles.row}>
                         <td className={styles.cell}>{log.uuid}</td>
                         <td className={styles.cell}>{log.name}</td>
