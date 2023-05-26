@@ -64,6 +64,8 @@ services:
       - fregepoc-main
     expose:
       - "${DOCKER_POSTGRES_PORT}"
+    ports:
+      - "${DOCKER_POSTGRES_PORT}:${DOCKER_POSTGRES_PORT}"
     profiles: [ "dev", "prod" ]
     restart: on-failure
     volumes:
