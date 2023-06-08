@@ -204,6 +204,10 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated"
     ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
     "DEFAULT_FILTER_BACKENDS": [
         "django_filters.rest_framework.DjangoFilterBackend"
     ],
@@ -213,11 +217,23 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_RATES": {"apikey": "500/minute"},
 }
 
+
 # CORS
 
 CORS_ALLOWED_ORIGINS = [
     # set for production
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'http://localhost:3030'
 ]
+
+CORS_ALLOW_METHODS = [
+    'GET',
+    'POST',
+    'OPTIONS'
+]
+
+CORS_ALLOW_CREDENTIALS = True
 
 # CHANNELS
 
