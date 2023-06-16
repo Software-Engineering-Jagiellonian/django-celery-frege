@@ -31,6 +31,20 @@ class TestScalaAnalyzer:
             "expected_token_count",
         ],
         [
+            #spark-nlp test
+                (
+                {"repo_relative_file_path": "spark-nlp/src/main/scala/com/johnsnowlabs/client/CredentialParams.scala"},
+                0,
+                0,
+                0,
+                0,
+                0,
+                7,
+                30,
+            ),
+
+            ###
+
             (
                 {"repo_relative_file_path": "BinaryTree.scala"},
                 1.75,

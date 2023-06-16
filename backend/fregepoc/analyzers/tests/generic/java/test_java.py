@@ -29,6 +29,20 @@ class TestJavaAnalyzer:
             "expected_token_count",
         ],
         [
+        
+            #tests for calculator
+            (
+                {"repo_relative_file_path": "Calculator/src/main/java/com/houarizegai/calculator/App.java"},
+                1.0,
+                3.0,
+                1.0,
+                14.0,
+                7,
+                40,
+            ),
+
+            ######
+
             (
                 {"repo_relative_file_path": "BinaryTree.java"},
                 1.77,

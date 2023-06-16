@@ -18,6 +18,24 @@ class TestPhpAnalyzer:
             "expected_average_parameter_count",
         ],
         [
+            ##online shopping system tests
+                (
+                {"repo_relative_file_path": "online-shopping-system-advanced/action.php"},
+                0,
+                0.0,
+            ),
+            (
+                {"repo_relative_file_path": "online-shopping-system-advanced/body.php"},
+                0,
+                0.0,
+            ),
+
+
+            ##
+
+
+
+
             (
                 {"repo_relative_file_path": "main.php"},
                 1.71,

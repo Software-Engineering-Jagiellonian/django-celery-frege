@@ -77,10 +77,12 @@ After running application in dev profile, check these sites:
 * `localhost:5555` - [Flower](https://flower.readthedocs.io/en/latest/)
 * `localhost:8000` - back-end application
 
+
 Running **tests** for the application:
 ```
 docker compose exec -T fregepoc-backend-dev pytest
 ```
+The above command will run tests from backend/fregepoc/analyzers/tests directory. The tests are made for nine languages: golang, java, javascript, php, ruby, rust, scala, swift and typescript. Every language has a folder containing a few dummy files and one real project (added as a github submodule) written mainly in this specific language with a file from the repository included in the tests.
 
 Running application in **prod** environment (use with caution):
 ```

@@ -16,6 +16,15 @@ class TestJavascriptAnalyzer:
     @pytest.mark.parametrize(
         ["repo_file_params", "expected_loc"],
         [
+            #weatherapp tests
+            (
+                {"repo_relative_file_path": "localWeather_WebApp/app.js"},
+                36,
+            ),
+
+            ########
+
+
             (
                 {"repo_relative_file_path": "insertionSort.js"},
                 49,

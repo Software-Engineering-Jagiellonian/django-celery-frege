@@ -33,6 +33,21 @@ class TestSwiftAnalyzer:
             "expected_token_count",
         ],
         [
+            ##corona tracker tests
+            (
+                {"repo_relative_file_path": "CoronaTracker/Corona/Main/App.swift"},
+                1.43,
+                12.57,
+                6.9,
+                0.57,
+                44.1,
+                7,
+                65,
+                420,
+            ),
+
+            ###
+
             (
                 {"repo_relative_file_path": "binary_search.swift"},
                 4.0,
