@@ -27,7 +27,7 @@ x-backend: &backend
     - fregepoc_tmp:${DJANGO_DOWNLOAD_PATH}
   networks:
     - fregepoc-main
-  profiles: [ "dev" ]
+  profiles: [ "dev", "local-be-dev" ]
   restart: on-failure
   env_file:
     - .env
@@ -44,7 +44,7 @@ services:
       - fregepoc-main
     expose:
       - "${DOCKER_REDIS_PORT}"
-    profiles: [ "dev", "prod" ]
+    profiles: [ "dev", "prod", "local-be-dev" ]
     restart: on-failure
     healthcheck:
       test: "redis-cli ping || exit 1"
@@ -66,7 +66,7 @@ services:
       - "${DOCKER_POSTGRES_PORT}"
     ports:
       - "${DOCKER_POSTGRES_PORT}:${DOCKER_POSTGRES_PORT}"
-    profiles: [ "dev", "prod" ]
+    profiles: [ "dev", "prod", "local-be-dev" ]
     restart: on-failure
     volumes:
       - fregepoc_postgresql_data:/var/lib/postgresql/data
@@ -83,6 +83,8 @@ services:
     container_name: fregepoc-prometheus
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "${DOCKER_PROMETHEUS_PORT}:${DOCKER_PROMETHEUS_PORT}"
     expose:
       - ${DOCKER_PROMETHEUS_PORT}
     networks:
@@ -168,22 +170,22 @@ services:
       <<: [*backend, *celery-healthcheck]
       container_name: fregepoc-celery-crawl-worker-dev
       ports: []
-      command: celery -A fregepoc worker -Q crawl -l info --concurrency=${CELERY_WORKER_CRAWL_CONCURRENCY} -n worker_crawl
-      profiles: [ "dev" ]
+      command: celery -A fregepoc worker -Q crawl -l debug --concurrency=${CELERY_WORKER_CRAWL_CONCURRENCY} -n worker_crawl
+      profiles: [ "dev", "local-be-dev" ]
 
   fregepoc-celery-downloads-worker-dev:
     <<: [*backend, *celery-healthcheck]
     container_name: fregepoc-celery-downloads-worker-dev
     ports: []
-    command: celery -A fregepoc worker -Q downloads -l info --concurrency=${CELERY_WORKER_DOWNLOADS_CONCURRENCY} -n worker_downloads
-    profiles: [ "dev" ]
+    command: celery -A fregepoc worker -Q downloads -l debug --concurrency=${CELERY_WORKER_DOWNLOADS_CONCURRENCY} -n worker_downloads
+    profiles: [ "dev", "local-be-dev" ]
 
   fregepoc-celery-worker-dev:
     <<: [*backend, *celery-healthcheck]
     container_name: fregepoc-celery-worker-dev
     ports: []
-    command: celery -A fregepoc worker -Q celery -l info --concurrency=${CELERY_WORKER_BASE_CONCURRENCY} -n worker_celery
-    profiles: [ "dev" ]
+    command: celery -A fregepoc worker -Q celery -l debug --concurrency=${CELERY_WORKER_BASE_CONCURRENCY} -n worker_celery
+    profiles: [ "dev", "local-be-dev" ]
 
   fregepoc-grafana-dev: &grafana
     image: grafana/grafana:8.5.2

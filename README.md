@@ -101,6 +101,8 @@ In order to install pre-commit git-hook, run commands (recommended with [venv](h
 
 pip install -r backend/requirements.txt
 
+For more information about development of BE please refer to [backend/README.md](backend/README.md)
+
 2. Install npm packages:
 
 ```
