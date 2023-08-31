@@ -70,7 +70,8 @@ def _finalize_repo_analysis(repo_obj):
 
         with transaction.atomic():
             repo_obj.analyzed = True
-            repo_obj.save(update_fields=["analyzed", ])
+            repo_obj.analyzed_time = timezone.now()
+            repo_obj.save(update_fields=["analyzed", "analyzed_time", ])
 
         logger.info(f"Repository {repo_obj.git_url} fully analyzed, attempting delete")
 

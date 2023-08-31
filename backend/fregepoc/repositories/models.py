@@ -47,6 +47,12 @@ class Repository(models.Model):
         null=True,
         help_text=_("The time when the repository was downloaded."),
     )
+    analyzed_time = models.DateTimeField(
+        _("analyzed time"),
+        blank=True,
+        null=True,
+        help_text=_("The time when the repository was analyzed."),
+    )
 
     def __str__(self):
         return self.name
