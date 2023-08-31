@@ -3,6 +3,14 @@ from collections.abc import Generator
 from django.db import models
 
 
+class CommitMessagesTypes(models.TextChoices):
+    FEATURE = "FEATURE"
+    FIX = "FIX"
+    CONFIG = "CONFIG CHANGE"
+    MERGE_PR = "MERGE PR"
+    UNCLASSIFIED = "UNCLASSIFIED"
+
+
 class ProgrammingLanguages(models.TextChoices):
     PYTHON = "Python"
     C = "C"
