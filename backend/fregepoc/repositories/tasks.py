@@ -114,15 +114,19 @@ def _check_download_folder_size():
     If not, raise DownloadDirectoryFullException
     """
     path = Path(settings.DOWNLOAD_PATH)
-    files = list(
-        path.glob("**/*")
-    )  # This is necessary because files can get deleted while being processed
-    size = sum(f.stat().st_size for f in files if f.exists() and f.is_file())
-    logger.info(f"Current temp file size = {size}")
-    if size >= settings.DOWNLOAD_DIR_MAX_SIZE_BYTES:
-        raise DownloadDirectoryFullException(
-            f"Current temp file too big. Size = {size}"
-        )
+    try:
+        files = list(
+            path.glob("**/*")
+        )  # This is necessary because files can get deleted while being processed
+        size = sum(f.stat().st_size for f in files if f.exists() and f.is_file())
+        logger.info(f"Current temp file size = {size}")
+        if size >= settings.DOWNLOAD_DIR_MAX_SIZE_BYTES:
+            raise DownloadDirectoryFullException(
+                f"Current temp file too big. Size = {size}"
+            )
+    except FileNotFoundError:
+        logger.warning("Directory in download folder not found. Retrying the check of download folder size.")
+        _check_download_folder_size()
 
 
 def _check_queued_tasks_number():
