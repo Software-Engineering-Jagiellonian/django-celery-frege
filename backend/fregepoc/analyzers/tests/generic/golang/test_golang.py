@@ -33,6 +33,23 @@ class TestGolangAnalyzer:
             "expected_token_count",
         ],
         [
+            #test for sing_box
+            (
+                {"repo_relative_file_path": "sing-box/debug.go"},
+                8.0,
+                24.0,
+                1.0,
+                139.0,
+                30.0,
+                1.0,
+                147.0,
+            ),
+
+            ###################
+
+
+
+            
             (
                 {"repo_relative_file_path": "binary_tree.go"},
                 2.92,
@@ -42,6 +59,26 @@ class TestGolangAnalyzer:
                 297,
                 24,
                 1671,
+            ),
+            (
+                {"repo_relative_file_path": "main_test.go"},
+                1.69,
+                6.61,
+                0.77,
+                43.31,
+                110,
+                13,
+                767,
+            ),
+            (
+                {"repo_relative_file_path": "main.go"},
+                4.4,
+                17.0,
+                0.55,
+                106.1,
+                268,
+                11,
+                1568,
             ),
             (
                 {"repo_relative_file_path": "concurrent_prime_sieve.go"},

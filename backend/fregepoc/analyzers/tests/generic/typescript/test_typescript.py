@@ -29,6 +29,21 @@ class TestTypescriptAnalyzer:
             "expected_token_count",
         ],
         [
+            ##Nest-ReactTS-Minigame test
+                (
+                {"repo_relative_file_path": "Nest-ReactTS-Minigame/mini-battle-backend/src/main.ts"},
+                2,
+                7,
+                39.5,
+                20,
+                125,
+            ),
+
+            ###
+
+
+
+
             (
                 {"repo_relative_file_path": "bst.ts"},
                 1.0,
