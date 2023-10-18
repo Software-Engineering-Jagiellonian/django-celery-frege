@@ -11,6 +11,13 @@ from fregepoc.repositories.utils.paths import get_file_abs_path
 
 
 class GenericAnalysisResult(TypedDict):
+    """
+    Class representing general alaysis results
+
+    This class does not have any methods, it is just a collection
+    of various metrics gruoped together for convinience.
+    """
+
     lines_of_code: int
     token_count: int
     average_lines_of_code: float

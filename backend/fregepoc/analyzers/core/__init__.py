@@ -1,3 +1,6 @@
+"""
+The package with analyzers code
+"""
 from fregepoc.analyzers.core.cpp import *
 from fregepoc.analyzers.core.golang import *
 from fregepoc.analyzers.core.java import *

@@ -1,3 +1,8 @@
+"""
+This package contains python code requiered for core functionality of frege:
+analyzers, indexers and other utilities for downloading and analyzing of repositories.
+"""
+
 # This will make sure the app is always imported when
 # Django starts so that shared_task will use this app.
 from .celery_app import app as celery_app
