@@ -111,23 +111,54 @@ def _clone_repo(repo: Repository, local_path: Path) -> Optional[git.Repo]:
 def _check_download_folder_size():
     """
     Check if the size of downloads folder < DOWNLOAD_DIR_MAX_SIZE_BYTES.
-    If not, raise DownloadDirectoryFullException
+    If not, try to clean up some files before raising DownloadDirectoryFullException
     """
     path = Path(settings.DOWNLOAD_PATH)
     try:
-        files = list(
-            path.glob("**/*")
-        )  # This is necessary because files can get deleted while being processed
+        files = list(path.glob("**/*"))
         size = sum(f.stat().st_size for f in files if f.exists() and f.is_file())
         logger.info(f"Current temp file size = {size}")
+        
         if size >= settings.DOWNLOAD_DIR_MAX_SIZE_BYTES:
-            raise DownloadDirectoryFullException(
-                f"Current temp file too big. Size = {size}"
-            )
+            cleaned = False
+            
+            repos_to_clean = Repository.objects.filter(analyzed=True).order_by('analyzed_time')[:20]
+            
+            if repos_to_clean.exists():
+                for repo in repos_to_clean:
+                    repo_path = get_repo_local_path(repo)
+                    if repo_path.exists():
+                        logger.info(f"Cleaning up analyzed repository: {repo.git_url}")
+                        shutil.rmtree(str(repo_path), ignore_errors=True)
+                        cleaned = True
+            
+            if not cleaned or size >= settings.DOWNLOAD_DIR_MAX_SIZE_BYTES:
+                old_repos = Repository.objects.order_by('fetch_time')[:10]
+                
+                for repo in old_repos:
+                    repo_path = get_repo_local_path(repo)
+                    if repo_path.exists():
+                        logger.info(f"Emergency cleanup of old repository: {repo.git_url}")
+                        shutil.rmtree(str(repo_path), ignore_errors=True)
+                        cleaned = True
+            
+            if not cleaned or size >= settings.DOWNLOAD_DIR_MAX_SIZE_BYTES:
+                threshold = time.time() - (6 * 60 * 60)
+                old_files = [f for f in files if f.is_file() and f.stat().st_mtime < threshold]
+                
+                for file in old_files[:100]:
+                    logger.info(f"Emergency cleanup of old file: {file}")
+                    file.unlink(missing_ok=True)
+            
+            files = list(path.glob("**/*"))
+            size = sum(f.stat().st_size for f in files if f.exists() and f.is_file())
+            
+            if size >= settings.DOWNLOAD_DIR_MAX_SIZE_BYTES:
+                raise DownloadDirectoryFullException(f"Current temp file still too big after cleanup. Size = {size}")
+            
     except FileNotFoundError:
-        logger.warning("Directory in download folder not found. Retrying the check of download folder size.")
-        _check_download_folder_size()
-
+        logger.warning("Directory in download folder not found. Creating...")
+        path.mkdir(parents=True, exist_ok=True)
 
 def _check_queued_tasks_number():
     """
