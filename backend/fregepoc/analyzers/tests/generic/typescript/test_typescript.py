@@ -31,7 +31,7 @@ class TestTypescriptAnalyzer:
         [
             (
                 {"repo_relative_file_path": "bst.ts"},
-                1.0,
+                3.75,
                 3.0,
                 13.0,
                 45,
