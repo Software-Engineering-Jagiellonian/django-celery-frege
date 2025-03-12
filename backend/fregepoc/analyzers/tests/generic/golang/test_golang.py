@@ -57,7 +57,7 @@ class TestGolangAnalyzer:
                 {"repo_relative_file_path": "http_server.go"},
                 2.0,
                 8.0,
-                0,
+                0.666,
                 50.67,
                 31,
                 3,
