@@ -27,6 +27,19 @@ class TestRustAnalyzer:
             "expected_token_count",
         ],
         [
+            ##rust bouncy game
+                (
+                {"repo_relative_file_path": "Rust-bouncygame/src/main.rs"},
+                11.3,
+                3.33,
+                11.3,
+                1.0,
+                540,
+            ),
+
+            #####
+
+
             (
                 {"repo_relative_file_path": "iban.rs"},
                 32.0,

@@ -1,0 +1,27 @@
+[submodule "backend/fregepoc/analyzers/tests/generic/golang/__mock__/dummy_repo/sing-box"]
+	path = backend/fregepoc/analyzers/tests/generic/golang/__mock__/dummy_repo/sing-box
+	url = git@github.com:SagerNet/sing-box.git
+[submodule "backend/fregepoc/analyzers/tests/generic/java/__mock__/dummy_repo/Calculator"]
+	path = backend/fregepoc/analyzers/tests/generic/java/__mock__/dummy_repo/Calculator
+	url = git@github.com:HouariZegai/Calculator.git
+[submodule "backend/fregepoc/analyzers/tests/generic/javascript/__mock__/dummy_repo/localWeather_WebApp"]
+	path = backend/fregepoc/analyzers/tests/generic/javascript/__mock__/dummy_repo/localWeather_WebApp
+	url = git@github.com:yuvraaaj/localWeather_WebApp.git
+[submodule "backend/fregepoc/analyzers/tests/generic/php/__mock__/dummy_repo/online-shopping-system-advanced"]
+	path = backend/fregepoc/analyzers/tests/generic/php/__mock__/dummy_repo/online-shopping-system-advanced
+	url = git@github.com:PuneethReddyHC/online-shopping-system-advanced.git
+[submodule "backend/fregepoc/analyzers/tests/generic/ruby/__mock__/dummy_repo/Sniper-Game"]
+	path = backend/fregepoc/analyzers/tests/generic/ruby/__mock__/dummy_repo/Sniper-Game
+	url = git@github.com:robertocarlosmedina/Sniper-Game.git
+[submodule "backend/fregepoc/analyzers/tests/generic/rust/__mock__/dummy_repo/Rust-bouncygame"]
+	path = backend/fregepoc/analyzers/tests/generic/rust/__mock__/dummy_repo/Rust-bouncygame
+	url = git@github.com:Kalebu/Rust-bouncygame.git
+[submodule "backend/fregepoc/analyzers/tests/generic/scala/__mock__/dummy_repo/spark-nlp"]
+	path = backend/fregepoc/analyzers/tests/generic/scala/__mock__/dummy_repo/spark-nlp
+	url = git@github.com:JohnSnowLabs/spark-nlp.git
+[submodule "backend/fregepoc/analyzers/tests/generic/swift/__mock__/dummy_repo/CoronaTracker"]
+	path = backend/fregepoc/analyzers/tests/generic/swift/__mock__/dummy_repo/CoronaTracker
+	url = git@github.com:mhdhejazi/CoronaTracker.git
+[submodule "backend/fregepoc/analyzers/tests/generic/typescript/__mock__/dummy_repo/Nest-ReactTS-Minigame"]
+	path = backend/fregepoc/analyzers/tests/generic/typescript/__mock__/dummy_repo/Nest-ReactTS-Minigame
+	url = git@github.com:Raza-ILV/Nest-ReactTS-Minigame.git

@@ -18,6 +18,14 @@ class TestRubyAnalyzer:
             "expected_average_parameter_count",
         ],
         [
+            ##sniper tests
+            (
+                {"repo_relative_file_path": "Sniper-Game/sniper.rb"},
+                12.4,
+                0.2,
+            ),
+            #####
+            
             (
                 {"repo_relative_file_path": "data_mapper.rb"},
                 4.5,
