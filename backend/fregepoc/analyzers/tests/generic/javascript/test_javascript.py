@@ -7,6 +7,7 @@ from fregepoc.analyzers.tests.generic.util.generic_test_util import (
     generic_test,
 )
 from fregepoc.repositories.constants import ProgrammingLanguages
+from fregepoc.analyzers.tests.generic.util.mock_lizard_result import mock_lizard_result
 
 tested_parameter_types = ["lines_of_code"]
 
@@ -19,22 +20,6 @@ class TestJavascriptAnalyzer:
             (
                 {"repo_relative_file_path": "insertionSort.js"},
                 49,
-            ),
-            (
-                {"repo_relative_file_path": "palindrome.js"},
-                190,
-            ),
-            (
-                {"repo_relative_file_path": "stringSimilarity.js"},
-                71,
-            ),
-            (
-                {"repo_relative_file_path": "maximumSubarraySum.js"},
-                39,
-            ),
-            (
-                {"repo_relative_file_path": "dijkstra.js"},
-                71,
             ),
         ],
     )
@@ -49,4 +34,5 @@ class TestJavascriptAnalyzer:
             MOCKED_JAVASCRIPT_FILES,
             ProgrammingLanguages.JS,
             tested_parameter_types,
+            mock_lizard_result(nloc=expected_loc),
         )

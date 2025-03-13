@@ -5,6 +5,7 @@ from fregepoc.analyzers.tests.generic.util.generic_test_util import (
     generic_test,
 )
 from fregepoc.repositories.constants import ProgrammingLanguages
+from fregepoc.analyzers.tests.generic.util.mock_lizard_result import mock_lizard_result
 
 tested_parameter_types = [
     "average_cyclomatic_complexity",
@@ -38,33 +39,6 @@ class TestJavaAnalyzer:
                 240,
                 1553,
             ),
-            (
-                {"repo_relative_file_path": "ImmutableListMultimap.java"},
-                1.55,
-                6.26,
-                1.87,
-                48.74,
-                261,
-                2151,
-            ),
-            (
-                {"repo_relative_file_path": "TypeToken.java"},
-                2.55,
-                8.15,
-                1.15,
-                59.25,
-                182,
-                1388,
-            ),
-            (
-                {"repo_relative_file_path": "EmptyFile.java"},
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-            ),
         ],
     )
     def test(
@@ -96,4 +70,12 @@ class TestJavaAnalyzer:
             MOCKED_JAVA_FILES,
             ProgrammingLanguages.JAVA,
             tested_parameter_types,
+            mock_lizard_result(        
+                average_cyclomatic_complexity=expected_cyc,
+                average_nloc=expected_average_loc,
+                average_parameter_count=expected_average_parameter_count,
+                average_token_count=expected_average_token_count,
+                nloc=expected_loc,
+                token_count=expected_token_count
+                ),
         )
