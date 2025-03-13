@@ -21,5 +21,12 @@ sphinx-apidoc -o documentation .
 cd documentation
 make html
 ```
-
 HTML files should be created in `_build/html`.
+
+4. View documentation locally
+
+```
+xdg-open _build/html/_modules/index.html  #linux 
+open _build/html/_modules/index.html      # macOS
+start _build/html/_modules/index.html     # Windows
+```
