@@ -1,8 +1,9 @@
 import os
 import shutil
+import time
 from contextlib import closing
 from pathlib import Path
-from typing import Optional
+from typing import Optional, List, Tuple
 
 import git
 from celery import shared_task
@@ -87,25 +88,97 @@ def _delete_file(path: Path, repo: str):
     logger.info(f"File {path} deleted for repository {repo}")
 
 
-def _clone_repo(repo: Repository, local_path: Path) -> Optional[git.Repo]:
+def _get_download_folder_size():
+    """
+    Get the current size of the download folder in bytes.
+    """
+    path = Path(settings.DOWNLOAD_PATH)
     try:
-        repo_obj = git.Repo.clone_from(repo.git_url, local_path)
-        repo.fetch_time = timezone.now()
-        repo.save(update_fields=["fetch_time"])
-        logger.info(f"Repository {repo.git_url} cloned")
-        return repo_obj
-    except git.exc.GitCommandError:
+        files = list(
+            path.glob("**/*")
+        )
+        size = sum(f.stat().st_size for f in files if f.exists() and f.is_file())
+        logger.info(f"Current temp file size = {size}")
+        return size
+    except FileNotFoundError:
+        logger.warning("Directory in download folder not found.")
+        return 0
+
+
+def _get_repo_folders_with_timestamps() -> List[Tuple[Path, float]]:
+    """
+    Get list of repo folders with their creation timestamps for sorting.
+    Returns a list of tuples (folder_path, creation_time)
+    """
+    path = Path(settings.DOWNLOAD_PATH)
+    if not path.exists():
+        return []
+    
+    result = []
+    for folder in path.iterdir():
+        if folder.is_dir():
+            try:
+                creation_time = folder.stat().st_mtime
+                result.append((folder, creation_time))
+            except (FileNotFoundError, PermissionError):
+                logger.warning(f"Could not get stats for folder {folder}")
+    
+    result.sort(key=lambda x: x[1])
+    return result
+
+
+def _cleanup_download_folder(target_size_threshold_bytes: int = None):
+    """
+    Clean up the download folder by removing oldest repositories
+    until we're below the target threshold.
+    
+    Args:
+        target_size_threshold_bytes: Target size threshold (default: 70% of max size)
+    """
+    if target_size_threshold_bytes is None:
+        # Default to 70% of the maximum allowed size
+        target_size_threshold_bytes = int(settings.DOWNLOAD_DIR_MAX_SIZE_BYTES * 0.7)
+    
+    current_size = _get_download_folder_size()
+    
+    if current_size <= target_size_threshold_bytes:
+        return
+        
+    logger.info(f"Download folder size ({current_size} bytes) exceeds target threshold "
+                f"({target_size_threshold_bytes} bytes). Cleaning up oldest repositories...")
+    
+    repo_folders = _get_repo_folders_with_timestamps()
+    
+    for folder, timestamp in repo_folders:
+        if current_size <= target_size_threshold_bytes:
+            break
+            
         try:
-            repo_obj = git.Repo(local_path)
-            logger.info(
-                f"Repo {repo.git_url} already exists, fetched from disk"
-            )
-            return repo_obj
-        except git.exc.NoSuchPathError:
-            logger.error(
-                "Tried fetching from disk, but repository does not exist"
-            )
-            return None
+            folder_size = sum(f.stat().st_size for f in folder.glob("**/*") 
+                             if f.exists() and f.is_file())
+            
+            logger.info(f"Deleting old repository folder: {folder} (size: {folder_size} bytes, "
+                        f"created/modified: {time.ctime(timestamp)})")
+            
+            shutil.rmtree(str(folder), ignore_errors=True)
+            
+            current_size -= folder_size
+            
+        except Exception as e:
+            logger.error(f"Error deleting folder {folder}: {str(e)}")
+    
+    # Log the final size after cleanup
+    final_size = _get_download_folder_size()
+    logger.info(f"Download folder cleanup completed. New size: {final_size} bytes")
+
+
+def _is_download_folder_full():
+    """
+    Check if the download folder is close to or above the size limit.
+    Returns True if the folder is at or above 90% of the limit.
+    """
+    size = _get_download_folder_size()
+    return size >= (settings.DOWNLOAD_DIR_MAX_SIZE_BYTES * 0.9)
 
 
 def _check_download_folder_size():
@@ -113,20 +186,48 @@ def _check_download_folder_size():
     Check if the size of downloads folder < DOWNLOAD_DIR_MAX_SIZE_BYTES.
     If not, raise DownloadDirectoryFullException
     """
-    path = Path(settings.DOWNLOAD_PATH)
+    size = _get_download_folder_size()
+    if size >= settings.DOWNLOAD_DIR_MAX_SIZE_BYTES:
+        raise DownloadDirectoryFullException(
+            f"Current temp file too big. Size = {size}"
+        )
+
+
+def _clone_repo(repo: Repository, local_path: Path) -> Optional[git.Repo]:
+    # First check if the folder already exists on disk
     try:
-        files = list(
-            path.glob("**/*")
-        )  # This is necessary because files can get deleted while being processed
-        size = sum(f.stat().st_size for f in files if f.exists() and f.is_file())
-        logger.info(f"Current temp file size = {size}")
-        if size >= settings.DOWNLOAD_DIR_MAX_SIZE_BYTES:
-            raise DownloadDirectoryFullException(
-                f"Current temp file too big. Size = {size}"
-            )
-    except FileNotFoundError:
-        logger.warning("Directory in download folder not found. Retrying the check of download folder size.")
+        repo_obj = git.Repo(local_path)
+        logger.info(f"Repo {repo.git_url} already exists, fetched from disk")
+        return repo_obj
+    except git.exc.NoSuchPathError:
+        pass
+        
+    # Check if we're near capacity and clean up if necessary
+    if _is_download_folder_full():
+        logger.info(f"Download directory near capacity before cloning {repo.git_url}, attempting cleanup")
+        _cleanup_download_folder()
+        
+        # If we're still near capacity after cleanup, skip the clone
+        if _is_download_folder_full():
+            logger.warning(f"Download directory still near capacity after cleanup, skipping clone of {repo.git_url}")
+            return None
+    
+    try:
+        # Double-check download directory size before cloning
         _check_download_folder_size()
+        
+        repo_obj = git.Repo.clone_from(repo.git_url, local_path)
+        repo.fetch_time = timezone.now()
+        repo.save(update_fields=["fetch_time"])
+        logger.info(f"Repository {repo.git_url} cloned")
+        return repo_obj
+        
+    except DownloadDirectoryFullException:
+        logger.warning(f"Download directory full, skipping clone of {repo.git_url}")
+        return None
+    except git.exc.GitCommandError:
+        logger.error(f"Git command error when cloning {repo.git_url}")
+        return None
 
 
 def _check_queued_tasks_number():
@@ -156,6 +257,9 @@ def init_worker(**kwargs):
     if os.environ.get("CELERY_CRAWL_ON_STARTUP", "true").lower() != "true":
         return
 
+    # Clean up download folder on startup
+    _cleanup_download_folder()
+
     for indexer_cls in indexers:
         crawl_repos_task.apply_async(args=(indexer_cls.__name__,))
 
@@ -169,6 +273,18 @@ def init_worker(**kwargs):
     default_retry_delay=15,
 )
 def crawl_repos_task(indexer_class_name):
+    if _is_download_folder_full():
+        logger.info("Download directory near capacity, attempting cleanup before crawling")
+        _cleanup_download_folder()
+        
+        if _is_download_folder_full():
+            logger.warning("Download directory still near capacity after cleanup, delaying crawl")
+            crawl_repos_task.apply_async(
+                args=(indexer_class_name,),
+                countdown=300,  # 5 minute delay
+            )
+            return
+
     try:
         _check_queued_tasks_number()
     except DownloadQueueTooBigException as ex:
@@ -181,9 +297,14 @@ def crawl_repos_task(indexer_class_name):
     try:
         _check_download_folder_size()
     except DownloadDirectoryFullException as ex:
-        # Trigger Celery auto retry by re-raising exception
-        logger.info("Too many files downloaded currently. Retrying")
-        raise ex
+        logger.info("Download folder full, attempting cleanup")
+        _cleanup_download_folder()
+        
+        try:
+            _check_download_folder_size()
+        except DownloadDirectoryFullException:
+            logger.info("Too many files downloaded currently, even after cleanup. Retrying")
+            raise ex
 
     indexer_model = apps.get_model("indexers", indexer_class_name)
     indexer: BaseIndexer = indexer_model.load()
@@ -211,7 +332,27 @@ def crawl_repos_task(indexer_class_name):
 
 @shared_task
 def process_repo_task(repo_pk):
-    # TODO: docstring & cleanup
+    if _is_download_folder_full():
+        logger.info(f"Download directory near capacity before processing repo {repo_pk}, attempting cleanup")
+        _cleanup_download_folder()
+        
+        if _is_download_folder_full():
+            logger.warning(f"Download directory still near capacity after cleanup, rescheduling processing of repo {repo_pk}")
+            process_repo_task.apply_async(args=(repo_pk,), countdown=300)  # 5 minutes delay
+            return
+
+    try:
+        _check_download_folder_size()
+    except DownloadDirectoryFullException:
+        logger.info(f"Download folder full before processing repo {repo_pk}, attempting cleanup")
+        _cleanup_download_folder()
+        
+        try:
+            _check_download_folder_size()
+        except DownloadDirectoryFullException:
+            logger.warning(f"Download directory still full after cleanup, rescheduling processing of repo {repo_pk}")
+            process_repo_task.apply_async(args=(repo_pk,), countdown=300)  # 5 minutes delay
+            return
 
     try:
         repo = Repository.objects.get(pk=repo_pk)
@@ -228,6 +369,15 @@ def process_repo_task(repo_pk):
     logger.info(f"Fetching repository via url: {repo.git_url}")
     repo_obj = _clone_repo(repo, repo_local_path)
     if repo_obj is None:
+        if Path(settings.DOWNLOAD_PATH).exists():
+            logger.info(f"Clone failed for {repo.git_url}, attempting cleanup")
+            _cleanup_download_folder()
+            
+            repo_obj = _clone_repo(repo, repo_local_path)
+            if repo_obj is None:
+                logger.warning(f"Clone still failed after cleanup for {repo.git_url}, rescheduling")
+                process_repo_task.apply_async(args=(repo_pk,), countdown=300)  # 5 minutes delay
+                return
         return
 
     with closing(repo_obj) as cloned_repo:
@@ -315,8 +465,6 @@ def analyze_commit_message_quality_task(commit_message_pk):
 
 @shared_task
 def analyze_file_task(repo_file_pk):
-    # TODO: docstring & cleanup
-
     try:
         repo_file = RepositoryFile.objects.get(pk=repo_file_pk)
     except RepositoryFile.DoesNotExist:
@@ -386,3 +534,13 @@ def analyze_file_task(repo_file_pk):
         _delete_file(Path(absolute_file_path), repo_file.repository.name)
 
         _finalize_repo_analysis(repo_file.repository)
+
+
+@shared_task
+def periodic_cleanup_download_folder():
+    """
+    Periodically clean up the download folder to maintain free space.
+    This can be scheduled using Celery beat.
+    """
+    logger.info("Running periodic cleanup of download folder")
+    _cleanup_download_folder()
