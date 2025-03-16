@@ -188,7 +188,6 @@ services:
   fregepoc-grafana-dev: &grafana
     image: grafana/grafana:8.5.2
     container_name: fregepoc-grafana-dev
-    user: root
     depends_on:
       - fregepoc-prometheus
       - fregepoc-postgres
