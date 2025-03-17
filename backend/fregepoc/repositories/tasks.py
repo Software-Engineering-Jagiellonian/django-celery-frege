@@ -218,6 +218,8 @@ def process_repo_task(repo_pk):
     except Repository.DoesNotExist:
         logger.error(f"Repository does not exist ({repo_pk = })")
         return
+    
+    _remove_database_entries(repo)
 
     repo_local_path = get_repo_local_path(repo)
 
@@ -276,6 +278,17 @@ def process_repo_task(repo_pk):
             analyze_file_task.apply_async(args=(repo_file.pk,))
 
     _finalize_repo_analysis(repo)
+
+def _remove_database_entries(repo: Repository):
+    repo_pk = repo.pk
+    removed_commits_amount = CommitMessage.objects.filter(repository=repo_pk).delete()[0]
+    removed_repo_quality_metrics_amount = RepositoryCommitMessagesQuality.objects.filter(repository=repo_pk).delete()[0]
+    removed_files_amount = RepositoryFile.objects.filter(repository=repo_pk).delete()[0]
+
+    if(removed_commits_amount > 0 or removed_repo_quality_metrics_amount > 0 or removed_files_amount > 0):
+        logger.warning(f"Had to remove database entries for repository \"{repo.name}\". This shouldn't happen.")
+    repo.analyzed = False
+    repo.save(update_fields=["analyzed"])
 
 
 @shared_task
