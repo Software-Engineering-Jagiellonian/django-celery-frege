@@ -70,7 +70,6 @@ services:
     restart: on-failure
     volumes:
       - fregepoc_postgresql_data:/var/lib/postgresql/data
-      - ./config/postgresql/pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf:ro
     # Removing code below is a workaround for 'role "root" does not exist' error.
     # TODO: modification of healthcheck code below to error-free form.
     #healthcheck:
