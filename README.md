@@ -97,17 +97,24 @@ Alternatively, you can use **extensions** (such as prettier or black) to format 
 There are three linters/formatters for Python: `flake8`, `isort`, `black`; and there are two for Javascript/TypeScript: `prettier`, `eslint`.
 
 In order to install pre-commit git-hook, run commands (recommended with [venv](https://docs.python.org/3/library/venv.html) previously created):
+
 1. Install python packages:
 
-pip install -r backend/requirements.txt
+  `pip install -r backend/requirements.txt`
 
-For more information about development of BE please refer to [backend/README.md](backend/README.md)
+  For more information about development of BE please refer to [backend/README.md](backend/README.md)
 
 2. Install npm packages:
 
 ```
 cd frontend
 npm install
+```
+
+To launch the application run the following command in frontend directory:
+
+```
+npm start
 ```
 
 3. Install pre-commit git hook:
