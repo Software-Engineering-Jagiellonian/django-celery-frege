@@ -4,8 +4,7 @@
         {
           "builtIn": 1,
           "datasource": {
-            "type": "datasource",
-            "uid": "grafana"
+            "type": "datasource"
           },
           "enable": true,
           "hide": true,
@@ -49,8 +48,7 @@
     "panels": [
       {
         "datasource": {
-          "type": "prometheus",
-          "uid": "PEBC2E3263E2CA5B6"
+          "type": "prometheus"
         },
         "fieldConfig": {
           "defaults": {
@@ -123,8 +121,7 @@
       },
       {
         "datasource": {
-          "type": "prometheus",
-          "uid": "PEBC2E3263E2CA5B6"
+          "type": "prometheus"
         },
         "fieldConfig": {
           "defaults": {
@@ -191,8 +188,7 @@
       },
       {
         "datasource": {
-          "type": "prometheus",
-          "uid": "PEBC2E3263E2CA5B6"
+          "type": "prometheus"
         },
         "fieldConfig": {
           "defaults": {
@@ -267,8 +263,7 @@
       },
       {
         "datasource": {
-          "type": "postgres",
-          "uid": "PA942B37CCFAF5A81"
+          "type": "postgres"
         },
         "editable": true,
         "error": false,
@@ -291,8 +286,7 @@
       },
       {
         "datasource": {
-          "type": "prometheus",
-          "uid": "PEBC2E3263E2CA5B6"
+          "type": "prometheus"
         },
         "fieldConfig": {
           "defaults": {
@@ -412,8 +406,7 @@
       },
       {
         "datasource": {
-          "type": "postgres",
-          "uid": "PA942B37CCFAF5A81"
+          "type": "postgres"
         },
         "editable": true,
         "error": false,
@@ -436,8 +429,7 @@
       },
       {
         "datasource": {
-          "type": "prometheus",
-          "uid": "PEBC2E3263E2CA5B6"
+          "type": "prometheus"
         },
         "fieldConfig": {
           "defaults": {
@@ -555,8 +547,7 @@
       },
       {
         "datasource": {
-          "type": "prometheus",
-          "uid": "PEBC2E3263E2CA5B6"
+          "type": "prometheus"
         },
         "fieldConfig": {
           "defaults": {
@@ -645,8 +636,7 @@
       },
       {
         "datasource": {
-          "type": "postgres",
-          "uid": "PA942B37CCFAF5A81"
+          "type": "postgres"
         },
         "editable": true,
         "error": false,
@@ -669,8 +659,7 @@
       },
       {
         "datasource": {
-          "type": "prometheus",
-          "uid": "PEBC2E3263E2CA5B6"
+          "type": "prometheus"
         },
         "fieldConfig": {
           "defaults": {
@@ -758,8 +747,7 @@
       },
       {
         "datasource": {
-          "type": "postgres",
-          "uid": "PA942B37CCFAF5A81"
+          "type": "postgres"
         },
         "editable": true,
         "error": false,
@@ -797,8 +785,7 @@
             "value": "fregepoc-prometheus:9090"
           },
           "datasource": {
-            "type": "prometheus",
-            "uid": "PEBC2E3263E2CA5B6"
+            "type": "prometheus"
           },
           "definition": "",
           "hide": 0,
@@ -854,7 +841,6 @@
     },
     "timezone": "browser",
     "title": "Prometheus Stats",
-    "uid": "rpfmFFz7z",
     "version": 1,
     "weekStart": ""
   }
