@@ -33,3 +33,17 @@ class TestSourceforgeProjectExtractor:
             f"Expected description:\n{expected_description}\n"
             f"But got:\n{description}"
         )
+
+    def test_extract_code_url_missing(self, soup) -> None:
+        for tag in soup.find_all():
+            tag.extract()
+
+        code_url = extract_code_url(soup)
+        assert code_url is None, "Expected None when the code URL is missing"
+
+    def test_extract_description_missing(self, soup) -> None:
+        for tag in soup.find_all():
+            tag.extract()
+
+        description = extract_description(soup)
+        assert description is None, "Expected None when the description is missing"
