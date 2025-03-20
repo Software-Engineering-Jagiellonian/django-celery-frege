@@ -781,8 +781,8 @@
         {
           "current": {
             "selected": false,
-            "text": "fregepoc-prometheus:9090",
-            "value": "fregepoc-prometheus:9090"
+            "text": "frege-prometheus:9090",
+            "value": "frege-prometheus:9090"
           },
           "datasource": {
             "type": "prometheus"

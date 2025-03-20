@@ -25,12 +25,13 @@
 
 - [About](#about)
 - [Getting Started](#getting-started)
-    - [Prerequisites](#prerequisites)
-    - [Installation](#installation)
-    - [Usage](#usage)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Usage](#usage)
 - [Contributing](#contributing)
-    - [Linters](#linters)
-    - [Commit message convention](#commit-message-convention)
+  - [Linters](#linters)
+  - [Commit message convention](#commit-message-convention)
+- [Documentation](#documentation)
 
 </details>
 
@@ -79,7 +80,7 @@ After running application in dev profile, check these sites:
 
 Running **tests** for the application:
 ```
-docker compose exec -T fregepoc-backend-dev pytest
+docker compose exec -T frege-backend-dev pytest
 ```
 
 Running application in **prod** environment (use with caution):

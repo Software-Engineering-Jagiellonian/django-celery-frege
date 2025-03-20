@@ -24,5 +24,4 @@ jobs:
       - name: Ensure Containers are Running
         run: docker compose ps
       - name: Run tests
-        run: docker compose exec -T fregepoc-backend-dev pytest
-        
+        run: docker compose exec -T frege-backend-dev pytest
