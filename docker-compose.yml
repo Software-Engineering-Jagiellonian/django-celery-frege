@@ -27,14 +27,13 @@ x-backend: &backend
     - fregepoc_tmp:${DJANGO_DOWNLOAD_PATH}
   networks:
     - fregepoc-main
-  profiles: [ "dev", "local-be-dev" ]
+  profiles: ["dev", "local-be-dev"]
   restart: on-failure
   env_file:
     - .env
 
 services:
-
-# === [Common] ===
+  # === [Common] ===
 
   fregepoc-redis:
     container_name: fregepoc-redis
@@ -44,7 +43,7 @@ services:
       - fregepoc-main
     expose:
       - "${DOCKER_REDIS_PORT}"
-    profiles: [ "dev", "prod", "local-be-dev" ]
+    profiles: ["dev", "prod", "local-be-dev"]
     restart: on-failure
     healthcheck:
       test: "redis-cli ping || exit 1"
@@ -66,7 +65,7 @@ services:
       - "${DOCKER_POSTGRES_PORT}"
     ports:
       - "${DOCKER_POSTGRES_PORT}:${DOCKER_POSTGRES_PORT}"
-    profiles: [ "dev", "prod", "local-be-dev" ]
+    profiles: ["dev", "prod", "local-be-dev"]
     restart: on-failure
     volumes:
       - fregepoc_postgresql_data:/var/lib/postgresql/data
@@ -89,7 +88,7 @@ services:
       - ${DOCKER_PROMETHEUS_PORT}
     networks:
       - fregepoc-main
-    profiles: [ "dev", "prod" ]
+    profiles: ["dev", "prod"]
     restart: on-failure
     healthcheck:
       test: "wget -nv -t1 --spider http://localhost:${DOCKER_PROMETHEUS_PORT} || exit 1"
@@ -109,7 +108,7 @@ services:
     # command: -config.file=/etc/loki/local-config.yaml
     networks:
       - fregepoc-main
-    profiles: [ "dev", "prod" ]
+    profiles: ["dev", "prod"]
 
   fregepoc-promtail:
     image: grafana/promtail:2.6.1
@@ -122,9 +121,9 @@ services:
       - /var/lib/docker/containers:/var/lib/docker/containers
     networks:
       - fregepoc-main
-    profiles: [ "dev", "prod" ]
+    profiles: ["dev", "prod"]
 
-# === [Dev] ===
+  # === [Dev] ===
 
   fregepoc-backend-dev:
     <<: *backend
@@ -150,7 +149,7 @@ services:
       - fregepoc-celery-downloads-worker-dev
       - fregepoc-celery-crawl-worker-dev
       - fregepoc-redis
-    profiles: [ "dev" ]
+    profiles: ["dev"]
     healthcheck:
       test: "curl -f http://localhost:${DOCKER_FLOWER_PORT} || exit 1"
       interval: 10s
@@ -167,25 +166,25 @@ services:
   #   profiles: [ "dev" ]
 
   fregepoc-celery-crawl-worker-dev:
-      <<: [*backend, *celery-healthcheck]
-      container_name: fregepoc-celery-crawl-worker-dev
-      ports: []
-      command: celery -A fregepoc worker -Q crawl -l debug --concurrency=${CELERY_WORKER_CRAWL_CONCURRENCY} -n worker_crawl
-      profiles: [ "dev", "local-be-dev" ]
+    <<: [*backend, *celery-healthcheck]
+    container_name: fregepoc-celery-crawl-worker-dev
+    ports: []
+    command: celery -A fregepoc worker -Q crawl -l debug --concurrency=${CELERY_WORKER_CRAWL_CONCURRENCY} -n worker_crawl
+    profiles: ["dev", "local-be-dev"]
 
   fregepoc-celery-downloads-worker-dev:
     <<: [*backend, *celery-healthcheck]
     container_name: fregepoc-celery-downloads-worker-dev
     ports: []
     command: celery -A fregepoc worker -Q downloads -l debug --concurrency=${CELERY_WORKER_DOWNLOADS_CONCURRENCY} -n worker_downloads
-    profiles: [ "dev", "local-be-dev" ]
+    profiles: ["dev", "local-be-dev"]
 
   fregepoc-celery-worker-dev:
     <<: [*backend, *celery-healthcheck]
     container_name: fregepoc-celery-worker-dev
     ports: []
     command: celery -A fregepoc worker -Q celery -l debug --concurrency=${CELERY_WORKER_BASE_CONCURRENCY} -n worker_celery
-    profiles: [ "dev", "local-be-dev" ]
+    profiles: ["dev", "local-be-dev"]
 
   fregepoc-grafana-dev: &grafana
     image: grafana/grafana:8.5.2
@@ -213,7 +212,7 @@ services:
       - fregepoc-main
     env_file:
       - .env
-    profiles: [ "dev" ]
+    profiles: ["dev"]
     restart: on-failure
     healthcheck:
       test: "wget -nv -t1 --spider http://localhost:${DOCKER_GRAFANA_PORT}/api/health || exit 1"
@@ -246,7 +245,7 @@ services:
       - fregepoc-grafana-dev
     networks:
       - fregepoc-main
-    profiles: [ "dev" ]
+    profiles: ["dev"]
     restart: on-failure
     healthcheck:
       test: "wget -nv -t1 --spider http://localhost:${DOCKER_FRONTEND_PORT} || exit 1"
@@ -255,7 +254,41 @@ services:
       retries: 2
       start_period: 40s
 
-# === [Prod] ===
+  fregepoc-front-dev: &frontend
+    container_name: fregepoc-front-dev
+    hostname: fregepoc-front-dev
+    build:
+      context: front
+      dockerfile: Dockerfile
+    environment:
+      - PORT=${DOCKER_NEW_FRONTEND_PORT}
+      - REACT_APP_DOCKER_GRAFANA_HOST=fregepoc-grafana-dev
+      - REACT_APP_DOCKER_GRAFANA_PORT=3000
+      - DOCKER_FLOWER_HOST=fregepoc-flower-dev
+      - DOCKER_FLOWER_PORT=5555
+      - DJANGO_SUPERUSER_USERNAME=django_admin
+      - DJANGO_SUPERUSER_PASSWORD=pass
+      - CHOKIDAR_USEPOLLING=true
+    volumes:
+      - /app/node_modules
+      - ./front:/app
+    command: npm run dev
+    ports:
+      - ${DOCKER_NEW_FRONTEND_PORT}:${DOCKER_NEW_FRONTEND_PORT}
+    depends_on:
+      - fregepoc-grafana-dev
+    networks:
+      - fregepoc-main
+    profiles: ["dev"]
+    restart: on-failure
+    healthcheck:
+      test: "wget -nv -t1 --spider http://localhost:${DOCKER_NEW_FRONTEND_PORT} || exit 1"
+      interval: 10s
+      timeout: 10s
+      retries: 2
+      start_period: 40s
+
+  # === [Prod] ===
 
   fregepoc-frontend-prod:
     <<: *frontend
@@ -275,7 +308,7 @@ services:
       - LETSENCRYPT_HOST=${FRONTEND_HOSTNAME}
     depends_on:
       - fregepoc-grafana-prod
-    profiles: [ "prod" ]
+    profiles: ["prod"]
 
   fregepoc-backend-prod:
     <<: *backend
@@ -288,7 +321,7 @@ services:
     volumes:
       - fregepoc_tmp:${DJANGO_DOWNLOAD_PATH}
       - fregepoc_static_files:/app/static
-    profiles: [ "prod" ]
+    profiles: ["prod"]
     ports: []
     expose:
       - ${DOCKER_BACKEND_PORT}
@@ -316,7 +349,7 @@ services:
       # - GF_SERVER_SERVE_FROM_SUB_PATH=true
       - VIRTUAL_HOST=${FRONTEND_HOSTNAME}
       - LETSENCRYPT_HOST=${FRONTEND_HOSTNAME}
-    profiles: [ "prod" ]
+    profiles: ["prod"]
     expose:
       - ${DOCKER_FRONTEND_PORT}
     ports: []
@@ -336,7 +369,7 @@ services:
       - fregepoc-celery-downloads-worker-prod
       - fregepoc-celery-crawl-worker-prod
       - fregepoc-redis
-    profiles: [ "prod" ]
+    profiles: ["prod"]
     healthcheck:
       test: "curl -f http://localhost:${DOCKER_FLOWER_PORT} || exit 1"
       interval: 10s
@@ -344,25 +377,25 @@ services:
       retries: 2
 
   fregepoc-celery-crawl-worker-prod:
-      <<: [*backend, *celery-healthcheck]
-      container_name: fregepoc-celery-crawl-worker-prod
-      ports: []
-      command: celery -A fregepoc worker -Q crawl -l info --concurrency=${CELERY_WORKER_CRAWL_CONCURRENCY} -n worker_crawl
-      profiles: [ "prod" ]
+    <<: [*backend, *celery-healthcheck]
+    container_name: fregepoc-celery-crawl-worker-prod
+    ports: []
+    command: celery -A fregepoc worker -Q crawl -l info --concurrency=${CELERY_WORKER_CRAWL_CONCURRENCY} -n worker_crawl
+    profiles: ["prod"]
 
   fregepoc-celery-downloads-worker-prod:
     <<: [*backend, *celery-healthcheck]
     container_name: fregepoc-celery-downloads-worker-prod
     ports: []
     command: celery -A fregepoc worker -Q downloads -l info --concurrency=${CELERY_WORKER_DOWNLOADS_CONCURRENCY} -n worker_downloads
-    profiles: [ "prod" ]
+    profiles: ["prod"]
 
   fregepoc-celery-worker-prod:
     <<: [*backend, *celery-healthcheck]
     container_name: fregepoc-celery-worker-prod
     ports: []
     command: celery -A fregepoc worker -Q celery -l info --concurrency=${CELERY_WORKER_BASE_CONCURRENCY} -n worker_celery
-    profiles: [ "prod" ]
+    profiles: ["prod"]
 
   nginx-proxy:
     image: nginx
@@ -382,7 +415,7 @@ services:
       #       location rule in egress.ngins.conf) - should be fixed
       - fregepoc_static_files:/var/www/backend/static
     restart: always
-    profiles: [ "prod" ]
+    profiles: ["prod"]
     networks:
       - fregepoc-main
     healthcheck:
@@ -404,7 +437,7 @@ services:
       - ./nginx/egress.nginx.conf:/etc/docker-gen/templates/nginx.tmpl:ro
       - /var/run/docker.sock:/tmp/docker.sock:ro
     restart: on-failure
-    profiles: [ "prod" ]
+    profiles: ["prod"]
     networks:
       - fregepoc-main
 
@@ -424,7 +457,7 @@ services:
     environment:
       - DEFAULT_EMAIL=${LETSENCRYPT_EMAIL}
       - NGINX_PROXY_CONTAINER=fregepoc-proxy
-    profiles: [ "tls" ]
+    profiles: ["tls"]
 
 networks:
   fregepoc-main:
