@@ -6,6 +6,8 @@ from fregepoc.repositories.models import Repository, RepositoryFile, CommitMessa
 @admin.register(Repository)
 class RepositoryAdmin(admin.ModelAdmin):
     list_display = (
+        "id",
+        "name",
         "analyzed",
         "git_url",
         "repo_url",
