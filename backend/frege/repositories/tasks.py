@@ -394,6 +394,6 @@ def _remove_database_entries(repo: Repository):
     removed_files_amount = RepositoryFile.objects.filter(repository=repo_pk).delete()[0]
 
     if(removed_commits_amount > 0 or removed_repo_quality_metrics_amount > 0 or removed_files_amount > 0):
-        logger.warning(f"Had to remove database entries for repository \"{repo.name}\". This shouldn't happen.")
+        logger.warning(f"Had to remove database entries for repository \"{repo.name}\". This shouldn't happen unless you're restarting FREGE and rescheduling unanalyzed repos.")
     repo.analyzed = False
     repo.save(update_fields=["analyzed"])
