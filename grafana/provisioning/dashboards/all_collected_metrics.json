@@ -445,8 +445,8 @@
       "list": []
     },
     "time": {
-      "from": "now-1y/y",
-      "to": "now-1y/y"
+    "from": "now",
+    "to": "now-1y/y"
     },
     "timepicker": {},
     "timezone": "",
