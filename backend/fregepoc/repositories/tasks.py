@@ -249,7 +249,12 @@ def process_repo_task(repo_pk):
                 analyzed=False
             )
             all_commit_messages.append(commit_message)
-        CommitMessage.objects.bulk_create(all_commit_messages)
+
+        # Not limiting batch sizes can lead to OutOfMemory exceptions
+        # for the database when handling large repositories.
+        batch_size = 128
+        for i in range(0, len(all_commit_messages), batch_size):
+            CommitMessage.objects.bulk_create(all_commit_messages[i:i + batch_size])
 
         repo_quality_metrics = RepositoryCommitMessagesQuality(repository=repo, analyzed=False)
         repo_quality_metrics.save()
