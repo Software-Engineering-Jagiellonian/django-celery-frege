@@ -4,8 +4,7 @@
         {
           "builtIn": 1,
           "datasource": {
-            "type": "datasource",
-            "uid": "grafana"
+            "type": "datasource"
           },
           "enable": true,
           "hide": true,
@@ -48,8 +47,7 @@
     "panels": [
       {
         "datasource": {
-          "type": "prometheus",
-          "uid": "PEBC2E3263E2CA5B6"
+          "type": "prometheus"
         },
         "fieldConfig": {
           "defaults": {
@@ -173,8 +171,7 @@
       },
       {
         "datasource": {
-          "type": "prometheus",
-          "uid": "PEBC2E3263E2CA5B6"
+          "type": "prometheus"
         },
         "fieldConfig": {
           "defaults": {
@@ -265,8 +262,7 @@
       },
       {
         "datasource": {
-          "type": "prometheus",
-          "uid": "PEBC2E3263E2CA5B6"
+          "type": "prometheus"
         },
         "description": "",
         "fieldConfig": {
@@ -368,8 +364,7 @@
       },
       {
         "datasource": {
-          "type": "prometheus",
-          "uid": "PEBC2E3263E2CA5B6"
+          "type": "prometheus"
         },
         "fieldConfig": {
           "defaults": {
@@ -447,8 +442,7 @@
       },
       {
         "datasource": {
-          "type": "prometheus",
-          "uid": "PEBC2E3263E2CA5B6"
+          "type": "prometheus"
         },
         "fieldConfig": {
           "defaults": {
@@ -548,8 +542,7 @@
       },
       {
         "datasource": {
-          "type": "prometheus",
-          "uid": "PEBC2E3263E2CA5B6"
+          "type": "prometheus"
         },
         "fieldConfig": {
           "defaults": {
@@ -669,8 +662,7 @@
       },
       {
         "datasource": {
-          "type": "prometheus",
-          "uid": "PEBC2E3263E2CA5B6"
+          "type": "prometheus"
         },
         "description": "",
         "fieldConfig": {
@@ -761,8 +753,7 @@
       },
       {
         "datasource": {
-          "type": "prometheus",
-          "uid": "PEBC2E3263E2CA5B6"
+          "type": "prometheus"
         },
         "fieldConfig": {
           "defaults": {
@@ -873,8 +864,7 @@
       },
       {
         "datasource": {
-          "type": "prometheus",
-          "uid": "PEBC2E3263E2CA5B6"
+          "type": "prometheus"
         },
         "description": "",
         "fieldConfig": {
@@ -1004,8 +994,7 @@
       },
       {
         "datasource": {
-          "type": "prometheus",
-          "uid": "PEBC2E3263E2CA5B6"
+          "type": "prometheus"
         },
         "fieldConfig": {
           "defaults": {
@@ -1103,8 +1092,7 @@
       },
       {
         "datasource": {
-          "type": "prometheus",
-          "uid": "PEBC2E3263E2CA5B6"
+          "type": "prometheus"
         },
         "fieldConfig": {
           "defaults": {
@@ -1193,8 +1181,7 @@
       },
       {
         "datasource": {
-          "type": "prometheus",
-          "uid": "PEBC2E3263E2CA5B6"
+          "type": "prometheus"
         },
         "fieldConfig": {
           "defaults": {
@@ -1284,8 +1271,7 @@
       },
       {
         "datasource": {
-          "type": "prometheus",
-          "uid": "PEBC2E3263E2CA5B6"
+          "type": "prometheus"
         },
         "fieldConfig": {
           "defaults": {
@@ -1423,7 +1409,6 @@
     },
     "timezone": "browser",
     "title": "Prometheus 2.0 Stats",
-    "uid": "UDdpyzz7z",
     "version": 1,
     "weekStart": ""
   }

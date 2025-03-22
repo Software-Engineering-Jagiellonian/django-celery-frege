@@ -25,12 +25,13 @@
 
 - [About](#about)
 - [Getting Started](#getting-started)
-    - [Prerequisites](#prerequisites)
-    - [Installation](#installation)
-    - [Usage](#usage)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Usage](#usage)
 - [Contributing](#contributing)
-    - [Linters](#linters)
-    - [Commit message convention](#commit-message-convention)
+  - [Linters](#linters)
+  - [Commit message convention](#commit-message-convention)
+- [Documentation](#documentation)
 
 </details>
 
@@ -79,7 +80,7 @@ After running application in dev profile, check these sites:
 
 Running **tests** for the application:
 ```
-docker compose exec -T fregepoc-backend-dev pytest
+docker compose exec -T frege-backend-dev pytest
 ```
 
 Running application in **prod** environment (use with caution):
@@ -97,17 +98,24 @@ Alternatively, you can use **extensions** (such as prettier or black) to format 
 There are three linters/formatters for Python: `flake8`, `isort`, `black`; and there are two for Javascript/TypeScript: `prettier`, `eslint`.
 
 In order to install pre-commit git-hook, run commands (recommended with [venv](https://docs.python.org/3/library/venv.html) previously created):
+
 1. Install python packages:
 
-pip install -r backend/requirements.txt
+  `pip install -r backend/requirements.txt`
 
-For more information about development of BE please refer to [backend/README.md](backend/README.md)
+  For more information about development of BE please refer to [backend/README.md](backend/README.md)
 
 2. Install npm packages:
 
 ```
 cd frontend
 npm install
+```
+
+To launch the application run the following command in frontend directory:
+
+```
+npm start
 ```
 
 3. Install pre-commit git hook:
