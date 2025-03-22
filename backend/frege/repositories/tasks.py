@@ -390,7 +390,7 @@ def analyze_file_task(repo_file_pk):
         _finalize_repo_analysis(repo_file.repository)
 
 def _sanitize():
-    if settings.REDIS_PERSISTENCE_ENABLED:
+    if settings.REDIS_PERSISTENCE_ENABLED == "1":
         # If persistence is enabled, we don't need to sanitize
         # since all previous tasks are still in the queue.
         return
