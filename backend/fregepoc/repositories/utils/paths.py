@@ -15,7 +15,9 @@ from fregepoc.repositories.models import RepositoryFile
 
 def get_repo_local_path(repo: models.Repository) -> Path:
     # TODO: docstring
-    return Path(settings.DOWNLOAD_PATH) / repo.name
+    # We use the primary key of the repository as the directory name
+    # to avoid name conflicts.
+    return Path(settings.DOWNLOAD_PATH) / str(repo.pk)
 
 
 def get_repo_files(
