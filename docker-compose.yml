@@ -1,5 +1,3 @@
-version: "3.9"
-
 x-celery-healthcheck: &celery-healthcheck
   healthcheck:
     test: "celery -b redis://${DOCKER_REDIS_HOST}:${DOCKER_REDIS_PORT} inspect ping || exit 1"
@@ -8,8 +6,8 @@ x-celery-healthcheck: &celery-healthcheck
     retries: 2
 
 x-backend: &backend
-  container_name: fregepoc-backend
-  image: fregepoc-backend-image
+  container_name: frege-backend
+  image: frege-backend-image
   build: ./backend
   hostname: backend
   command: >
@@ -20,13 +18,13 @@ x-backend: &backend
   ports:
     - "${DOCKER_EGRESS_IP}:${DOCKER_BACKEND_PORT}:${DOCKER_BACKEND_PORT}"
   depends_on:
-    - fregepoc-postgres
-    - fregepoc-redis
+    - frege-postgres
+    - frege-redis
   volumes:
     - ./backend:/app
-    - fregepoc_tmp:${DJANGO_DOWNLOAD_PATH}
+    - frege_tmp:${DJANGO_DOWNLOAD_PATH}
   networks:
-    - fregepoc-main
+    - frege-main
   profiles: [ "dev", "local-be-dev" ]
   restart: on-failure
   env_file:
@@ -36,13 +34,13 @@ services:
 
 # === [Common] ===
 
-  fregepoc-redis:
-    container_name: fregepoc-redis
-    hostname: fregepoc-redis
+  frege-redis:
+    container_name: frege-redis
+    hostname: frege-redis
     image: redis:7.0
     command: sh -c "if [ \"$REDIS_PERSISTENCE_ENABLED\" = \"1\" ]; then redis-server; else redis-server --save \"\" --appendonly no; fi"
     networks:
-      - fregepoc-main
+      - frege-main
     expose:
       - "${DOCKER_REDIS_PORT}"
     ports:
@@ -55,16 +53,16 @@ services:
       timeout: 10s
       retries: 2
 
-  fregepoc-postgres:
-    container_name: fregepoc-postgres
-    hostname: fregepoc-postgres
+  frege-postgres:
+    container_name: frege-postgres
+    hostname: frege-postgres
     image: postgres:14.2
     environment:
       - POSTGRES_USER=${DJANGO_DATABASE_USER}
       - POSTGRES_PASSWORD=${DJANGO_DATABASE_PASSWORD}
       - POSTGRES_DB=${DJANGO_DATABASE_NAME}
     networks:
-      - fregepoc-main
+      - frege-main
     expose:
       - "${DOCKER_POSTGRES_PORT}"
     ports:
@@ -72,7 +70,7 @@ services:
     profiles: [ "dev", "prod", "local-be-dev" ]
     restart: on-failure
     volumes:
-      - fregepoc_postgresql_data:/var/lib/postgresql/data
+      - frege_postgresql_data:/var/lib/postgresql/data
     # Removing code below is a workaround for 'role "root" does not exist' error.
     # TODO: modification of healthcheck code below to error-free form.
     #healthcheck:
@@ -81,9 +79,9 @@ services:
     #  timeout: 10s
     #  retries: 2
 
-  fregepoc-prometheus:
+  frege-prometheus:
     image: prom/prometheus:v2.35.0
-    container_name: fregepoc-prometheus
+    container_name: frege-prometheus
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
@@ -91,7 +89,7 @@ services:
     expose:
       - ${DOCKER_PROMETHEUS_PORT}
     networks:
-      - fregepoc-main
+      - frege-main
     profiles: [ "dev", "prod" ]
     restart: on-failure
     healthcheck:
@@ -100,10 +98,10 @@ services:
       timeout: 10s
       retries: 2
 
-  fregepoc-loki:
+  frege-loki:
     image: grafana/loki:2.7.4
     user: "1000"
-    container_name: fregepoc-loki
+    container_name: frege-loki
     ports:
       - 3100:3100
     volumes:
@@ -111,25 +109,25 @@ services:
       # - ./loki/loki-config.yaml:/etc/loki/local-config.yaml
     # command: -config.file=/etc/loki/local-config.yaml
     networks:
-      - fregepoc-main
+      - frege-main
     profiles: [ "dev", "prod" ]
 
-  fregepoc-promtail:
+  frege-promtail:
     image: grafana/promtail:2.6.1
-    container_name: fregepoc-promtail
+    container_name: frege-promtail
     depends_on:
-      - fregepoc-loki
+      - frege-loki
     volumes:
       - ./loki/promtail-config.yaml:/etc/promtail/config.yml
       - /var/run/docker.sock:/var/run/docker.sock
       - /var/lib/docker/containers:/var/lib/docker/containers
     networks:
-      - fregepoc-main
+      - frege-main
     profiles: [ "dev", "prod" ]
 
 # === [Dev] ===
 
-  fregepoc-backend-dev:
+  frege-backend-dev:
     <<: *backend
     healthcheck:
       test: "curl -f http://localhost:${DOCKER_BACKEND_PORT}/ht || exit 1"
@@ -137,22 +135,22 @@ services:
       timeout: 10s
       retries: 2
 
-  fregepoc-flower-dev:
+  frege-flower-dev:
     <<: *backend
-    container_name: fregepoc-flower-dev
-    command: celery -A fregepoc flower
+    container_name: frege-flower-dev
+    command: celery -A frege flower
     ports:
       - 5555:5555
     expose:
       - 5555
     environment:
-      CELERY_BROKER_URL: redis://fregepoc-redis
-      CELERY_RESULT_BACKEND: redis://fregepoc-redis
+      CELERY_BROKER_URL: redis://frege-redis
+      CELERY_RESULT_BACKEND: redis://frege-redis
     depends_on:
-      - fregepoc-celery-worker-dev
-      - fregepoc-celery-downloads-worker-dev
-      - fregepoc-celery-crawl-worker-dev
-      - fregepoc-redis
+      - frege-celery-worker-dev
+      - frege-celery-downloads-worker-dev
+      - frege-celery-crawl-worker-dev
+      - frege-redis
     profiles: [ "dev" ]
     healthcheck:
       test: "curl -f http://localhost:${DOCKER_FLOWER_PORT} || exit 1"
@@ -162,44 +160,44 @@ services:
 
   # Autoreload on code change won't work without this setup
   #
-  # fregepoc-celery-worker-dev:
+  # frege-celery-worker-dev:
   #   <<: [*backend, *celery-healthcheck]
-  #   container_name: fregepoc-celery-worker-dev
+  #   container_name: frege-celery-worker-dev
   #   ports: []
   #   command: sh -c "python3 manage.py celery_dev_autoreload"
   #   profiles: [ "dev" ]
 
-  fregepoc-celery-crawl-worker-dev:
+  frege-celery-crawl-worker-dev:
       <<: [*backend, *celery-healthcheck]
-      container_name: fregepoc-celery-crawl-worker-dev
+      container_name: frege-celery-crawl-worker-dev
       ports: []
-      command: celery -A fregepoc worker -Q crawl -l debug --concurrency=${CELERY_WORKER_CRAWL_CONCURRENCY} -n worker_crawl
+      command: celery -A frege worker -Q crawl -l debug --concurrency=${CELERY_WORKER_CRAWL_CONCURRENCY} -n worker_crawl
       profiles: [ "dev", "local-be-dev" ]
 
-  fregepoc-celery-downloads-worker-dev:
+  frege-celery-downloads-worker-dev:
     <<: [*backend, *celery-healthcheck]
-    container_name: fregepoc-celery-downloads-worker-dev
+    container_name: frege-celery-downloads-worker-dev
     ports: []
-    command: celery -A fregepoc worker -Q downloads -l debug --concurrency=${CELERY_WORKER_DOWNLOADS_CONCURRENCY} -n worker_downloads
+    command: celery -A frege worker -Q downloads -l debug --concurrency=${CELERY_WORKER_DOWNLOADS_CONCURRENCY} -n worker_downloads
     profiles: [ "dev", "local-be-dev" ]
 
-  fregepoc-celery-worker-dev:
+  frege-celery-worker-dev:
     <<: [*backend, *celery-healthcheck]
-    container_name: fregepoc-celery-worker-dev
+    container_name: frege-celery-worker-dev
     ports: []
-    command: celery -A fregepoc worker -Q celery -l debug --concurrency=${CELERY_WORKER_BASE_CONCURRENCY} -n worker_celery
+    command: celery -A frege worker -Q celery -l debug --concurrency=${CELERY_WORKER_BASE_CONCURRENCY} -n worker_celery
     profiles: [ "dev", "local-be-dev" ]
 
-  fregepoc-grafana-dev: &grafana
+  frege-grafana-dev: &grafana
     image: grafana/grafana:8.5.2
-    container_name: fregepoc-grafana-dev
+    container_name: frege-grafana-dev
     depends_on:
-      - fregepoc-prometheus
-      - fregepoc-postgres
-      - fregepoc-loki
-      - fregepoc-promtail
+      - frege-prometheus
+      - frege-postgres
+      - frege-loki
+      - frege-promtail
     volumes:
-      - fregepoc_grafana_storage:/var/lib/grafana
+      - frege_grafana_storage:/var/lib/grafana
       - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
       - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
     environment:
@@ -207,13 +205,14 @@ services:
       - GF_USERS_ALLOW_SIGN_UP=false
       - GF_USERS_ALLOW_ORG_CREATE=false
       - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
       - GF_SECURITY_ALLOW_EMBEDDING=true
       - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/grafana/
       - GF_SERVER_SERVE_FROM_SUB_PATH=true
     ports:
       - ${DOCKER_GRAFANA_PORT}:${DOCKER_GRAFANA_PORT}
     networks:
-      - fregepoc-main
+      - frege-main
     env_file:
       - .env
     profiles: [ "dev" ]
@@ -224,17 +223,17 @@ services:
       timeout: 10s
       retries: 2
 
-  fregepoc-frontend-dev: &frontend
-    container_name: fregepoc-frontend-dev
-    hostname: fregepoc-frontend-dev
+  frege-frontend-dev: &frontend
+    container_name: frege-frontend-dev
+    hostname: frege-frontend-dev
     build:
       context: frontend
       dockerfile: Dockerfile
     environment:
       - PORT=${DOCKER_FRONTEND_PORT}
-      - REACT_APP_DOCKER_GRAFANA_HOST=fregepoc-grafana-dev
+      - REACT_APP_DOCKER_GRAFANA_HOST=frege-grafana-dev
       - REACT_APP_DOCKER_GRAFANA_PORT=3000
-      - DOCKER_FLOWER_HOST=fregepoc-flower-dev
+      - DOCKER_FLOWER_HOST=frege-flower-dev
       - DOCKER_FLOWER_PORT=5555
       - DJANGO_SUPERUSER_USERNAME=django_admin
       - DJANGO_SUPERUSER_PASSWORD=pass
@@ -246,9 +245,9 @@ services:
     ports:
       - ${DOCKER_FRONTEND_PORT}:${DOCKER_FRONTEND_PORT}
     depends_on:
-      - fregepoc-grafana-dev
+      - frege-grafana-dev
     networks:
-      - fregepoc-main
+      - frege-main
     profiles: [ "dev" ]
     restart: on-failure
     healthcheck:
@@ -260,37 +259,37 @@ services:
 
 # === [Prod] ===
 
-  fregepoc-frontend-prod:
+  frege-frontend-prod:
     <<: *frontend
-    container_name: fregepoc-frontend-prod
-    hostname: fregepoc-frontend-prod
+    container_name: frege-frontend-prod
+    hostname: frege-frontend-prod
     ports: []
     expose:
       - ${DOCKER_FRONTEND_PORT}
     environment:
       - PORT=${DOCKER_FRONTEND_PORT}
-      - REACT_APP_DOCKER_GRAFANA_HOST=fregepoc-grafana-prod
+      - REACT_APP_DOCKER_GRAFANA_HOST=frege-grafana-prod
       - REACT_APP_DOCKER_GRAFANA_PORT=3000
-      - DOCKER_FLOWER_HOST=fregepoc-flower-dev
+      - DOCKER_FLOWER_HOST=frege-flower-dev
       - DOCKER_FLOWER_PORT=5555
       - NODE_ENV=production
       - VIRTUAL_HOST=${FRONTEND_HOSTNAME}
       - LETSENCRYPT_HOST=${FRONTEND_HOSTNAME}
     depends_on:
-      - fregepoc-grafana-prod
+      - frege-grafana-prod
     profiles: [ "prod" ]
 
-  fregepoc-backend-prod:
+  frege-backend-prod:
     <<: *backend
-    container_name: fregepoc-backend-prod
+    container_name: frege-backend-prod
     command: >
       sh -c "python manage.py migrate --noinput
       && python manage.py initadmin
       && python manage.py collectstatic --noinput
-      && gunicorn fregepoc.wsgi:application --bind 0.0.0.0:${DOCKER_BACKEND_PORT}"
+      && gunicorn frege.wsgi:application --bind 0.0.0.0:${DOCKER_BACKEND_PORT}"
     volumes:
-      - fregepoc_tmp:${DJANGO_DOWNLOAD_PATH}
-      - fregepoc_static_files:/app/static
+      - frege_tmp:${DJANGO_DOWNLOAD_PATH}
+      - frege_static_files:/app/static
     profiles: [ "prod" ]
     ports: []
     expose:
@@ -304,9 +303,9 @@ services:
       timeout: 10s
       retries: 2
 
-  fregepoc-grafana-prod:
+  frege-grafana-prod:
     <<: *grafana
-    container_name: fregepoc-grafana-prod
+    container_name: frege-grafana-prod
     environment:
       - GF_USERS_DEFAULT_THEME=dark
       - GF_USERS_ALLOW_SIGN_UP=false
@@ -325,20 +324,20 @@ services:
     ports: []
     env_file: []
 
-  fregepoc-flower-prod:
+  frege-flower-prod:
     <<: *backend
-    container_name: fregepoc-flower-prod
-    command: celery -A fregepoc flower
+    container_name: frege-flower-prod
+    command: celery -A frege flower
     expose:
       - ${DOCKER_FLOWER_PORT}
     environment:
-      CELERY_BROKER_URL: redis://fregepoc-redis
-      CELERY_RESULT_BACKEND: redis://fregepoc-redis
+      CELERY_BROKER_URL: redis://frege-redis
+      CELERY_RESULT_BACKEND: redis://frege-redis
     depends_on:
-      - fregepoc-celery-worker-prod
-      - fregepoc-celery-downloads-worker-prod
-      - fregepoc-celery-crawl-worker-prod
-      - fregepoc-redis
+      - frege-celery-worker-prod
+      - frege-celery-downloads-worker-prod
+      - frege-celery-crawl-worker-prod
+      - frege-redis
     profiles: [ "prod" ]
     healthcheck:
       test: "curl -f http://localhost:${DOCKER_FLOWER_PORT} || exit 1"
@@ -346,25 +345,25 @@ services:
       timeout: 10s
       retries: 2
 
-  fregepoc-celery-crawl-worker-prod:
+  frege-celery-crawl-worker-prod:
       <<: [*backend, *celery-healthcheck]
-      container_name: fregepoc-celery-crawl-worker-prod
+      container_name: frege-celery-crawl-worker-prod
       ports: []
-      command: celery -A fregepoc worker -Q crawl -l info --concurrency=${CELERY_WORKER_CRAWL_CONCURRENCY} -n worker_crawl
+      command: celery -A frege worker -Q crawl -l info --concurrency=${CELERY_WORKER_CRAWL_CONCURRENCY} -n worker_crawl
       profiles: [ "prod" ]
 
-  fregepoc-celery-downloads-worker-prod:
+  frege-celery-downloads-worker-prod:
     <<: [*backend, *celery-healthcheck]
-    container_name: fregepoc-celery-downloads-worker-prod
+    container_name: frege-celery-downloads-worker-prod
     ports: []
-    command: celery -A fregepoc worker -Q downloads -l info --concurrency=${CELERY_WORKER_DOWNLOADS_CONCURRENCY} -n worker_downloads
+    command: celery -A frege worker -Q downloads -l info --concurrency=${CELERY_WORKER_DOWNLOADS_CONCURRENCY} -n worker_downloads
     profiles: [ "prod" ]
 
-  fregepoc-celery-worker-prod:
+  frege-celery-worker-prod:
     <<: [*backend, *celery-healthcheck]
-    container_name: fregepoc-celery-worker-prod
+    container_name: frege-celery-worker-prod
     ports: []
-    command: celery -A fregepoc worker -Q celery -l info --concurrency=${CELERY_WORKER_BASE_CONCURRENCY} -n worker_celery
+    command: celery -A frege worker -Q celery -l info --concurrency=${CELERY_WORKER_BASE_CONCURRENCY} -n worker_celery
     profiles: [ "prod" ]
 
   nginx-proxy:
@@ -376,18 +375,18 @@ services:
       - "${DOCKER_EGRESS_IP}:80:80"
       - "${DOCKER_EGRESS_IP}:443:443"
     volumes:
-      - fregepoc_proxy_conf:/etc/nginx/conf.d
-      - fregepoc_proxy_vhost:/etc/nginx/vhost.d
-      - fregepoc_proxy_html:/usr/share/nginx/html
-      - fregepoc_proxy_certs:/etc/nginx/certs:ro
+      - frege_proxy_conf:/etc/nginx/conf.d
+      - frege_proxy_vhost:/etc/nginx/vhost.d
+      - frege_proxy_html:/usr/share/nginx/html
+      - frege_proxy_certs:/etc/nginx/certs:ro
       # TODO: this is a hack to get the nginx proxy to work with the django
       #       static files (currently there exists a blanket "api_static"
       #       location rule in egress.ngins.conf) - should be fixed
-      - fregepoc_static_files:/var/www/backend/static
+      - frege_static_files:/var/www/backend/static
     restart: always
     profiles: [ "prod" ]
     networks:
-      - fregepoc-main
+      - frege-main
     healthcheck:
       test: "curl -f localhost || exit 1"
       interval: 10s
@@ -397,7 +396,7 @@ services:
 
   docker-gen:
     image: nginxproxy/docker-gen
-    container_name: fregepoc-nginx-proxy-gen
+    container_name: frege-nginx-proxy-gen
     command: >
       -notify-sighup nginx-proxy
       -watch /etc/docker-gen/templates/nginx.tmpl /etc/nginx/conf.d/default.conf
@@ -409,37 +408,37 @@ services:
     restart: on-failure
     profiles: [ "prod" ]
     networks:
-      - fregepoc-main
+      - frege-main
 
-  fregepoc-proxy-acme:
+  frege-proxy-acme:
     image: nginxproxy/acme-companion:2.2
-    container_name: fregepoc-proxy-acme
-    hostname: fregepoc-proxy-acme
+    container_name: frege-proxy-acme
+    hostname: frege-proxy-acme
     restart: on-failure
     networks:
-      - fregepoc-main
+      - frege-main
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - fregepoc_proxy_conf:/etc/nginx/conf.d
-      - fregepoc_proxy_vhost:/etc/nginx/vhost.d
-      - fregepoc_proxy_html:/usr/share/nginx/html
-      - fregepoc_proxy_certs:/etc/nginx/certs:rw
+      - frege_proxy_conf:/etc/nginx/conf.d
+      - frege_proxy_vhost:/etc/nginx/vhost.d
+      - frege_proxy_html:/usr/share/nginx/html
+      - frege_proxy_certs:/etc/nginx/certs:rw
     environment:
       - DEFAULT_EMAIL=${LETSENCRYPT_EMAIL}
-      - NGINX_PROXY_CONTAINER=fregepoc-proxy
+      - NGINX_PROXY_CONTAINER=frege-proxy
     profiles: [ "tls" ]
 
 networks:
-  fregepoc-main:
+  frege-main:
 
 volumes:
-  fregepoc_postgresql_data:
-  fregepoc_tmp:
-  fregepoc_grafana_storage:
+  frege_postgresql_data:
+  frege_tmp:
+  frege_grafana_storage:
 
   # Production
-  fregepoc_static_files:
-  fregepoc_proxy_conf:
-  fregepoc_proxy_vhost:
-  fregepoc_proxy_html:
-  fregepoc_proxy_certs:
+  frege_static_files:
+  frege_proxy_conf:
+  frege_proxy_vhost:
+  frege_proxy_html:
+  frege_proxy_certs:
