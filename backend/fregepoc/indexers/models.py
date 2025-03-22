@@ -1,4 +1,5 @@
 import os
+import sys
 from typing import List
 
 import github.GithubException
@@ -11,7 +12,6 @@ from fregepoc.indexers.base import BaseIndexer
 from fregepoc.indexers.sourceforge import SourceforgeProjectsExtractor
 from fregepoc.indexers.utils import bitbucket, gitlab
 from fregepoc.repositories.models import Repository
-
 
 class GitHubIndexer(BaseIndexer):
     min_forks = models.PositiveIntegerField(
@@ -43,6 +43,9 @@ class GitHubIndexer(BaseIndexer):
                 )
                 self.current_page += 1
                 self.save(update_fields=["current_page"])
+
+                unique_repos = [repo for repo in list_of_repos if is_repo_unique(repo.clone_url, self.__class__.__name__)]
+
                 repos_to_process = [
                     Repository(
                         name=repo.name,
@@ -53,7 +56,7 @@ class GitHubIndexer(BaseIndexer):
                             repo.default_branch
                         ).commit.sha,
                     )
-                    for repo in list_of_repos
+                    for repo in unique_repos
                 ]
                 Repository.objects.bulk_create(repos_to_process)
             except github.RateLimitExceededException:
@@ -97,6 +100,8 @@ class SourceforgeIndexer(BaseIndexer):
         repos_to_process = []
         for project in projects:
             if project.code is not None:
+                if not is_repo_unique(project.code.url, self.__class__.__name__):
+                    continue
                 repos_to_process.append(
                     Repository(
                         name=project.name,
@@ -108,6 +113,8 @@ class SourceforgeIndexer(BaseIndexer):
                 )
 
             for subproject in project.subprojects:
+                if not is_repo_unique(subproject.code.url, self.__class__.__name__):
+                    continue
                 repos_to_process.append(
                     Repository(
                         name=f"{project.name}/{subproject.name}",
@@ -168,6 +175,9 @@ class BitbucketIndexer(BaseIndexer):
             if not (clone_url and repo_url and commit_hash):
                 continue
 
+            if not is_repo_unique(clone_url, self.__class__.__name__):
+                continue
+
             repo_to_process = Repository.objects.create(
                 name=repository_data.get("name"),
                 description=repository_data.get("description"),
@@ -210,6 +220,8 @@ class GitLabIndexer(BaseIndexer):
         try:
             for repo_data, _id in gitlab_client.repositories():
                 self.last_project_id = _id
+                if not is_repo_unique(repo_data["git_url"], self.__class__.__name__):
+                    continue
                 self.save(update_fields=["last_project_id"])
                 repo_to_process = Repository.objects.create(**repo_data)
 
@@ -220,3 +232,9 @@ class GitLabIndexer(BaseIndexer):
     class Meta:
         verbose_name = _("GitLab Indexer")
         verbose_name_plural = verbose_name
+
+def is_repo_unique(clone_url: str, indexer_name: str) -> bool:
+    if Repository.objects.filter(git_url=clone_url).exists():
+        print(f"Indexer {indexer_name} ignored crawled repository {clone_url} as it's already in the database.", file=sys.stderr)
+        return False
+    return True

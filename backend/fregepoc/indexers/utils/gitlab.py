@@ -60,7 +60,9 @@ class Client:
             headers = {"PRIVATE-TOKEN": self.token}
 
         response = requests.get(*args, **kwargs, headers=headers)
-        self.ratelimit_remaining = response.headers['RateLimit-Remaining']
+
+        if 'RateLimit-Remaining' in response.headers:
+            self.ratelimit_remaining = response.headers['RateLimit-Remaining']
         return response
 
     def _projects(self):
