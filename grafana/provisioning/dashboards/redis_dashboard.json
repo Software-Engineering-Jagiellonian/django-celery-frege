@@ -4,8 +4,7 @@
       {
         "builtIn": 1,
         "datasource": {
-          "type": "grafana",
-          "uid": "-- Grafana --"
+          "type": "grafana"
         },
         "enable": true,
         "hide": true,
@@ -30,8 +29,7 @@
   "panels": [
     {
       "datasource": {
-        "type": "redis-datasource",
-        "uid": "PA7F6415749A3297A"
+        "type": "redis-datasource"
       },
       "fieldConfig": {
         "defaults": {
@@ -133,8 +131,7 @@
         {
           "command": "info",
           "datasource": {
-            "type": "redis-datasource",
-            "uid": "PA7F6415749A3297A"
+            "type": "redis-datasource"
           },
           "field": "used_memory",
           "query": "",
@@ -162,7 +159,6 @@
   "timepicker": {},
   "timezone": "",
   "title": "Redis",
-  "uid": "8lpCA3unk",
   "version": 2,
   "weekStart": ""
 }
