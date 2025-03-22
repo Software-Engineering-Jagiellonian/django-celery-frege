@@ -4,8 +4,7 @@
       {
         "builtIn": 1,
         "datasource": {
-          "type": "grafana",
-          "uid": "-- Grafana --"
+          "type": "grafana"
         },
         "enable": true,
         "hide": true,
@@ -29,8 +28,7 @@
   "panels": [
     {
       "datasource": {
-        "type": "prometheus",
-        "uid": "PEBC2E3263E2CA5B6"
+        "type": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -103,8 +101,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "PEBC2E3263E2CA5B6"
+            "type": "prometheus"
           },
           "expr": "flower_worker_number_of_currently_executing_tasks{}",
           "refId": "A"
@@ -115,8 +112,7 @@
     },
     {
       "datasource": {
-        "type": "prometheus",
-        "uid": "PEBC2E3263E2CA5B6"
+        "type": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -189,8 +185,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "PEBC2E3263E2CA5B6"
+            "type": "prometheus"
           },
           "expr": "flower_task_runtime_seconds_bucket{}",
           "refId": "A"
@@ -214,7 +209,6 @@
   "timepicker": {},
   "timezone": "",
   "title": "Celery dashboard",
-  "uid": "lOxMdaunz",
   "version": 1,
   "weekStart": ""
 }
