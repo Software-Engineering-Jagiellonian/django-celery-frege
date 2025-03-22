@@ -44,7 +44,7 @@ class GitHubIndexer(BaseIndexer):
                 self.current_page += 1
                 self.save(update_fields=["current_page"])
 
-                unique_repos = [repo for repo in list_of_repos if is_repo_unique(repo.clone_url, self.__class__.__name__)]
+                unique_repos = [repo for repo in list_of_repos if _is_repo_unique(repo.clone_url, self.__class__.__name__)]
 
                 repos_to_process = [
                     Repository(
@@ -100,7 +100,7 @@ class SourceforgeIndexer(BaseIndexer):
         repos_to_process = []
         for project in projects:
             if project.code is not None:
-                if not is_repo_unique(project.code.url, self.__class__.__name__):
+                if not _is_repo_unique(project.code.url, self.__class__.__name__):
                     continue
                 repos_to_process.append(
                     Repository(
@@ -113,7 +113,7 @@ class SourceforgeIndexer(BaseIndexer):
                 )
 
             for subproject in project.subprojects:
-                if not is_repo_unique(subproject.code.url, self.__class__.__name__):
+                if not _is_repo_unique(subproject.code.url, self.__class__.__name__):
                     continue
                 repos_to_process.append(
                     Repository(
@@ -175,7 +175,7 @@ class BitbucketIndexer(BaseIndexer):
             if not (clone_url and repo_url and commit_hash):
                 continue
 
-            if not is_repo_unique(clone_url, self.__class__.__name__):
+            if not _is_repo_unique(clone_url, self.__class__.__name__):
                 continue
 
             repo_to_process = Repository.objects.create(
@@ -220,7 +220,7 @@ class GitLabIndexer(BaseIndexer):
         try:
             for repo_data, _id in gitlab_client.repositories():
                 self.last_project_id = _id
-                if not is_repo_unique(repo_data["git_url"], self.__class__.__name__):
+                if not _is_repo_unique(repo_data["git_url"], self.__class__.__name__):
                     continue
                 self.save(update_fields=["last_project_id"])
                 repo_to_process = Repository.objects.create(**repo_data)
@@ -233,7 +233,7 @@ class GitLabIndexer(BaseIndexer):
         verbose_name = _("GitLab Indexer")
         verbose_name_plural = verbose_name
 
-def is_repo_unique(clone_url: str, indexer_name: str) -> bool:
+def _is_repo_unique(clone_url: str, indexer_name: str) -> bool:
     if Repository.objects.filter(git_url=clone_url).exists():
         print(f"Indexer {indexer_name} ignored crawled repository {clone_url} as it's already in the database.", file=sys.stderr)
         return False
