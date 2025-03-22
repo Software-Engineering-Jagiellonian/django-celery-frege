@@ -167,24 +167,24 @@ services:
   #   profiles: [ "dev" ]
 
   fregepoc-celery-crawl-worker-dev:
-      <<: [*backend, *celery-healthcheck]
-      container_name: fregepoc-celery-crawl-worker-dev
-      ports: []
-      command: celery -A fregepoc worker -Q crawl -l debug --concurrency=${CELERY_WORKER_CRAWL_CONCURRENCY} -n worker_crawl
-      profiles: [ "dev", "local-be-dev" ]
+    <<: [*backend, *celery-healthcheck]
+    container_name: fregepoc-celery-crawl-worker-dev
+    ports: []
+    command: celery --app fregepoc worker --loglevel=${CELERY_LOG_LEVEL_DEV} --queues crawl --concurrency=${CELERY_WORKER_CRAWL_CONCURRENCY} --hostname worker_crawl
+    profiles: [ "dev", "local-be-dev" ]
 
   fregepoc-celery-downloads-worker-dev:
     <<: [*backend, *celery-healthcheck]
     container_name: fregepoc-celery-downloads-worker-dev
     ports: []
-    command: celery -A fregepoc worker -Q downloads -l debug --concurrency=${CELERY_WORKER_DOWNLOADS_CONCURRENCY} -n worker_downloads
+    command: celery --app fregepoc worker --loglevel=${CELERY_LOG_LEVEL_DEV} --queues downloads --concurrency=${CELERY_WORKER_DOWNLOADS_CONCURRENCY} --hostname worker_downloads
     profiles: [ "dev", "local-be-dev" ]
 
   fregepoc-celery-worker-dev:
     <<: [*backend, *celery-healthcheck]
     container_name: fregepoc-celery-worker-dev
     ports: []
-    command: celery -A fregepoc worker -Q celery -l debug --concurrency=${CELERY_WORKER_BASE_CONCURRENCY} -n worker_celery
+    command: celery --app fregepoc worker --loglevel=${CELERY_LOG_LEVEL_DEV} --queues celery --concurrency=${CELERY_WORKER_BASE_CONCURRENCY} --hostname worker_celery
     profiles: [ "dev", "local-be-dev" ]
 
   fregepoc-grafana-dev: &grafana
@@ -344,24 +344,24 @@ services:
       retries: 2
 
   fregepoc-celery-crawl-worker-prod:
-      <<: [*backend, *celery-healthcheck]
-      container_name: fregepoc-celery-crawl-worker-prod
-      ports: []
-      command: celery -A fregepoc worker -Q crawl -l info --concurrency=${CELERY_WORKER_CRAWL_CONCURRENCY} -n worker_crawl
-      profiles: [ "prod" ]
+    <<: [*backend, *celery-healthcheck]
+    container_name: fregepoc-celery-crawl-worker-prod
+    ports: []
+    command: celery --app fregepoc worker --queues crawl --loglevel=${CELERY_LOG_LEVEL_PROD} --concurrency=${CELERY_WORKER_CRAWL_CONCURRENCY} --hostname worker_crawl
+    profiles: [ "prod" ]
 
   fregepoc-celery-downloads-worker-prod:
     <<: [*backend, *celery-healthcheck]
     container_name: fregepoc-celery-downloads-worker-prod
     ports: []
-    command: celery -A fregepoc worker -Q downloads -l info --concurrency=${CELERY_WORKER_DOWNLOADS_CONCURRENCY} -n worker_downloads
+    command: celery --app fregepoc worker --queues downloads --loglevel=${CELERY_LOG_LEVEL_PROD} --concurrency=${CELERY_WORKER_DOWNLOADS_CONCURRENCY} --hostname worker_downloads
     profiles: [ "prod" ]
 
   fregepoc-celery-worker-prod:
     <<: [*backend, *celery-healthcheck]
     container_name: fregepoc-celery-worker-prod
     ports: []
-    command: celery -A fregepoc worker -Q celery -l info --concurrency=${CELERY_WORKER_BASE_CONCURRENCY} -n worker_celery
+    command: celery --app fregepoc worker --queues celery --loglevel=${CELERY_LOG_LEVEL_PROD} --concurrency=${CELERY_WORKER_BASE_CONCURRENCY} --hostname worker_celery
     profiles: [ "prod" ]
 
   nginx-proxy:
