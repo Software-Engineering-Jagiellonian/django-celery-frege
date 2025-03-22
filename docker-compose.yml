@@ -270,8 +270,9 @@ services:
       - DJANGO_SUPERUSER_PASSWORD=pass
       - CHOKIDAR_USEPOLLING=true
     volumes:
-      - /app/node_modules
       - ./front:/app
+      - /app/node_modules
+      - /app/.next
     command: npm run dev
     ports:
       - ${DOCKER_NEW_FRONTEND_PORT}:${DOCKER_NEW_FRONTEND_PORT}
