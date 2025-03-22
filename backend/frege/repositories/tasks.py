@@ -107,16 +107,17 @@ def _clone_repo(repo: Repository, local_path: Path) -> Optional[git.Repo]:
             )
             return None
 
-
 def _check_download_folder_size(depth=0):
     """
     Check if the size of downloads folder < DOWNLOAD_DIR_MAX_SIZE_BYTES.
     If not, raise DownloadDirectoryFullException
     """
     if depth > 7:
-        # Prevent infinite recursion
+    # Prevent infinite recursion
         logger.error("Failed to check download folder size.")
-        return
+        raise DownloadDirectoryFullException(
+                f"Couldn't determine download folder size after {depth} attempts."
+            )
     path = Path(settings.DOWNLOAD_PATH)
     try:
         files = list(
