@@ -6,7 +6,7 @@ from typing import Optional
 
 import git
 from celery import shared_task
-from celery.signals import celeryd_init
+from celery.signals import celeryd_after_setup
 from celery.utils.log import get_task_logger
 from django.apps import apps
 from django.db import transaction
@@ -26,6 +26,8 @@ from fregepoc.repositories.utils.paths import (
     get_repo_files,
     get_repo_local_path,
 )
+import redis
+from redis.lock import Lock
 
 logger = get_task_logger(__name__)
 
@@ -150,15 +152,15 @@ def _check_queued_tasks_number():
     if reserved > settings.MAX_DOWNLOAD_TASKS_COUNT:
         raise DownloadQueueTooBigException(count=reserved)
 
+@celeryd_after_setup.connect(sender="celery@worker_crawl")
+def init_worker(sender, **kwargs):
+    _sanitize()
 
-@celeryd_init.connect
-def init_worker(**kwargs):
     if os.environ.get("CELERY_CRAWL_ON_STARTUP", "true").lower() != "true":
         return
 
     for indexer_cls in indexers:
         crawl_repos_task.apply_async(args=(indexer_cls.__name__,))
-
 
 @shared_task(
     autoretry_for=[
@@ -386,3 +388,43 @@ def analyze_file_task(repo_file_pk):
         _delete_file(Path(absolute_file_path), repo_file.repository.name)
 
         _finalize_repo_analysis(repo_file.repository)
+
+def _sanitize():
+    if settings.REDIS_PERSISTENCE_ENABLED:
+        # If persistence is enabled, we don't need to sanitize
+        # since all previous tasks are still in the queue.
+        return
+    client = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT)
+    lock = Lock(client, "sanitization_lock")
+    with lock:
+        # Wait for only one crawler to sanitize. We cannot safely clean
+        # the download dir and reschedule unanalyzed repos concurrently.
+        has_sanitized = client.get("has_sanitized")
+        if has_sanitized is not None:
+            return
+        client.set("has_sanitized", "true")
+        logger.info("Sanitizing")
+        _wipe_downloads_dir()
+        _reschedule_unanalyzed_repos()
+
+def _wipe_downloads_dir():
+    for filename in os.listdir(settings.DOWNLOAD_PATH):
+        file_path = os.path.join(settings.DOWNLOAD_PATH, filename)
+        if os.path.isfile(file_path) or os.path.islink(file_path):
+            os.unlink(file_path)
+        elif os.path.isdir(file_path):
+            shutil.rmtree(file_path)
+
+def _reschedule_unanalyzed_repos():
+    try:
+        objects = Repository.objects.all()
+        if objects.exists():
+            unanalyzed_repos = Repository.objects.filter(analyzed=False)
+            logger.info(f"Rescheduling {unanalyzed_repos.count()} unanalyzed repositories")
+            for repo in unanalyzed_repos:
+                process_repo_task.apply_async(args=(repo.pk,))
+        else:
+            logger.info("No repositories found")
+            return
+    except Exception as ex:
+        logger.error(f"Failed to reschedule unanalyzed repositories: {ex}")

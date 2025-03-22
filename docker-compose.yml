@@ -40,10 +40,13 @@ services:
     container_name: fregepoc-redis
     hostname: fregepoc-redis
     image: redis:7.0
+    command: sh -c "if [ \"$REDIS_PERSISTENCE_ENABLED\" = \"1\" ]; then redis-server; else redis-server --save \"\" --appendonly no; fi"
     networks:
       - fregepoc-main
     expose:
       - "${DOCKER_REDIS_PORT}"
+    ports:
+      - "${DOCKER_REDIS_PORT}:${DOCKER_REDIS_PORT}"
     profiles: [ "dev", "prod", "local-be-dev" ]
     restart: on-failure
     healthcheck:
