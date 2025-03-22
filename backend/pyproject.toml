@@ -10,8 +10,8 @@ include = '\.pyi?$'
 force-exclude = '/(migrations|\.direnv|\.eggs|\.git|\.hg|\.mypy_cache|\.nox|\.tox|\.venv|venv|\.env|env|\.svn|_build|buck-out|build|dist)/'
 
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "fregepoc.settings"
+DJANGO_SETTINGS_MODULE = "frege.settings"
 python_files = "tests.py test_*.py *_tests.py"
 pythonpath = [
-  ".", "fregepoc",
+  ".", "frege",
 ]

@@ -2,12 +2,12 @@
 
 For BE development the minimal required set of services is:
 
-- `fregepoc-backend`
-- `fregepoc-redis`
-- `fregepoc-postgres`
-- `fregepoc-celery-crawl-worker-dev`
-- `fregepoc-celery-downloads-worker-dev`
-- `fregepoc-celery-worker-dev`
+- `frege-backend`
+- `frege-redis`
+- `frege-postgres`
+- `frege-celery-crawl-worker-dev`
+- `frege-celery-downloads-worker-dev`
+- `frege-celery-worker-dev`
 
 Similarly to the instruction in a main README, firstly copy `.env.template` file and save as `.env` file in root
 directory of the whole FREGE repository. Next step is to modify `DJANGO_DEBUG` env variable in this file to be `True`
