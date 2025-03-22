@@ -80,7 +80,7 @@ def _finalize_repo_analysis(repo_obj):
 
         logger.info(f"Repository {repo_obj.git_url} files deleted successfully")
 
-def _clone_repo(repo: Repository, local_path: Path) -> tuple[Optional[git.Repo], int]:
+def _clone_repo(repo: Repository, local_path: Path) -> Optional[git.Repo]:
     try:
         repo_obj = git.Repo.clone_from(repo.git_url, local_path)
         repo.fetch_time = timezone.now()
