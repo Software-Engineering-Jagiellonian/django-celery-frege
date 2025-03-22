@@ -113,7 +113,7 @@ def _check_download_folder_size(depth=0):
     If not, raise DownloadDirectoryFullException
     """
     if depth > 7:
-    # Prevent infinite recursion
+        # Prevent infinite recursion
         logger.error("Failed to check download folder size.")
         raise DownloadDirectoryFullException(
                 f"Couldn't determine download folder size after {depth} attempts."
@@ -132,7 +132,6 @@ def _check_download_folder_size(depth=0):
     except FileNotFoundError:
         logger.warning("Directory in download folder not found. Retrying the check of download folder size.")
         _check_download_folder_size(depth+1)
-
 
 def _check_queued_tasks_number():
     """
