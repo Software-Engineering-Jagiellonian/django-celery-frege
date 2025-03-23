@@ -38,10 +38,13 @@ services:
     container_name: frege-redis
     hostname: frege-redis
     image: redis:7.0
+    command: sh -c "if [ \"$REDIS_PERSISTENCE_ENABLED\" = \"True\" ]; then redis-server; else redis-server --save \"\" --appendonly no; fi"
     networks:
       - frege-main
     expose:
       - "${DOCKER_REDIS_PORT}"
+    ports:
+      - "${DOCKER_REDIS_PORT}:${DOCKER_REDIS_PORT}"
     profiles: [ "dev", "prod", "local-be-dev" ]
     restart: on-failure
     healthcheck:
