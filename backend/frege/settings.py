@@ -127,7 +127,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
@@ -254,9 +254,3 @@ REDIS_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/"
 HEALTHCHECK_CELERY_TIMEOUT = 1
 HEALTHCHECK_CELERY_PING_TIMEOUT = 1
 HEALTHCHECK_CELERY_QUEUE_TIMEOUT = 1
-
-# STORAGES = {
-#     "staticfiles": {
-#         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-#     },
-# }
