@@ -65,6 +65,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
 
 ROOT_URLCONF = "frege.urls"
@@ -121,7 +122,6 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 
 USE_TZ = True
-
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
@@ -254,3 +254,9 @@ REDIS_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/"
 HEALTHCHECK_CELERY_TIMEOUT = 1
 HEALTHCHECK_CELERY_PING_TIMEOUT = 1
 HEALTHCHECK_CELERY_QUEUE_TIMEOUT = 1
+
+# STORAGES = {
+#     "staticfiles": {
+#         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+#     },
+# }

@@ -129,6 +129,15 @@ services:
 
   frege-backend-dev:
     <<: *backend
+    volumes:
+      - ./backend:/app
+      - frege_tmp:${DJANGO_DOWNLOAD_PATH}
+      - ./backend/static:/app/static
+    command: >
+      sh -c "python manage.py migrate --noinput
+      && python manage.py initadmin
+      && python manage.py collectstatic --noinput
+      && python manage.py runserver 0.0.0.0:${DOCKER_BACKEND_PORT}"
     healthcheck:
       test: "curl -f http://localhost:${DOCKER_BACKEND_PORT}/ht || exit 1"
       interval: 10s
