@@ -80,13 +80,6 @@ def _finalize_repo_analysis(repo_obj):
 
         logger.info(f"Repository {repo_obj.git_url} files deleted successfully")
 
-
-def _delete_file(path: Path, repo: str):
-    logger.info(f"Deleting file {path} for repository {repo}")
-    path.unlink(missing_ok=True)
-    logger.info(f"File {path} deleted for repository {repo}")
-
-
 def _clone_repo(repo: Repository, local_path: Path) -> Optional[git.Repo]:
     try:
         repo_obj = git.Repo.clone_from(repo.git_url, local_path)
@@ -259,10 +252,8 @@ def process_repo_task(repo_pk):
         repo_quality_metrics.save()
 
         for relative_file_path, language in get_repo_files(cloned_repo):
-            absolute_file_path = repo_path / relative_file_path
-
             if not AnalyzerFactory.has_analyzers(language):
-                _delete_file(absolute_file_path, repo.name)
+                continue
 
             file = RepositoryFile(
                 repository=repo,
@@ -387,6 +378,5 @@ def analyze_file_task(repo_file_pk):
                 get_repo_local_path(repo_file.repository)
                 / repo_file.repo_relative_file_path
         )
-        _delete_file(Path(absolute_file_path), repo_file.repository.name)
 
         _finalize_repo_analysis(repo_file.repository)
