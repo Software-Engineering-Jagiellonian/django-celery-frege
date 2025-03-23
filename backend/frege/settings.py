@@ -157,7 +157,8 @@ DATABASES = {
 }
 
 REDIS_HOST = os.environ.get("DJANGO_REDIS_HOST", "127.0.0.1")
-REDIS_PORT = os.environ.get("DJANGO_REDIS_PORT", "16379")
+REDIS_PORT = os.environ.get("DJANGO_REDIS_PORT", "6379")
+REDIS_PERSISTENCE_ENABLED: bool = os.environ.get("REDIS_PERSISTENCE_ENABLED", "False").lower() == "true"
 
 # CELERY STUFF
 CELERY_BROKER_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/"

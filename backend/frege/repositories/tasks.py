@@ -6,7 +6,7 @@ from typing import Optional
 
 import git
 from celery import shared_task
-from celery.signals import celeryd_init
+from celery.signals import celeryd_after_setup
 from celery.utils.log import get_task_logger
 from django.apps import apps
 from django.db import transaction
@@ -26,6 +26,8 @@ from frege.repositories.utils.paths import (
     get_repo_files,
     get_repo_local_path,
 )
+import redis
+from redis.lock import Lock
 
 logger = get_task_logger(__name__)
 
@@ -80,14 +82,8 @@ def _finalize_repo_analysis(repo_obj):
 
         logger.info(f"Repository {repo_obj.git_url} files deleted successfully")
 
-
-def _delete_file(path: Path, repo: str):
-    logger.info(f"Deleting file {path} for repository {repo}")
-    path.unlink(missing_ok=True)
-    logger.info(f"File {path} deleted for repository {repo}")
-
-
 def _clone_repo(repo: Repository, local_path: Path) -> Optional[git.Repo]:
+    _check_download_folder_size()
     try:
         repo_obj = git.Repo.clone_from(repo.git_url, local_path)
         repo.fetch_time = timezone.now()
@@ -103,16 +99,21 @@ def _clone_repo(repo: Repository, local_path: Path) -> Optional[git.Repo]:
             return repo_obj
         except git.exc.NoSuchPathError:
             logger.error(
-                "Tried fetching from disk, but repository does not exist"
+                f"Tried fetching {repo.git_url} from disk, but repository does not exist."
             )
             return None
 
-
-def _check_download_folder_size():
+def _check_download_folder_size(depth=0):
     """
     Check if the size of downloads folder < DOWNLOAD_DIR_MAX_SIZE_BYTES.
     If not, raise DownloadDirectoryFullException
     """
+    if depth > 7:
+        # Prevent infinite recursion
+        logger.error("Failed to check download folder size.")
+        raise DownloadDirectoryFullException(
+                f"Couldn't determine download folder size after {depth} attempts."
+            )
     path = Path(settings.DOWNLOAD_PATH)
     try:
         files = list(
@@ -126,8 +127,7 @@ def _check_download_folder_size():
             )
     except FileNotFoundError:
         logger.warning("Directory in download folder not found. Retrying the check of download folder size.")
-        _check_download_folder_size()
-
+        _check_download_folder_size(depth+1)
 
 def _check_queued_tasks_number():
     """
@@ -150,15 +150,15 @@ def _check_queued_tasks_number():
     if reserved > settings.MAX_DOWNLOAD_TASKS_COUNT:
         raise DownloadQueueTooBigException(count=reserved)
 
+@celeryd_after_setup.connect(sender="celery@worker_crawl")
+def init_worker(sender, **kwargs):
+    _sanitize()
 
-@celeryd_init.connect
-def init_worker(**kwargs):
     if os.environ.get("CELERY_CRAWL_ON_STARTUP", "true").lower() != "true":
         return
 
     for indexer_cls in indexers:
         crawl_repos_task.apply_async(args=(indexer_cls.__name__,))
-
 
 @shared_task(
     autoretry_for=[
@@ -175,15 +175,8 @@ def crawl_repos_task(indexer_class_name):
         # Trigger Celery auto retry by re-raising exception
         logger.info("Download queue too big. Retrying")
         raise ex
-    except ValueError:
-        logger.info("Failed to inspect queue")
-
-    try:
-        _check_download_folder_size()
-    except DownloadDirectoryFullException as ex:
-        # Trigger Celery auto retry by re-raising exception
-        logger.info("Too many files downloaded currently. Retrying")
-        raise ex
+    except ValueError as ex:
+        logger.info(f"Failed to inspect queue with exception {ex}")
 
     indexer_model = apps.get_model("indexers", indexer_class_name)
     indexer: BaseIndexer = indexer_model.load()
@@ -203,13 +196,20 @@ def crawl_repos_task(indexer_class_name):
     crawl_repos_task.apply_async(args=(indexer_class_name,))
 
     batch = next(iter(indexer), [])
+    logger.info(f"Scheduling batch of {len(batch)} repositories")
     for repo in batch:
         repo.refresh_from_db()
         if not repo.analyzed:
             process_repo_task.apply_async(args=(repo.pk,))
 
 
-@shared_task
+@shared_task(
+    autoretry_for=[
+        DownloadDirectoryFullException,
+    ],
+    max_retries=None,
+    default_retry_delay=15,
+)
 def process_repo_task(repo_pk):
     # TODO: docstring & cleanup
 
@@ -218,6 +218,10 @@ def process_repo_task(repo_pk):
     except Repository.DoesNotExist:
         logger.error(f"Repository does not exist ({repo_pk = })")
         return
+    
+    logger.info(f"Processing repository {repo.git_url}")
+    
+    _remove_database_entries(repo)
 
     repo_local_path = get_repo_local_path(repo)
 
@@ -228,6 +232,7 @@ def process_repo_task(repo_pk):
     logger.info(f"Fetching repository via url: {repo.git_url}")
     repo_obj = _clone_repo(repo, repo_local_path)
     if repo_obj is None:
+        logger.error(f"Failed to obtain repository {repo.git_url}. This has unknown consequences.")
         return
 
     with closing(repo_obj) as cloned_repo:
@@ -249,16 +254,19 @@ def process_repo_task(repo_pk):
                 analyzed=False
             )
             all_commit_messages.append(commit_message)
-        CommitMessage.objects.bulk_create(all_commit_messages)
+
+        # Not limiting batch sizes can lead to OutOfMemory exceptions
+        # for the database when handling large repositories.
+        batch_size = 128
+        for i in range(0, len(all_commit_messages), batch_size):
+            CommitMessage.objects.bulk_create(all_commit_messages[i:i + batch_size])
 
         repo_quality_metrics = RepositoryCommitMessagesQuality(repository=repo, analyzed=False)
         repo_quality_metrics.save()
 
         for relative_file_path, language in get_repo_files(cloned_repo):
-            absolute_file_path = repo_path / relative_file_path
-
             if not AnalyzerFactory.has_analyzers(language):
-                _delete_file(absolute_file_path, repo.name)
+                continue
 
             file = RepositoryFile(
                 repository=repo,
@@ -276,7 +284,6 @@ def process_repo_task(repo_pk):
             analyze_file_task.apply_async(args=(repo_file.pk,))
 
     _finalize_repo_analysis(repo)
-
 
 @shared_task
 def analyze_commit_message_quality_task(commit_message_pk):
@@ -312,7 +319,6 @@ def analyze_commit_message_quality_task(commit_message_pk):
                     f"from repository {commit_message.repository.name} analyzed successfully!")
         _finalize_repo_analysis(commit_message.repository)
 
-
 @shared_task
 def analyze_file_task(repo_file_pk):
     # TODO: docstring & cleanup
@@ -347,14 +353,14 @@ def analyze_file_task(repo_file_pk):
             repo_file.metrics = metrics_dict
             repo_file.analyzed = True
             repo_file.analyzed_time = timezone.now()
-            repo_file.lines_of_code = metrics_dict["lines_of_code"]
-            repo_file.token_count = metrics_dict["token_count"]
-            repo_file.function_count = metrics_dict["function_count"]
-            repo_file.average_function_name_length = metrics_dict["average_function_name_length"]
-            repo_file.average_lines_of_code = metrics_dict["average_lines_of_code"]
-            repo_file.average_token_count = metrics_dict["average_token_count"]
-            repo_file.average_cyclomatic_complexity = metrics_dict["average_cyclomatic_complexity"]
-            repo_file.average_parameter_count = metrics_dict["average_parameter_count"]
+            repo_file.lines_of_code = metrics_dict.get("lines_of_code", 0)
+            repo_file.token_count = metrics_dict.get("token_count", 0)
+            repo_file.function_count = metrics_dict.get("function_count", 0)
+            repo_file.average_function_name_length = metrics_dict.get("average_function_name_length", 0)
+            repo_file.average_lines_of_code = metrics_dict.get("average_lines_of_code", 0)
+            repo_file.average_token_count = metrics_dict.get("average_token_count", 0)
+            repo_file.average_cyclomatic_complexity = metrics_dict.get("average_cyclomatic_complexity", 0)
+            repo_file.average_parameter_count = metrics_dict.get("average_parameter_count", 0)
 
             repo_file.save(update_fields=["metrics",
                                           "analyzed",
@@ -383,6 +389,59 @@ def analyze_file_task(repo_file_pk):
                 get_repo_local_path(repo_file.repository)
                 / repo_file.repo_relative_file_path
         )
-        _delete_file(Path(absolute_file_path), repo_file.repository.name)
 
         _finalize_repo_analysis(repo_file.repository)
+
+def _remove_database_entries(repo: Repository):
+    """
+    When processing a repository we need to make sure to remove all previous database entries, because we insert into the database all the files and commit messages again.
+    """
+    repo_pk = repo.pk
+    removed_commits_amount = CommitMessage.objects.filter(repository=repo_pk).delete()[0]
+    removed_repo_quality_metrics_amount = RepositoryCommitMessagesQuality.objects.filter(repository=repo_pk).delete()[0]
+    removed_files_amount = RepositoryFile.objects.filter(repository=repo_pk).delete()[0]
+
+    if(removed_commits_amount > 0 or removed_repo_quality_metrics_amount > 0 or removed_files_amount > 0):
+        logger.warning(f"Had to remove database entries for repository \"{repo.name}\". This shouldn't happen unless you're restarting FREGE and rescheduling unanalyzed repos.")
+    repo.analyzed = False
+    repo.save(update_fields=["analyzed"])
+
+def _sanitize():
+    if settings.REDIS_PERSISTENCE_ENABLED:
+        # If persistence is enabled, we don't need to sanitize
+        # since all previous tasks are still in the queue.
+        return
+    client = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT)
+    lock = Lock(client, "sanitization_lock")
+    with lock:
+        # Wait for only one crawler to sanitize. We cannot safely clean
+        # the download dir and reschedule unanalyzed repos concurrently.
+        has_sanitized = client.get("has_sanitized")
+        if has_sanitized is not None:
+            return
+        client.set("has_sanitized", "true")
+        logger.info("Sanitizing")
+        _wipe_downloads_dir()
+        _reschedule_unanalyzed_repos()
+
+def _wipe_downloads_dir():
+    for filename in os.listdir(settings.DOWNLOAD_PATH):
+        file_path = os.path.join(settings.DOWNLOAD_PATH, filename)
+        if os.path.isfile(file_path) or os.path.islink(file_path):
+            os.unlink(file_path)
+        elif os.path.isdir(file_path):
+            shutil.rmtree(file_path)
+
+def _reschedule_unanalyzed_repos():
+    try:
+        objects = Repository.objects.all()
+        if objects.exists():
+            unanalyzed_repos = Repository.objects.filter(analyzed=False)
+            logger.info(f"Rescheduling {unanalyzed_repos.count()} unanalyzed repositories")
+            for repo in unanalyzed_repos:
+                process_repo_task.apply_async(args=(repo.pk,))
+        else:
+            logger.info("No repositories found")
+            return
+    except Exception as ex:
+        logger.error(f"Failed to reschedule unanalyzed repositories: {ex}")

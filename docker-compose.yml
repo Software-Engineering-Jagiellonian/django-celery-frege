@@ -38,10 +38,13 @@ services:
     container_name: frege-redis
     hostname: frege-redis
     image: redis:7.0
+    command: sh -c "if [ \"$REDIS_PERSISTENCE_ENABLED\" = \"True\" ]; then redis-server; else redis-server --save \"\" --appendonly no; fi"
     networks:
       - frege-main
     expose:
       - "${DOCKER_REDIS_PORT}"
+    ports:
+      - "${DOCKER_REDIS_PORT}:${DOCKER_REDIS_PORT}"
     profiles: [ "dev", "prod", "local-be-dev" ]
     restart: on-failure
     healthcheck:
@@ -165,24 +168,24 @@ services:
   #   profiles: [ "dev" ]
 
   frege-celery-crawl-worker-dev:
-      <<: [*backend, *celery-healthcheck]
-      container_name: frege-celery-crawl-worker-dev
-      ports: []
-      command: celery -A frege worker -Q crawl -l debug --concurrency=${CELERY_WORKER_CRAWL_CONCURRENCY} -n worker_crawl
-      profiles: [ "dev", "local-be-dev" ]
+    <<: [*backend, *celery-healthcheck]
+    container_name: frege-celery-crawl-worker-dev
+    ports: []
+    command: celery --app frege worker --loglevel=${CELERY_LOG_LEVEL_DEV} --queues crawl --concurrency=${CELERY_WORKER_CRAWL_CONCURRENCY} --hostname worker_crawl
+    profiles: [ "dev", "local-be-dev" ]
 
   frege-celery-downloads-worker-dev:
     <<: [*backend, *celery-healthcheck]
     container_name: frege-celery-downloads-worker-dev
     ports: []
-    command: celery -A frege worker -Q downloads -l debug --concurrency=${CELERY_WORKER_DOWNLOADS_CONCURRENCY} -n worker_downloads
+    command: celery --app frege worker --loglevel=${CELERY_LOG_LEVEL_DEV} --queues downloads --concurrency=${CELERY_WORKER_DOWNLOADS_CONCURRENCY} --hostname worker_downloads
     profiles: [ "dev", "local-be-dev" ]
 
   frege-celery-worker-dev:
     <<: [*backend, *celery-healthcheck]
     container_name: frege-celery-worker-dev
     ports: []
-    command: celery -A frege worker -Q celery -l debug --concurrency=${CELERY_WORKER_BASE_CONCURRENCY} -n worker_celery
+    command: celery --app frege worker --loglevel=${CELERY_LOG_LEVEL_DEV} --queues celery --concurrency=${CELERY_WORKER_BASE_CONCURRENCY} --hostname worker_celery
     profiles: [ "dev", "local-be-dev" ]
 
   frege-grafana-dev: &grafana
@@ -343,24 +346,24 @@ services:
       retries: 2
 
   frege-celery-crawl-worker-prod:
-      <<: [*backend, *celery-healthcheck]
-      container_name: frege-celery-crawl-worker-prod
-      ports: []
-      command: celery -A frege worker -Q crawl -l info --concurrency=${CELERY_WORKER_CRAWL_CONCURRENCY} -n worker_crawl
-      profiles: [ "prod" ]
+    <<: [*backend, *celery-healthcheck]
+    container_name: frege-celery-crawl-worker-prod
+    ports: []
+    command: celery --app frege worker --queues crawl --loglevel=${CELERY_LOG_LEVEL_PROD} --concurrency=${CELERY_WORKER_CRAWL_CONCURRENCY} --hostname worker_crawl
+    profiles: [ "prod" ]
 
   frege-celery-downloads-worker-prod:
     <<: [*backend, *celery-healthcheck]
     container_name: frege-celery-downloads-worker-prod
     ports: []
-    command: celery -A frege worker -Q downloads -l info --concurrency=${CELERY_WORKER_DOWNLOADS_CONCURRENCY} -n worker_downloads
+    command: celery --app frege worker --queues downloads --loglevel=${CELERY_LOG_LEVEL_PROD} --concurrency=${CELERY_WORKER_DOWNLOADS_CONCURRENCY} --hostname worker_downloads
     profiles: [ "prod" ]
 
   frege-celery-worker-prod:
     <<: [*backend, *celery-healthcheck]
     container_name: frege-celery-worker-prod
     ports: []
-    command: celery -A frege worker -Q celery -l info --concurrency=${CELERY_WORKER_BASE_CONCURRENCY} -n worker_celery
+    command: celery --app frege worker --queues celery --loglevel=${CELERY_LOG_LEVEL_PROD} --concurrency=${CELERY_WORKER_BASE_CONCURRENCY} --hostname worker_celery
     profiles: [ "prod" ]
 
   nginx-proxy:
