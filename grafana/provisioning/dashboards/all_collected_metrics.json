@@ -4,7 +4,8 @@
         {
           "builtIn": 1,
           "datasource": {
-            "type": "grafana"
+            "type": "grafana",
+            "uid": "-- Grafana --"
           },
           "enable": true,
           "hide": true,
@@ -38,7 +39,8 @@
         "targets": [
           {
             "datasource": {
-              "type": "postgres"
+              "type": "postgres",
+              "uid": "PA942B37CCFAF5A81"
             },
             "rawQuery": true,
             "rawSql": "SELECT analyzed_time AS time, SUM(COUNT(*)) OVER (ORDER BY analyzed_time) AS analyzed_repositories FROM repositories_repository WHERE analyzed = true GROUP BY analyzed_time ORDER BY analyzed_time",
@@ -48,7 +50,8 @@
           },
           {
           "datasource": {
-            "type": "postgres"
+            "type": "postgres",
+            "uid": "PA942B37CCFAF5A81"
           },
           "rawQuery": true,
           "rawSql": "SELECT discovered_time AS time, SUM(COUNT(*)) OVER (ORDER BY discovered_time) AS all_discovered_repositories FROM repositories_repository GROUP BY discovered_time ORDER BY discovered_time",
@@ -58,7 +61,8 @@
           },
           {
           "datasource": {
-            "type": "postgres"
+            "type": "postgres",
+            "uid": "PA942B37CCFAF5A81"
           },
           "rawQuery": true,
           "rawSql": "SELECT fetch_time AS time, SUM(COUNT(*)) OVER (ORDER BY fetch_time) AS fetched_repositories FROM repositories_repository GROUP BY fetch_time ORDER BY fetch_time",
@@ -89,7 +93,8 @@
       },
       {
         "datasource": {
-          "type": "postgres"
+          "type": "postgres",
+          "uid": "PA942B37CCFAF5A81"
         },
         "fieldConfig": {
           "defaults": {
@@ -139,7 +144,8 @@
         "targets": [
           {
             "datasource": {
-              "type": "postgres"
+              "type": "postgres",
+              "uid": "PA942B37CCFAF5A81"
             },
             "format": "table",
             "group": [],
@@ -174,7 +180,8 @@
       },
       {
         "datasource": {
-          "type": "postgres"
+          "type": "postgres",
+          "uid": "PA942B37CCFAF5A81"
         },
         "fieldConfig": {
           "defaults": {
@@ -224,7 +231,8 @@
         "targets": [
           {
             "datasource": {
-              "type": "postgres"
+              "type": "postgres",
+              "uid": "PA942B37CCFAF5A81"
             },
             "format": "table",
             "group": [],
@@ -257,7 +265,8 @@
       },
       {
         "datasource": {
-          "type": "postgres"
+          "type": "postgres",
+          "uid": "PA942B37CCFAF5A81"
         },
         "fieldConfig": {
           "defaults": {
@@ -307,7 +316,8 @@
         "targets": [
           {
             "datasource": {
-              "type": "postgres"
+              "type": "postgres",
+              "uid": "PA942B37CCFAF5A81"
             },
             "format": "table",
             "group": [],
@@ -342,7 +352,8 @@
       },
       {
         "datasource": {
-          "type": "postgres"
+          "type": "postgres",
+          "uid": "PA942B37CCFAF5A81"
         },
         "fieldConfig": {
           "defaults": {
@@ -392,7 +403,8 @@
         "targets": [
           {
             "datasource": {
-              "type": "postgres"
+              "type": "postgres",
+              "uid": "PA942B37CCFAF5A81"
             },
             "format": "table",
             "group": [],
@@ -439,6 +451,7 @@
     "timepicker": {},
     "timezone": "",
     "title": "All Collected Metrics",
+    "uid": "qr5Lwn5Vk",
     "version": 1,
     "weekStart": ""
   }
