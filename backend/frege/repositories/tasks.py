@@ -353,14 +353,14 @@ def analyze_file_task(repo_file_pk):
             repo_file.metrics = metrics_dict
             repo_file.analyzed = True
             repo_file.analyzed_time = timezone.now()
-            repo_file.lines_of_code = metrics_dict["lines_of_code"]
-            repo_file.token_count = metrics_dict["token_count"]
-            repo_file.function_count = metrics_dict["function_count"]
-            repo_file.average_function_name_length = metrics_dict["average_function_name_length"]
-            repo_file.average_lines_of_code = metrics_dict["average_lines_of_code"]
-            repo_file.average_token_count = metrics_dict["average_token_count"]
-            repo_file.average_cyclomatic_complexity = metrics_dict["average_cyclomatic_complexity"]
-            repo_file.average_parameter_count = metrics_dict["average_parameter_count"]
+            repo_file.lines_of_code = metrics_dict.get("lines_of_code", 0)
+            repo_file.token_count = metrics_dict.get("token_count", 0)
+            repo_file.function_count = metrics_dict.get("function_count", 0)
+            repo_file.average_function_name_length = metrics_dict.get("average_function_name_length", 0)
+            repo_file.average_lines_of_code = metrics_dict.get("average_lines_of_code", 0)
+            repo_file.average_token_count = metrics_dict.get("average_token_count", 0)
+            repo_file.average_cyclomatic_complexity = metrics_dict.get("average_cyclomatic_complexity", 0)
+            repo_file.average_parameter_count = metrics_dict.get("average_parameter_count", 0)
 
             repo_file.save(update_fields=["metrics",
                                           "analyzed",
