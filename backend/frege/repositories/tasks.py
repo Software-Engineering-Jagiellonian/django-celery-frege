@@ -82,14 +82,8 @@ def _finalize_repo_analysis(repo_obj):
 
         logger.info(f"Repository {repo_obj.git_url} files deleted successfully")
 
-
-def _delete_file(path: Path, repo: str):
-    logger.info(f"Deleting file {path} for repository {repo}")
-    path.unlink(missing_ok=True)
-    logger.info(f"File {path} deleted for repository {repo}")
-
-
 def _clone_repo(repo: Repository, local_path: Path) -> Optional[git.Repo]:
+    _check_download_folder_size()
     try:
         repo_obj = git.Repo.clone_from(repo.git_url, local_path)
         repo.fetch_time = timezone.now()
@@ -105,16 +99,21 @@ def _clone_repo(repo: Repository, local_path: Path) -> Optional[git.Repo]:
             return repo_obj
         except git.exc.NoSuchPathError:
             logger.error(
-                "Tried fetching from disk, but repository does not exist"
+                f"Tried fetching {repo.git_url} from disk, but repository does not exist."
             )
             return None
 
-
-def _check_download_folder_size():
+def _check_download_folder_size(depth=0):
     """
     Check if the size of downloads folder < DOWNLOAD_DIR_MAX_SIZE_BYTES.
     If not, raise DownloadDirectoryFullException
     """
+    if depth > 7:
+        # Prevent infinite recursion
+        logger.error("Failed to check download folder size.")
+        raise DownloadDirectoryFullException(
+                f"Couldn't determine download folder size after {depth} attempts."
+            )
     path = Path(settings.DOWNLOAD_PATH)
     try:
         files = list(
@@ -128,8 +127,7 @@ def _check_download_folder_size():
             )
     except FileNotFoundError:
         logger.warning("Directory in download folder not found. Retrying the check of download folder size.")
-        _check_download_folder_size()
-
+        _check_download_folder_size(depth+1)
 
 def _check_queued_tasks_number():
     """
@@ -177,15 +175,8 @@ def crawl_repos_task(indexer_class_name):
         # Trigger Celery auto retry by re-raising exception
         logger.info("Download queue too big. Retrying")
         raise ex
-    except ValueError:
-        logger.info("Failed to inspect queue")
-
-    try:
-        _check_download_folder_size()
-    except DownloadDirectoryFullException as ex:
-        # Trigger Celery auto retry by re-raising exception
-        logger.info("Too many files downloaded currently. Retrying")
-        raise ex
+    except ValueError as ex:
+        logger.info(f"Failed to inspect queue with exception {ex}")
 
     indexer_model = apps.get_model("indexers", indexer_class_name)
     indexer: BaseIndexer = indexer_model.load()
@@ -205,13 +196,20 @@ def crawl_repos_task(indexer_class_name):
     crawl_repos_task.apply_async(args=(indexer_class_name,))
 
     batch = next(iter(indexer), [])
+    logger.info(f"Scheduling batch of {len(batch)} repositories")
     for repo in batch:
         repo.refresh_from_db()
         if not repo.analyzed:
             process_repo_task.apply_async(args=(repo.pk,))
 
 
-@shared_task
+@shared_task(
+    autoretry_for=[
+        DownloadDirectoryFullException,
+    ],
+    max_retries=None,
+    default_retry_delay=15,
+)
 def process_repo_task(repo_pk):
     # TODO: docstring & cleanup
 
@@ -220,6 +218,8 @@ def process_repo_task(repo_pk):
     except Repository.DoesNotExist:
         logger.error(f"Repository does not exist ({repo_pk = })")
         return
+    
+    logger.info(f"Processing repository {repo.git_url}")
 
     repo_local_path = get_repo_local_path(repo)
 
@@ -230,6 +230,7 @@ def process_repo_task(repo_pk):
     logger.info(f"Fetching repository via url: {repo.git_url}")
     repo_obj = _clone_repo(repo, repo_local_path)
     if repo_obj is None:
+        logger.error(f"Failed to obtain repository {repo.git_url}. This has unknown consequences.")
         return
 
     with closing(repo_obj) as cloned_repo:
@@ -257,10 +258,8 @@ def process_repo_task(repo_pk):
         repo_quality_metrics.save()
 
         for relative_file_path, language in get_repo_files(cloned_repo):
-            absolute_file_path = repo_path / relative_file_path
-
             if not AnalyzerFactory.has_analyzers(language):
-                _delete_file(absolute_file_path, repo.name)
+                continue
 
             file = RepositoryFile(
                 repository=repo,
@@ -385,7 +384,6 @@ def analyze_file_task(repo_file_pk):
                 get_repo_local_path(repo_file.repository)
                 / repo_file.repo_relative_file_path
         )
-        _delete_file(Path(absolute_file_path), repo_file.repository.name)
 
         _finalize_repo_analysis(repo_file.repository)
 
