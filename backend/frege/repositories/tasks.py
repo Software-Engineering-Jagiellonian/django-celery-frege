@@ -220,6 +220,8 @@ def process_repo_task(repo_pk):
         return
     
     logger.info(f"Processing repository {repo.git_url}")
+    
+    _remove_database_entries(repo)
 
     repo_local_path = get_repo_local_path(repo)
 
@@ -252,7 +254,12 @@ def process_repo_task(repo_pk):
                 analyzed=False
             )
             all_commit_messages.append(commit_message)
-        CommitMessage.objects.bulk_create(all_commit_messages)
+
+        # Not limiting batch sizes can lead to OutOfMemory exceptions
+        # for the database when handling large repositories.
+        batch_size = 128
+        for i in range(0, len(all_commit_messages), batch_size):
+            CommitMessage.objects.bulk_create(all_commit_messages[i:i + batch_size])
 
         repo_quality_metrics = RepositoryCommitMessagesQuality(repository=repo, analyzed=False)
         repo_quality_metrics.save()
@@ -277,7 +284,6 @@ def process_repo_task(repo_pk):
             analyze_file_task.apply_async(args=(repo_file.pk,))
 
     _finalize_repo_analysis(repo)
-
 
 @shared_task
 def analyze_commit_message_quality_task(commit_message_pk):
@@ -312,7 +318,6 @@ def analyze_commit_message_quality_task(commit_message_pk):
         logger.info(f"commit_message {commit_message.commit_hash} "
                     f"from repository {commit_message.repository.name} analyzed successfully!")
         _finalize_repo_analysis(commit_message.repository)
-
 
 @shared_task
 def analyze_file_task(repo_file_pk):
@@ -386,6 +391,20 @@ def analyze_file_task(repo_file_pk):
         )
 
         _finalize_repo_analysis(repo_file.repository)
+
+def _remove_database_entries(repo: Repository):
+    """
+    When processing a repository we need to make sure to remove all previous database entries, because we insert into the database all the files and commit messages again.
+    """
+    repo_pk = repo.pk
+    removed_commits_amount = CommitMessage.objects.filter(repository=repo_pk).delete()[0]
+    removed_repo_quality_metrics_amount = RepositoryCommitMessagesQuality.objects.filter(repository=repo_pk).delete()[0]
+    removed_files_amount = RepositoryFile.objects.filter(repository=repo_pk).delete()[0]
+
+    if(removed_commits_amount > 0 or removed_repo_quality_metrics_amount > 0 or removed_files_amount > 0):
+        logger.warning(f"Had to remove database entries for repository \"{repo.name}\". This shouldn't happen unless you're restarting FREGE and rescheduling unanalyzed repos.")
+    repo.analyzed = False
+    repo.save(update_fields=["analyzed"])
 
 def _sanitize():
     if settings.REDIS_PERSISTENCE_ENABLED:
