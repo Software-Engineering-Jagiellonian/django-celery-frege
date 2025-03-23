@@ -6,7 +6,6 @@ providers:
     folder: 'Redis'
     # <bool> disable dashboard deletion
     disableDeletion: false
-    editable: true
     # <int> how often Grafana will scan for changed dashboards
     updateIntervalSeconds: 10
     # <bool> allow updating provisioned dashboards from the UI
@@ -21,7 +20,6 @@ providers:
     folder: 'Celery'
     # <bool> disable dashboard deletion
     disableDeletion: false
-    editable: true
     # <int> how often Grafana will scan for changed dashboards
     updateIntervalSeconds: 10
     # <bool> allow updating provisioned dashboards from the UI

@@ -1,444 +1,457 @@
 {
-    "annotations": {
-      "list": [
-        {
-          "builtIn": 1,
-          "datasource": {
-            "type": "grafana"
-          },
-          "enable": true,
-          "hide": true,
-          "iconColor": "rgba(0, 211, 255, 1)",
-          "name": "Annotations & Alerts",
-          "target": {
-            "limit": 100,
-            "matchAny": false,
-            "tags": [],
-            "type": "dashboard"
-          },
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
           "type": "dashboard"
-        }
-      ]
-    },
-    "editable": true,
-    "fiscalYearStartMonth": 0,
-    "graphTooltip": 0,
-    "id": 7,
-    "links": [],
-    "liveNow": false,
-    "panels": [
-      {
-        "gridPos": {
-          "h": 10,
-          "w": 24,
-          "x": 0,
-          "y": 0
         },
-        "id": 1,
-        "targets": [
-          {
-            "datasource": {
-              "type": "postgres"
-            },
-            "rawQuery": true,
-            "rawSql": "SELECT analyzed_time AS time, SUM(COUNT(*)) OVER (ORDER BY analyzed_time) AS analyzed_repositories FROM repositories_repository WHERE analyzed = true GROUP BY analyzed_time ORDER BY analyzed_time",
-            "legendFormat": "Cumulative already Analyzed Count",
-            "refId": "A",
-            "format": "time_series"
-          },
-          {
-          "datasource": {
-            "type": "postgres"
-          },
-          "rawQuery": true,
-          "rawSql": "SELECT discovered_time AS time, SUM(COUNT(*)) OVER (ORDER BY discovered_time) AS all_discovered_repositories FROM repositories_repository GROUP BY discovered_time ORDER BY discovered_time",
-          "legendFormat": "Cumulative All discovered repository count",
-          "refId": "B",
-          "format": "time_series"
-          },
-          {
-          "datasource": {
-            "type": "postgres"
-          },
-          "rawQuery": true,
-          "rawSql": "SELECT fetch_time AS time, SUM(COUNT(*)) OVER (ORDER BY fetch_time) AS fetched_repositories FROM repositories_repository GROUP BY fetch_time ORDER BY fetch_time",
-          "legendFormat": "Cumulative All fetched repository count",
-          "refId": "C",
-          "format": "time_series"
-          }
-        ],
-        "xaxis": {
-          "show": true,
-          "mode": "discovered_time",
-          "range": {
-            "from": "now-1h",
-            "to": "now"
-          }
-        },
-        "yaxes": [
-          {
-            "format": "short",
-            "label": "Count"
-          },
-          {
-            "format": "short"
-          }
-        ],
-        "title": "Analyzed Repositories Count",
-        "type": "graph"
-      },
-      {
-        "datasource": {
-          "type": "postgres"
-        },
-        "fieldConfig": {
-          "defaults": {
-            "color": {
-              "mode": "thresholds"
-            },
-            "custom": {
-              "align": "auto",
-              "displayMode": "auto",
-              "inspect": false
-            },
-            "mappings": [],
-            "thresholds": {
-              "mode": "absolute",
-              "steps": [
-                {
-                  "color": "green",
-                  "value": null
-                },
-                {
-                  "color": "red",
-                  "value": 80
-                }
-              ]
-            }
-          },
-          "overrides": []
-        },
-        "gridPos": {
-          "h": 10,
-          "w": 24,
-          "x": 0,
-          "y": 0
-        },
-        "id": 2,
-        "options": {
-          "footer": {
-            "fields": "",
-            "reducer": [
-              "sum"
-            ],
-            "show": false
-          },
-          "showHeader": true
-        },
-        "pluginVersion": "8.5.2",
-        "targets": [
-          {
-            "datasource": {
-              "type": "postgres"
-            },
-            "format": "table",
-            "group": [],
-            "metricColumn": "language",
-            "rawQuery": true,
-            "rawSql": "SELECT\n  *\nFROM repositories_repositoryfile\nORDER BY id",
-            "refId": "A",
-            "select": [
-              [
-                {
-                  "params": [
-                    "value"
-                  ],
-                  "type": "column"
-                }
-              ]
-            ],
-            "table": "repositories_repositoryfile",
-            "timeColumn": "analyzed_time",
-            "timeColumnType": "timestamptz",
-            "where": [
-              {
-                "name": "$__timeFilter",
-                "params": [],
-                "type": "macro"
-              }
-            ]
-          }
-        ],
-        "title": "Metrics",
-        "type": "table"
-      },
-      {
-        "datasource": {
-          "type": "postgres"
-        },
-        "fieldConfig": {
-          "defaults": {
-            "color": {
-              "mode": "thresholds"
-            },
-            "custom": {
-              "align": "auto",
-              "displayMode": "auto",
-              "inspect": false
-            },
-            "mappings": [],
-            "thresholds": {
-              "mode": "absolute",
-              "steps": [
-                {
-                  "color": "green",
-                  "value": null
-                },
-                {
-                  "color": "red",
-                  "value": 80
-                }
-              ]
-            }
-          },
-          "overrides": []
-        },
-        "gridPos": {
-          "h": 9,
-          "w": 24,
-          "x": 0,
-          "y": 10
-        },
-        "id": 4,
-        "options": {
-          "footer": {
-            "fields": "",
-            "reducer": [
-              "sum"
-            ],
-            "show": false
-          },
-          "showHeader": true
-        },
-        "pluginVersion": "8.5.2",
-        "targets": [
-          {
-            "datasource": {
-              "type": "postgres"
-            },
-            "format": "table",
-            "group": [],
-            "metricColumn": "none",
-            "rawQuery": true,
-            "rawSql": "SELECT\n  *\nFROM repositories_repository\n",
-            "refId": "A",
-            "select": [
-              [
-                {
-                  "params": [
-                    "value"
-                  ],
-                  "type": "column"
-                }
-              ]
-            ],
-            "timeColumn": "time",
-            "where": [
-              {
-                "name": "$__timeFilter",
-                "params": [],
-                "type": "macro"
-              }
-            ]
-          }
-        ],
-        "title": "Repository Info",
-        "type": "table"
-      },
-      {
-        "datasource": {
-          "type": "postgres"
-        },
-        "fieldConfig": {
-          "defaults": {
-            "color": {
-              "mode": "thresholds"
-            },
-            "custom": {
-              "align": "auto",
-              "displayMode": "auto",
-              "inspect": false
-            },
-            "mappings": [],
-            "thresholds": {
-              "mode": "absolute",
-              "steps": [
-                {
-                  "color": "green",
-                  "value": null
-                },
-                {
-                  "color": "red",
-                  "value": 80
-                }
-              ]
-            }
-          },
-          "overrides": []
-        },
-        "gridPos": {
-          "h": 10,
-          "w": 24,
-          "x": 0,
-          "y": 0
-        },
-        "id": 5,
-        "options": {
-          "footer": {
-            "fields": "",
-            "reducer": [
-              "sum"
-            ],
-            "show": false
-          },
-          "showHeader": true
-        },
-        "pluginVersion": "8.5.2",
-        "targets": [
-          {
-            "datasource": {
-              "type": "postgres"
-            },
-            "format": "table",
-            "group": [],
-            "metricColumn": "language",
-            "rawQuery": true,
-            "rawSql": "SELECT\n  *\nFROM repositories_repositorycommitmessagesquality\n",
-            "refId": "A",
-            "select": [
-              [
-                {
-                  "params": [
-                    "value"
-                  ],
-                  "type": "column"
-                }
-              ]
-            ],
-            "table": "repositories_repositorycommitmessagesquality",
-            "timeColumn": "analyzed_time",
-            "timeColumnType": "timestamptz",
-            "where": [
-              {
-                "name": "$__timeFilter",
-                "params": [],
-                "type": "macro"
-              }
-            ]
-          }
-        ],
-        "title": "Commit Messages Quality for Repositories",
-        "type": "table"
-      },
-      {
-        "datasource": {
-          "type": "postgres"
-        },
-        "fieldConfig": {
-          "defaults": {
-            "color": {
-              "mode": "thresholds"
-            },
-            "custom": {
-              "align": "auto",
-              "displayMode": "auto",
-              "inspect": false
-            },
-            "mappings": [],
-            "thresholds": {
-              "mode": "absolute",
-              "steps": [
-                {
-                  "color": "green",
-                  "value": null
-                },
-                {
-                  "color": "red",
-                  "value": 80
-                }
-              ]
-            }
-          },
-          "overrides": []
-        },
-        "gridPos": {
-          "h": 10,
-          "w": 24,
-          "x": 0,
-          "y": 0
-        },
-        "id": 6,
-        "options": {
-          "footer": {
-            "fields": "",
-            "reducer": [
-              "sum"
-            ],
-            "show": false
-          },
-          "showHeader": true
-        },
-        "pluginVersion": "8.5.2",
-        "targets": [
-          {
-            "datasource": {
-              "type": "postgres"
-            },
-            "format": "table",
-            "group": [],
-            "metricColumn": "language",
-            "rawQuery": true,
-            "rawSql": "SELECT\n  *\nFROM repositories_commitmessage\nORDER BY id",
-            "refId": "A",
-            "select": [
-              [
-                {
-                  "params": [
-                    "value"
-                  ],
-                  "type": "column"
-                }
-              ]
-            ],
-            "table": "repositories_commitmessage",
-            "timeColumn": "analyzed_time",
-            "timeColumnType": "timestamptz",
-            "where": [
-              {
-                "name": "$__timeFilter",
-                "params": [],
-                "type": "macro"
-              }
-            ]
-          }
-        ],
-        "title": "Commit Messages metrics",
-        "type": "table"
+        "type": "dashboard"
       }
-    ],
-    "schemaVersion": 36,
-    "style": "dark",
-    "tags": [],
-    "templating": {
-      "list": []
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 7,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "PA942B37CCFAF5A81"
+          },
+          "rawQuery": true,
+          "rawSql": "SELECT analyzed_time AS time, SUM(COUNT(*)) OVER (ORDER BY analyzed_time) AS analyzed_repositories FROM repositories_repository WHERE analyzed = true GROUP BY analyzed_time ORDER BY analyzed_time",
+          "legendFormat": "Cumulative already Analyzed Count",
+          "refId": "A",
+          "format": "time_series"
+        },
+        {
+        "datasource": {
+          "type": "postgres",
+          "uid": "PA942B37CCFAF5A81"
+        },
+        "rawQuery": true,
+        "rawSql": "SELECT discovered_time AS time, SUM(COUNT(*)) OVER (ORDER BY discovered_time) AS all_discovered_repositories FROM repositories_repository GROUP BY discovered_time ORDER BY discovered_time",
+        "legendFormat": "Cumulative All discovered repository count",
+        "refId": "B",
+        "format": "time_series"
+        },
+        {
+        "datasource": {
+          "type": "postgres",
+          "uid": "PA942B37CCFAF5A81"
+        },
+        "rawQuery": true,
+        "rawSql": "SELECT fetch_time AS time, SUM(COUNT(*)) OVER (ORDER BY fetch_time) AS fetched_repositories FROM repositories_repository GROUP BY fetch_time ORDER BY fetch_time",
+        "legendFormat": "Cumulative All fetched repository count",
+        "refId": "C",
+        "format": "time_series"
+        }
+      ],
+      "xaxis": {
+        "show": true,
+        "mode": "discovered_time",
+        "range": {
+          "from": "now-1h",
+          "to": "now"
+        }
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": "Count"
+        },
+        {
+          "format": "short"
+        }
+      ],
+      "title": "Analyzed Repositories Count",
+      "type": "graph"
     },
-    "time": {
-    "from": "now",
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "PA942B37CCFAF5A81"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto",
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "footer": {
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "8.5.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "PA942B37CCFAF5A81"
+          },
+          "format": "table",
+          "group": [],
+          "metricColumn": "language",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  *\nFROM repositories_repositoryfile\nORDER BY id",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "repositories_repositoryfile",
+          "timeColumn": "analyzed_time",
+          "timeColumnType": "timestamptz",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Metrics",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "PA942B37CCFAF5A81"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto",
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 10
+      },
+      "id": 4,
+      "options": {
+        "footer": {
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "8.5.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "PA942B37CCFAF5A81"
+          },
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  *\nFROM repositories_repository\n",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Repository Info",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "PA942B37CCFAF5A81"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto",
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 5,
+      "options": {
+        "footer": {
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "8.5.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "PA942B37CCFAF5A81"
+          },
+          "format": "table",
+          "group": [],
+          "metricColumn": "language",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  *\nFROM repositories_repositorycommitmessagesquality\n",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "repositories_repositorycommitmessagesquality",
+          "timeColumn": "analyzed_time",
+          "timeColumnType": "timestamptz",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Commit Messages Quality for Repositories",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "PA942B37CCFAF5A81"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto",
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 6,
+      "options": {
+        "footer": {
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "8.5.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "PA942B37CCFAF5A81"
+          },
+          "format": "table",
+          "group": [],
+          "metricColumn": "language",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  *\nFROM repositories_commitmessage\nORDER BY id",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "repositories_commitmessage",
+          "timeColumn": "analyzed_time",
+          "timeColumnType": "timestamptz",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Commit Messages metrics",
+      "type": "table"
+    }
+  ],
+  "schemaVersion": 36,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-1y/y",
     "to": "now-1y/y"
-    },
-    "timepicker": {},
-    "timezone": "",
-    "title": "All Collected Metrics",
-    "version": 1,
-    "weekStart": ""
-  }
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "All Collected Metrics",
+  "uid": "qr5Lwn5Vk",
+  "version": 1,
+  "weekStart": ""
+}
