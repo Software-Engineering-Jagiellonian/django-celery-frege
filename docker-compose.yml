@@ -1,5 +1,3 @@
-version: "3.9"
-
 x-celery-healthcheck: &celery-healthcheck
   healthcheck:
     test: "celery -b redis://${DOCKER_REDIS_HOST}:${DOCKER_REDIS_PORT} inspect ping || exit 1"
