@@ -20,15 +20,8 @@ channels-redis==4.0.0
 djangochannelsrestframework==1.3.0
 django-health-check~=3.18.3
 psutil~=5.9.4
-nltk
+nltk==3.9.1
 textstat==0.7.3
-
-# Currently unused/useful for later:
-# django-redis
-
-# django-celery-beat==2.1.0
-# django-celery-results
-# websockets
 
 # Development tools:
 black~=22.3.0
@@ -36,7 +29,7 @@ isort~=5.10.1
 flake8~=4.0.1
 pre-commit~=2.18.1
 pyupgrade~=3.3.1
-gitlint
+gitlint==0.19.1
 
 # Testing
 pytest~=7.1.2
