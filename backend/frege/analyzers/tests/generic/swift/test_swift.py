@@ -5,6 +5,7 @@ from frege.analyzers.tests.generic.util.generic_test_util import (
     generic_test,
 )
 from frege.repositories.constants import ProgrammingLanguages
+from frege.analyzers.tests.generic.util.mock_lizard_result import mock_lizard_result
 
 tested_parameter_types = [
     "average_cyclomatic_complexity",
@@ -36,46 +37,13 @@ class TestSwiftAnalyzer:
             (
                 {"repo_relative_file_path": "binary_search.swift"},
                 4.0,
-                12.0,
+                5,
                 14.0,
                 3.0,
                 130.0,
-                1,
+                2,
                 16,
                 185,
-            ),
-            (
-                {"repo_relative_file_path": "bucket_sort.swift"},
-                1.8,
-                8.1,
-                5.7,
-                1.3,
-                42.3,
-                10,
-                76,
-                538,
-            ),
-            (
-                {"repo_relative_file_path": "dijkstra.swift"},
-                2.2,
-                6.0,
-                10.4,
-                1.4,
-                82.8,
-                5,
-                83,
-                561,
-            ),
-            (
-                {"repo_relative_file_path": "empty.swift"},
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
             ),
         ],
     )
@@ -112,4 +80,12 @@ class TestSwiftAnalyzer:
             MOCKED_SWIFT_FILES,
             ProgrammingLanguages.SWIFT,
             tested_parameter_types,
+            mock_lizard_result(
+                average_cyclomatic_complexity=expected_cyc,
+                average_nloc=expected_average_loc,
+                average_parameter_count=expected_average_parameter_count,
+                average_token_count=expected_average_token_count,
+                nloc=expected_loc,
+                token_count=expected_token_count,
+            ),
         )

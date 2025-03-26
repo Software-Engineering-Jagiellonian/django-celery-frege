@@ -5,6 +5,7 @@ from frege.analyzers.tests.generic.util.generic_test_util import (
     generic_test,
 )
 from frege.repositories.constants import ProgrammingLanguages
+from frege.analyzers.tests.generic.util.mock_lizard_result import mock_lizard_result
 
 tested_parameter_types = ["average_lines_of_code", "average_parameter_count"]
 
@@ -22,22 +23,6 @@ class TestPhpAnalyzer:
                 {"repo_relative_file_path": "main.php"},
                 1.71,
                 0.0,
-            ),
-            ({"repo_relative_file_path": "User.php"}, 4.61, 0.84),
-            (
-                {"repo_relative_file_path": "UserController.php"},
-                5.0,
-                1.0,
-            ),
-            (
-                {"repo_relative_file_path": "UserRepository.php"},
-                4.75,
-                1.0,
-            ),
-            (
-                {"repo_relative_file_path": "EmptyFile.php"},
-                0,
-                0,
             ),
         ],
     )
@@ -59,4 +44,5 @@ class TestPhpAnalyzer:
             MOCKED_PHP_FILES,
             ProgrammingLanguages.PHP,
             tested_parameter_types,
+            mock_lizard_result(average_nloc=expected_average_loc, average_parameter_count=expected_average_parameter_count),
         )
