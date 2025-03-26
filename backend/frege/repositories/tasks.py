@@ -98,9 +98,14 @@ def _clone_repo(repo: Repository, local_path: Path) -> Optional[git.Repo]:
             )
             return repo_obj
         except git.exc.NoSuchPathError:
+            # Mark the repository as failed if it doesn't exist.
+            repo.clone_failed = True
+            repo.save(update_fields=["clone_failed"])
+
             logger.error(
-                f"Tried fetching {repo.git_url} from disk, but repository does not exist."
+                f"Tried fetching {repo.git_url} from disk, but repository does not exist. Marking as failed."
             )
+            
             return None
 
 def _check_download_folder_size(depth=0):
@@ -221,6 +226,11 @@ def process_repo_task(repo_pk):
     
     logger.info(f"Processing repository {repo.git_url}")
     
+    if repo.clone_failed:
+        logger.error(f"Repository {repo.git_url} marked as failed. Skipping.")
+
+        return
+
     _remove_database_entries(repo)
 
     repo_local_path = get_repo_local_path(repo)
