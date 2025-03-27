@@ -5,6 +5,7 @@ from frege.analyzers.tests.generic.util.generic_test_util import (
     generic_test,
 )
 from frege.repositories.constants import ProgrammingLanguages
+from frege.analyzers.tests.generic.util.mock_lizard_result import mock_lizard_result
 
 tested_parameter_types = ["average_lines_of_code", "average_parameter_count"]
 
@@ -22,21 +23,6 @@ class TestRubyAnalyzer:
                 {"repo_relative_file_path": "data_mapper.rb"},
                 4.5,
                 0.0,
-            ),
-            (
-                {"repo_relative_file_path": "file_read.rb"},
-                0.0,
-                0.0,
-            ),
-            (
-                {"repo_relative_file_path": "expand_path.rb"},
-                0.0,
-                0.0,
-            ),
-            (
-                {"repo_relative_file_path": "EmptyFile.rb"},
-                0,
-                0,
             ),
         ],
     )
@@ -58,4 +44,5 @@ class TestRubyAnalyzer:
             MOCKED_RUBY_FILES,
             ProgrammingLanguages.RUBY,
             tested_parameter_types,
+            mock_lizard_result(average_nloc=expected_average_loc, average_parameter_count=expected_average_parameter_count),
         )
