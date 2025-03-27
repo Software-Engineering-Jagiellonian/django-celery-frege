@@ -54,6 +54,8 @@ class Repository(models.Model):
         help_text=_("The time when the repository was analyzed."),
     )
 
+    analysis_failed = models.BooleanField(default=False)
+
     def __str__(self):
         return self.name
 
