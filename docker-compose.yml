@@ -25,7 +25,7 @@ x-backend: &backend
     - frege_tmp:${DJANGO_DOWNLOAD_PATH}
   networks:
     - frege-main
-  profiles: [ "dev", "local-be-dev" ]
+  profiles: ["dev", "local-be-dev"]
   restart: on-failure
   env_file:
     - .env
@@ -44,7 +44,7 @@ services:
       - "${DOCKER_REDIS_PORT}"
     ports:
       - "${DOCKER_REDIS_PORT}:${DOCKER_REDIS_PORT}"
-    profiles: [ "dev", "prod", "local-be-dev" ]
+    profiles: ["dev", "prod", "local-be-dev"]
     restart: on-failure
     healthcheck:
       test: "redis-cli ping || exit 1"
@@ -89,7 +89,7 @@ services:
       - ${DOCKER_PROMETHEUS_PORT}
     networks:
       - frege-main
-    profiles: [ "dev", "prod" ]
+    profiles: ["dev", "prod"]
     restart: on-failure
     healthcheck:
       test: "wget -nv -t1 --spider http://localhost:${DOCKER_PROMETHEUS_PORT} || exit 1"
@@ -109,7 +109,7 @@ services:
     # command: -config.file=/etc/loki/local-config.yaml
     networks:
       - frege-main
-    profiles: [ "dev", "prod" ]
+    profiles: ["dev", "prod"]
 
   frege-promtail:
     image: grafana/promtail:2.6.1
@@ -122,7 +122,7 @@ services:
       - /var/lib/docker/containers:/var/lib/docker/containers
     networks:
       - frege-main
-    profiles: [ "dev", "prod" ]
+    profiles: ["dev", "prod"]
 
   # === [Dev] ===
 
@@ -150,7 +150,7 @@ services:
       - frege-celery-downloads-worker-dev
       - frege-celery-crawl-worker-dev
       - frege-redis
-    profiles: [ "dev" ]
+    profiles: ["dev"]
     healthcheck:
       test: "curl -f http://localhost:${DOCKER_FLOWER_PORT} || exit 1"
       interval: 10s
@@ -171,21 +171,21 @@ services:
     container_name: frege-celery-crawl-worker-dev
     ports: []
     command: celery --app frege worker --loglevel=${CELERY_LOG_LEVEL_DEV} --queues crawl --concurrency=${CELERY_WORKER_CRAWL_CONCURRENCY} --hostname worker_crawl
-    profiles: [ "dev", "local-be-dev" ]
+    profiles: ["dev", "local-be-dev"]
 
   frege-celery-downloads-worker-dev:
     <<: [*backend, *celery-healthcheck]
     container_name: frege-celery-downloads-worker-dev
     ports: []
     command: celery --app frege worker --loglevel=${CELERY_LOG_LEVEL_DEV} --queues downloads --concurrency=${CELERY_WORKER_DOWNLOADS_CONCURRENCY} --hostname worker_downloads
-    profiles: [ "dev", "local-be-dev" ]
+    profiles: ["dev", "local-be-dev"]
 
   frege-celery-worker-dev:
     <<: [*backend, *celery-healthcheck]
     container_name: frege-celery-worker-dev
     ports: []
     command: celery --app frege worker --loglevel=${CELERY_LOG_LEVEL_DEV} --queues celery --concurrency=${CELERY_WORKER_BASE_CONCURRENCY} --hostname worker_celery
-    profiles: [ "dev", "local-be-dev" ]
+    profiles: ["dev", "local-be-dev"]
 
   frege-grafana-dev: &grafana
     image: grafana/grafana:8.5.2
@@ -247,7 +247,7 @@ services:
       - frege-grafana-dev
     networks:
       - frege-main
-    profiles: [ "dev" ]
+    profiles: ["dev"]
     restart: on-failure
     healthcheck:
       test: "wget -nv -t1 --spider http://localhost:${DOCKER_FRONTEND_PORT} || exit 1"
@@ -256,17 +256,17 @@ services:
       retries: 2
       start_period: 40s
 
-  fregepoc-front-dev: &frontend
-    container_name: fregepoc-front-dev
-    hostname: fregepoc-front-dev
+  frege-front-dev: &frontend
+    container_name: frege-front-dev
+    hostname: frege-front-dev
     build:
       context: front
       dockerfile: Dockerfile
     environment:
       - PORT=${DOCKER_NEW_FRONTEND_PORT}
-      - REACT_APP_DOCKER_GRAFANA_HOST=fregepoc-grafana-dev
+      - REACT_APP_DOCKER_GRAFANA_HOST=frege-grafana-dev
       - REACT_APP_DOCKER_GRAFANA_PORT=3000
-      - DOCKER_FLOWER_HOST=fregepoc-flower-dev
+      - DOCKER_FLOWER_HOST=frege-flower-dev
       - DOCKER_FLOWER_PORT=5555
       - DJANGO_SUPERUSER_USERNAME=django_admin
       - DJANGO_SUPERUSER_PASSWORD=pass
@@ -279,9 +279,9 @@ services:
     ports:
       - ${DOCKER_NEW_FRONTEND_PORT}:${DOCKER_NEW_FRONTEND_PORT}
     depends_on:
-      - fregepoc-grafana-dev
+      - frege-grafana-dev
     networks:
-      - fregepoc-main
+      - frege-main
     profiles: ["dev"]
     restart: on-failure
     healthcheck:
@@ -311,7 +311,7 @@ services:
       - LETSENCRYPT_HOST=${FRONTEND_HOSTNAME}
     depends_on:
       - frege-grafana-prod
-    profiles: [ "prod" ]
+    profiles: ["prod"]
 
   frege-backend-prod:
     <<: *backend
@@ -324,7 +324,7 @@ services:
     volumes:
       - frege_tmp:${DJANGO_DOWNLOAD_PATH}
       - frege_static_files:/app/static
-    profiles: [ "prod" ]
+    profiles: ["prod"]
     ports: []
     expose:
       - ${DOCKER_BACKEND_PORT}
@@ -372,7 +372,7 @@ services:
       - frege-celery-downloads-worker-prod
       - frege-celery-crawl-worker-prod
       - frege-redis
-    profiles: [ "prod" ]
+    profiles: ["prod"]
     healthcheck:
       test: "curl -f http://localhost:${DOCKER_FLOWER_PORT} || exit 1"
       interval: 10s
@@ -384,21 +384,21 @@ services:
     container_name: frege-celery-crawl-worker-prod
     ports: []
     command: celery --app frege worker --queues crawl --loglevel=${CELERY_LOG_LEVEL_PROD} --concurrency=${CELERY_WORKER_CRAWL_CONCURRENCY} --hostname worker_crawl
-    profiles: [ "prod" ]
+    profiles: ["prod"]
 
   frege-celery-downloads-worker-prod:
     <<: [*backend, *celery-healthcheck]
     container_name: frege-celery-downloads-worker-prod
     ports: []
     command: celery --app frege worker --queues downloads --loglevel=${CELERY_LOG_LEVEL_PROD} --concurrency=${CELERY_WORKER_DOWNLOADS_CONCURRENCY} --hostname worker_downloads
-    profiles: [ "prod" ]
+    profiles: ["prod"]
 
   frege-celery-worker-prod:
     <<: [*backend, *celery-healthcheck]
     container_name: frege-celery-worker-prod
     ports: []
     command: celery --app frege worker --queues celery --loglevel=${CELERY_LOG_LEVEL_PROD} --concurrency=${CELERY_WORKER_BASE_CONCURRENCY} --hostname worker_celery
-    profiles: [ "prod" ]
+    profiles: ["prod"]
 
   nginx-proxy:
     image: nginx
@@ -460,7 +460,7 @@ services:
     environment:
       - DEFAULT_EMAIL=${LETSENCRYPT_EMAIL}
       - NGINX_PROXY_CONTAINER=frege-proxy
-    profiles: [ "tls" ]
+    profiles: ["tls"]
 
 networks:
   frege-main:
