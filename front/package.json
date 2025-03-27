@@ -6,20 +6,28 @@
     "dev": "next dev -p 3040",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prettier-format": "prettier --config .prettierrc \"{**/*,*}.{js,jsx,ts,tsx,css,md,json}\" --write"
   },
   "dependencies": {
+    "axios": "^1.8.4",
+    "bootstrap": "^5.3.3",
+    "next": "15.2.2",
     "react": "^19.0.0",
+    "react-bootstrap": "^2.10.9",
+    "react-bootstrap-icons": "^1.11.5",
     "react-dom": "^19.0.0",
-    "next": "15.2.2"
+    "react-grid-layout": "^1.5.1",
+    "sass": "^1.86.0"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@eslint/eslintrc": "^3",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.2.2",
-    "@eslint/eslintrc": "^3"
+    "prettier": "^3.5.3",
+    "typescript": "^5"
   }
 }

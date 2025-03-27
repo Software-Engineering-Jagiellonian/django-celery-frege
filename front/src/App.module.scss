@@ -1,0 +1,45 @@
+@import "colors.module";
+.App {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  background: $background-color;
+  color: $button-font-color;
+}
+
+.ContentNav {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.sideMenu {
+  flex: 0 0 200px;
+}
+
+.mainContent {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+    border-radius: 3px;
+    background: $background-color;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $main-borders-color;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: $frege-color;
+  }
+}
+
+.hidden {
+  display: none !important;
+}
+
