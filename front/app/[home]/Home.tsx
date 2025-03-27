@@ -1,7 +1,8 @@
-import styles from './[home]/home.module.scss';
-import ContributorsList from '@/src/components/autorsList/ContributorsList';
+import React from 'react';
+import ContributorsList from '../../src/components/autorsList/ContributorsList';
+import styles from './home.module.scss';
 
-export default function Home() {
+function Home() {
   return (
     <div>
       <div className={styles.coordinators}>
@@ -17,3 +18,4 @@ export default function Home() {
     </div>
   );
 }
+export default Home;
