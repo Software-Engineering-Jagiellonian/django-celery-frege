@@ -3,8 +3,7 @@
 import datetime
 
 from django.db import migrations, models
-from django.utils.timezone import utc
-
+from datetime import timezone
 
 class Migration(migrations.Migration):
 
@@ -41,9 +40,7 @@ class Migration(migrations.Migration):
                 (
                     "current_date",
                     models.DateTimeField(
-                        default=datetime.datetime(
-                            1970, 1, 1, 0, 0, tzinfo=utc
-                        ),
+                        default=datetime.datetime(1970, 1, 1, 0, 0),
                         help_text="The creation date of repository from which to start searching. Please note that Bitbucket API paginates repos by creation date, so the dates are used to iterate over repositories.",
                         verbose_name="current date",
                     ),
