@@ -441,6 +441,7 @@ def _reschedule_unanalyzed_repos():
             logger.info(f"Rescheduling {unanalyzed_repos.count()} unanalyzed repositories")
             for repo in unanalyzed_repos:
                 repo.analysis_failed = False
+                repo.save(update_fields=["analysis_failed"])
                 process_repo_task.apply_async(args=(repo.pk,))
         else:
             logger.info("No repositories found")
