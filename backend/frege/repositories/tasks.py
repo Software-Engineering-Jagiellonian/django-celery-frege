@@ -84,29 +84,20 @@ def _finalize_repo_analysis(repo_obj):
 
 def _clone_repo(repo: Repository, local_path: Path) -> Optional[git.Repo]:
     _check_download_folder_size()
+    
     try:
         repo_obj = git.Repo.clone_from(repo.git_url, local_path)
         repo.fetch_time = timezone.now()
         repo.save(update_fields=["fetch_time"])
         logger.info(f"Repository {repo.git_url} cloned")
+        
         return repo_obj
-    except git.exc.GitCommandError:
-        try:
-            repo_obj = git.Repo(local_path)
-            logger.info(
-                f"Repo {repo.git_url} already exists, fetched from disk"
-            )
-            return repo_obj
-        except git.exc.NoSuchPathError:
-            # Mark the repository as failed if it doesn't exist.
-            repo.analysis_failed = True
-            repo.save(update_fields=["analysis_failed"])
+    except Exception as e:
+        logger.error(f"Unexpected error while processing repository {repo.git_url}: {e}")
+        repo.analysis_failed = True
+        repo.save(update_fields=["analysis_failed"])
 
-            logger.error(
-                f"Tried fetching {repo.git_url} from disk, but repository does not exist. Marking as failed."
-            )
-
-            return None
+        return None
 
 def _check_download_folder_size(depth=0):
     """
