@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='repository',
-            name='clone_failed',
+            name='analysis_failed',
             field=models.BooleanField(default=False),
         ),
     ]

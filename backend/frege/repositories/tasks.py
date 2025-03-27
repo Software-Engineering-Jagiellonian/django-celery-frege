@@ -99,8 +99,8 @@ def _clone_repo(repo: Repository, local_path: Path) -> Optional[git.Repo]:
             return repo_obj
         except git.exc.NoSuchPathError:
             # Mark the repository as failed if it doesn't exist.
-            repo.clone_failed = True
-            repo.save(update_fields=["clone_failed"])
+            repo.analysis_failed = True
+            repo.save(update_fields=["analysis_failed"])
 
             logger.error(
                 f"Tried fetching {repo.git_url} from disk, but repository does not exist. Marking as failed."
@@ -226,7 +226,7 @@ def process_repo_task(repo_pk):
     
     logger.info(f"Processing repository {repo.git_url}")
     
-    if repo.clone_failed:
+    if repo.analysis_failed:
         logger.error(f"Repository {repo.git_url} marked as failed. Skipping.")
 
         return
@@ -242,7 +242,7 @@ def process_repo_task(repo_pk):
     logger.info(f"Fetching repository via url: {repo.git_url}")
     repo_obj = _clone_repo(repo, repo_local_path)
     if repo_obj is None:
-        if not repo.clone_failed:
+        if not repo.analysis_failed:
             error_message = f"Failed to obtain repository {repo.git_url}. This has unknown consequences."
         else:
             error_message = f"Repository {repo.git_url} marked as failed. Skipping."
