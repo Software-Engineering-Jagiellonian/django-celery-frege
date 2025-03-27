@@ -90,13 +90,12 @@ def _clone_repo(repo: Repository, local_path: Path) -> Optional[git.Repo]:
         repo.fetch_time = timezone.now()
         repo.save(update_fields=["fetch_time"])
         logger.info(f"Repository {repo.git_url} cloned")
-        
         return repo_obj
     except Exception as e:
         logger.error(f"Unexpected error while processing repository {repo.git_url}: {e}")
         repo.analysis_failed = True
         repo.save(update_fields=["analysis_failed"])
-
+        
         return None
 
 def _check_download_folder_size(depth=0):
@@ -195,7 +194,7 @@ def crawl_repos_task(indexer_class_name):
     logger.info(f"Scheduling batch of {len(batch)} repositories")
     for repo in batch:
         repo.refresh_from_db()
-        if not repo.analyzed:
+        if not repo.analyzed and not repo.analysis_failed:
             process_repo_task.apply_async(args=(repo.pk,))
 
 
@@ -216,11 +215,6 @@ def process_repo_task(repo_pk):
         return
     
     logger.info(f"Processing repository {repo.git_url}")
-    
-    if repo.analysis_failed:
-        logger.error(f"Repository {repo.git_url} marked as failed. Skipping.")
-
-        return
 
     _remove_database_entries(repo)
 
@@ -446,6 +440,7 @@ def _reschedule_unanalyzed_repos():
             unanalyzed_repos = Repository.objects.filter(analyzed=False)
             logger.info(f"Rescheduling {unanalyzed_repos.count()} unanalyzed repositories")
             for repo in unanalyzed_repos:
+                repo.analysis_failed = False
                 process_repo_task.apply_async(args=(repo.pk,))
         else:
             logger.info("No repositories found")
