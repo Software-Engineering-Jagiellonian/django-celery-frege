@@ -105,7 +105,7 @@ def _clone_repo(repo: Repository, local_path: Path) -> Optional[git.Repo]:
             logger.error(
                 f"Tried fetching {repo.git_url} from disk, but repository does not exist. Marking as failed."
             )
-            
+
             return None
 
 def _check_download_folder_size(depth=0):
@@ -242,7 +242,13 @@ def process_repo_task(repo_pk):
     logger.info(f"Fetching repository via url: {repo.git_url}")
     repo_obj = _clone_repo(repo, repo_local_path)
     if repo_obj is None:
-        logger.error(f"Failed to obtain repository {repo.git_url}. This has unknown consequences.")
+        if not repo.clone_failed:
+            error_message = f"Failed to obtain repository {repo.git_url}. This has unknown consequences."
+        else:
+            error_message = f"Repository {repo.git_url} marked as failed. Skipping."
+            
+        logger.error(error_message)
+
         return
 
     with closing(repo_obj) as cloned_repo:
