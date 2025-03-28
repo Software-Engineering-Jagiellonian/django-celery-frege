@@ -1,0 +1,139 @@
+@import '../../../colors.module';
+
+.widgetsHub {
+  width: 100%;
+  display: flex;
+  align-items: end;
+  flex-direction: column;
+}
+
+.widgetsHubGrid {
+  width: 100%;
+  min-height: 400px;
+  background-color: $hub-color;
+  border: $main-borders-color 1px solid;
+  border-radius: 5px;
+
+  path {
+    color: $hub-color;
+  }
+}
+
+.widget {
+  background: $widget-color;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  align-content: space-around;
+  border-radius: 5px;
+  justify-content: space-between;
+
+  &:hover{
+    .dragHeader{
+      visibility: visible;
+    }
+    .resizeHandler {
+      visibility: visible;
+    }
+    .unpinButton {
+      visibility: visible;
+    }
+  }
+
+  &:active{
+    .dragHeader{
+      visibility: visible;
+    }
+    .resizeHandler {
+      visibility: visible;
+    }
+    .unpinButton {
+      visibility: visible;
+    }
+  }
+}
+
+.dragHeader {
+  position: absolute;
+  background: $frege-color;
+  width: 20%;
+  height: 25px;
+  visibility: hidden;
+  display: flex;
+  justify-items: center;
+  justify-content: space-around;
+  align-items: center;
+  border-radius: 2px;
+  min-width: 30px;
+}
+
+.unpinButton {
+  background: $frege-color;
+  width: 25px;
+  height: 25px;
+  display: flex;
+  justify-items: center;
+  justify-content: space-around;
+  align-items: center;
+  border-radius: 2px;
+  align-self: end;
+  justify-self: end;
+  visibility: hidden;
+}
+
+.resizeHandler {
+  background: $frege-color;
+  width: 25px;
+  height: 25px;
+  display: flex;
+  justify-items: center;
+  justify-content: space-around;
+  align-items: center;
+  border-radius: 2px;
+  align-self: end;
+  justify-self: end;
+  visibility: hidden;
+
+  svg {
+    transform: rotate(90deg);
+  }
+}
+
+.actions {
+  display: flex;
+  width: 130px;
+  justify-content: space-between;
+  justify-items: stretch;
+  margin-bottom: 15px;
+}
+
+.widgetContent {
+  height: 100%;
+  align-self: stretch;
+  margin: 30px 20px 5px 20px;
+  display: flex;
+  justify-content: stretch;
+  justify-items: stretch;
+  align-content: stretch;
+  align-items: stretch;
+}
+
+.pinningListItem{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 60px;
+  border: $main-color 1px solid;
+  border-radius: 7px;
+  padding: 0 10px;
+  margin: 3px 0;
+
+  .listStyledButton{
+    width: 80px;
+    height: 40px;
+  }
+}
+
+.graphFrame {
+  pointer-events: none;
+}
