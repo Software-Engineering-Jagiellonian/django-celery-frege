@@ -74,8 +74,6 @@ The data flow is mostly similar to the one employed by the current solution, wit
 
 [Docker] (https://www.docker.com/) is a containerization platform that enables applications to run in isolated environments. It simplifies dependency management and deployment.
 
-[RabbitMQ] (https://www.rabbitmq.com/) is a robust message broker that enables efficient asynchronous task processing.
-
 [Gunicorn] (https://gunicorn.org/) is a popular WSGI server for running Django applications in a production environment. It is lightweight, easy to configure, and improves performance.
 
 [NGINX] (https://www.f5.com/go/product/welcome-to-nginx) is an essential component. It is a high-performance web server and reverse proxy often used with Django.
