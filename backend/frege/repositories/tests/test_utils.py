@@ -30,10 +30,10 @@ class GetRepoFilesTests(TestCase):
         ]
 
         with patch("frege.repositories.constants.get_languages_by_extension") as mock_lang:
-            mock_lang.side_effect = lambda ext: (
-                [ProgrammingLanguages.PYTHON] if ext == ".py" else
-                [ProgrammingLanguages.GOLANG] if ext == ".go" else []
-            )
+            mock_lang.side_effect = lambda ext: {
+                ".py": [ProgrammingLanguages.PYTHON],
+                ".go": [ProgrammingLanguages.GOLANG]
+            }.get(ext, [])
 
             result = list(get_repo_files(mock_repo))
             self.assertEqual(result, expected_output)
