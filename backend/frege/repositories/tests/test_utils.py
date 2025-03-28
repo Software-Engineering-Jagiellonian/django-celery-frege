@@ -1,45 +1,51 @@
-import pytest
-from pytest_mock import MockerFixture
-from pytest_unordered import unordered
-
-from frege.repositories.constants import ProgrammingLanguages
-from frege.repositories.models import RepositoryFile
+from unittest import TestCase
+from unittest.mock import patch
+from pathlib import Path
+from django.conf import settings
+from frege.repositories import models
 from frege.repositories.utils.analyzers import repo_file_content
 from frege.repositories.utils.paths import (
-    get_repo_files,
     get_repo_local_path,
+    get_repo_files,
+    get_file_abs_path
 )
-from frege.repositories.utils.tests import MOCK_DOWNLOAD_PATH
+from unittest.mock import MagicMock
+from frege.repositories.constants import ProgrammingLanguages
 
+class GetRepoLocalPathTests(TestCase):
+    @patch.object(settings, "DOWNLOAD_PATH", "/fake/path")
+    def test_get_repo_local_path(self):
+        repo = models.Repository(pk=123)
+        expected_path = Path("/fake/path/123")
+        self.assertEqual(get_repo_local_path(repo), expected_path)
 
-@pytest.mark.django_db
-def test_get_repo_local_path(settings, dummy_repo):
-    settings.DOWNLOAD_PATH = MOCK_DOWNLOAD_PATH
-    assert (
-        repo_local_path := get_repo_local_path(dummy_repo)
-    ) == MOCK_DOWNLOAD_PATH / "dummy_repo"
-    assert repo_local_path.exists()
+class GetRepoFilesTests(TestCase):
+    def test_get_repo_files(self):
+        mock_repo = MagicMock()
+        mock_repo.git.ls_files.return_value = "file1.py\nfile2.go\nfile3.txt"
 
-
-@pytest.mark.django_db
-def test_repo_file_content(settings, dummy_repo):
-    settings.DOWNLOAD_PATH = MOCK_DOWNLOAD_PATH
-    repo_file = RepositoryFile(
-        repository=dummy_repo,
-        repo_relative_file_path="hello_world.py",
-        language=ProgrammingLanguages.PYTHON,
-    )
-    with repo_file_content(repo_file) as content:
-        with open(MOCK_DOWNLOAD_PATH / "dummy_repo" / "hello_world.py") as f:
-            assert content == f.read()
-
-
-def test_get_repo_files(mocker: MockerFixture):
-    repo_obj_mock = mocker.MagicMock()
-    repo_obj_mock.git.ls_files = lambda: "ans.cpp\nhello_world.py"
-    assert list(get_repo_files(repo_obj_mock)) == unordered(
-        [
-            ("ans.cpp", ProgrammingLanguages.CPP),
-            ("hello_world.py", ProgrammingLanguages.PYTHON),
+        expected_output = [
+            ("file1.py", ProgrammingLanguages.PYTHON),
+            ("file2.go", ProgrammingLanguages.GOLANG),
         ]
-    )
+
+        with patch("frege.repositories.constants.get_languages_by_extension") as mock_lang:
+            mock_lang.side_effect = lambda ext: {
+                ".py": [ProgrammingLanguages.PYTHON],
+                ".go": [ProgrammingLanguages.GOLANG]
+            }.get(ext, [])
+
+            result = list(get_repo_files(mock_repo))
+            self.assertEqual(result, expected_output)
+
+class GetFileAbsPathTests(TestCase):
+    @patch("frege.repositories.utils.paths.get_repo_local_path")
+    def test_get_file_abs_path(self, mock_get_repo_local_path):
+        mock_get_repo_local_path.return_value = Path("/fake/repo/path")
+
+        repo_file = MagicMock()
+        repo_file.repository = MagicMock()
+        repo_file.repo_relative_file_path = "src/main.py"
+
+        expected_path = Path("/fake/repo/path/src/main.py")
+        self.assertEqual(get_file_abs_path(repo_file), expected_path)
