@@ -59,7 +59,7 @@ cp .env.template .env
 ```
 
 2. Setting up GitLab Token
-- Get the token from [the following instruction](https://docs.gitlab.com/user/profile/personal_access_tokens/).
+- Get the token from [the following instructions](https://docs.gitlab.com/user/profile/personal_access_tokens/).
 - Add the following line to the `.env` file:
 ```
 GITLAB_TOKEN=your_token_here
