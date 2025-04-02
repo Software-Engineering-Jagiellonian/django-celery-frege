@@ -70,7 +70,7 @@ class TestProcessRepoTask:
         assert dummy_repo.files.count() == 0
 
     def test_process_repo_task_download_directory_full(
-        self, mocker: MockerFixture, dummy_repo
+    self, mocker: MockerFixture, dummy_repo
     ):
         clone_from_mock = mocker.patch(
             "git.repo.base.Repo.clone_from", side_effect=DownloadDirectoryFullException("Download directory full")
