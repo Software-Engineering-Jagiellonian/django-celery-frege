@@ -58,7 +58,14 @@ Follow these simple instruction to set up a development environment:
 cp .env.template .env
 ```
 
-2. Build Docker container with following command:
+2. Setting up GitLab Token
+- Get the token from [the following instruction](https://docs.gitlab.com/user/profile/personal_access_tokens/).
+- Add the following line to the `.env` file:
+```
+GITLAB_TOKEN=your_token_here
+```
+
+3. Build Docker container with following command:
 > :warning: On older versions of Docker, you may need to substitute docker compose with docker-compose.
 
 ```
