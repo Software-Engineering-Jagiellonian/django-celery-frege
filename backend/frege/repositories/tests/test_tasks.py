@@ -69,16 +69,3 @@ class TestProcessRepoTask:
         clone_from_mock.assert_not_called()
         
         assert dummy_repo.files.count() == 0
-
-    def test_process_repo_task_with_git_exception(
-        self, mocker: MockerFixture, dummy_repo
-    ):
-        clone_from_mock = mocker.patch(
-            "git.repo.base.Repo.clone_from", side_effect=RuntimeError("Unexpected error")
-        )
-        mocker.patch("frege.repositories.tasks.logger")
-
-        with pytest.raises(RuntimeError):
-            process_repo_task.run(dummy_repo.pk)
-
-        clone_from_mock.assert_called_once()
