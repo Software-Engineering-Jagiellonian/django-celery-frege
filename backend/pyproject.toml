@@ -12,7 +12,5 @@ force-exclude = '/(migrations|\.direnv|\.eggs|\.git|\.hg|\.mypy_cache|\.nox|\.to
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "frege.settings"
 python_files = "tests.py test_*.py *_tests.py"
-pythonpath = [
-  ".", "frege",
-]
-filterwarnings = ignore::DeprecationWarning
+pythonpath = ["." , "frege"]
+filterwarnings = "ignore::DeprecationWarning"
