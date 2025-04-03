@@ -349,12 +349,12 @@ def analyze_file_task(repo_file_pk):
         for analyzer in analyzers:
             try:
                 metrics_dict |= analyzer.analyze(repo_file)
-            except Exception:
+            except Exception as e:
                 # This should use more specific exception but some analyzer is
                 # raising undocumented exceptions
                 logger.error(
                     f"Failed to analyze {repo_file.repository.git_url} for "
-                    f"analyzer {analyzer}"
+                    f"analyzer {analyzer}, error: {e}"
                 )
 
         with transaction.atomic():
