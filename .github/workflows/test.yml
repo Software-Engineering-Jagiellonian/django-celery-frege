@@ -27,7 +27,9 @@ jobs:
         run: docker compose exec -T frege-backend-dev pytest
       - name: Run consumers test
         run: |
-          for i in {1..300}; do
-            echo "Running test iteration $i"
+          iteration=1
+          while true; do
+            echo "Running test iteration $iteration"
             docker compose exec -T frege-backend-dev pytest frege/repositories/tests/test_consumers.py --showlocals
+            iteration=$((iteration + 1))
           done
