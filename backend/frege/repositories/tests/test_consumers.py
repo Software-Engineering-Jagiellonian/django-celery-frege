@@ -57,32 +57,14 @@ class TestLiveStatusConsumer:
         assert await communicator.receive_nothing()
         await communicator.disconnect()
 
-    @pytest.mark.asyncio
     async def test_subscribe_to_repository_file_activity(self, api_key):
-        communicator = WebsocketCommunicator(LiveStatusConsumer.as_asgi(), "/ws/")
-        connected, subprotocol = await communicator.connect()
-        assert connected
-        
-        await communicator.send_json_to({
-            "api_key": api_key, 
-            "action": "subscribe_to_repository_file_activity", 
-            "request_id": 1
-        })
-        
-        response = await communicator.receive_json_from(timeout=5)
-        assert response["response_status"] == 200
-        assert response["request_id"] == 1
-        assert response["action"] == "repository_file/create"
-        
-        file = await self._create_test_repository_file()
-        expected_data = RepositoryFileSerializer(file).data
-        actual_data = response["data"]
-        assert expected_data == actual_data
-
-        assert await communicator.receive_nothing()
-
-        await communicator.disconnect()
-
+        await self._test_event_api(
+            api_key=api_key,
+            request_action="subscribe_to_repository_file_activity",
+            create_fn=self._create_test_repository_file,
+            response_action="repository_file/create",
+            serializer=RepositoryFileSerializer,
+        )
 
     async def test_subscribe_to_repository_activity(self, api_key):
         await self._test_event_api(
