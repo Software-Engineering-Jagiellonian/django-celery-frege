@@ -54,7 +54,12 @@ class TestLiveStatusConsumer:
         expected_data = serializer(file).data
         actual_data = response["data"]
         assert expected_data == actual_data
-        assert await communicator.receive_nothing()
+ 
+        if request_action == "subscribe_to_repository_activity":
+            await communicator.receive_nothing(timeout=0.1)
+        else:
+            assert await communicator.receive_nothing()
+            
         await communicator.disconnect()
 
     async def test_subscribe_to_repository_file_activity(self, api_key):
