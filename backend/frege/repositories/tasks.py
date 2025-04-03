@@ -352,10 +352,15 @@ def analyze_file_task(repo_file_pk):
             except Exception as e:
                 # This should use more specific exception but some analyzer is
                 # raising undocumented exceptions
+                repo_file.repository.analysis_failed = True
+                repo_file.repository.save(update_fields=["analysis_failed"])
+
                 logger.error(
                     f"Failed to analyze {repo_file.repository.git_url} for "
                     f"analyzer {analyzer}, error: {e}"
                 )
+
+                return
 
         with transaction.atomic():
             repo_file.metrics = metrics_dict
@@ -385,8 +390,9 @@ def analyze_file_task(repo_file_pk):
 
         logger.info(f"repo_file {repo_file.repository.git_url} analyzed")
     except Exception as error:
-        repo_file.analyzed = True
-        repo_file.save(update_fields=["analyzed"])
+        repo_file.repository.analysis_failed = True
+        repo_file.repository.save(update_fields=["analysis_failed"])
+        
         logger.error(
             f"Can't analyze file {repo_file.repo_relative_file_path} for"
             f" the repository: {repo_file.repository.name}"
