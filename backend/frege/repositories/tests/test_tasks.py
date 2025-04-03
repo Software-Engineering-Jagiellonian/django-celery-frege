@@ -1,5 +1,6 @@
 from unittest.mock import call
 
+import git
 import pytest
 from pytest_mock import MockerFixture
 
@@ -69,15 +70,15 @@ class TestProcessRepoTask:
         
         assert dummy_repo.files.count() == 0
 
-    def test_process_repo_task_download_directory_full(
+    def test_process_repo_task_with_git_exception(
     self, mocker: MockerFixture, dummy_repo
     ):
         clone_from_mock = mocker.patch(
-            "git.repo.base.Repo.clone_from", side_effect=DownloadDirectoryFullException("Download directory full")
+            "git.repo.base.Repo.clone_from", side_effect=git.exc.GitCommandError("clone", "fatal: not enough space")
         )
         mocker.patch("frege.repositories.tasks.logger")
         
-        with pytest.raises(DownloadDirectoryFullException):
+        with pytest.raises(git.exc.GitCommandError):
             process_repo_task.run(dummy_repo.pk)
         
         clone_from_mock.assert_called_once()
