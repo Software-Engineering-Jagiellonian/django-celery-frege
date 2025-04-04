@@ -13,5 +13,3 @@ env/
 # pyenv
 .python-version
 .DS_Store
-
-!run_test_consumer_until_fail.sh
