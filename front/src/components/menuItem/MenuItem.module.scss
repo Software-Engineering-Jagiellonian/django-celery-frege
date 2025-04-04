@@ -1,0 +1,93 @@
+@import "../../colors.module.scss";
+
+#fullscreen-view-wrapper{
+  display: none;
+}
+
+.menuItem {
+  width: 100%;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  background: $button-main;
+  justify-content: space-between;
+  padding: 2px 5px 2px 5px;
+  box-sizing: border-box;
+  border: none;
+  text-decoration: none;
+  color: $button-font-color;
+  border-radius: 5px;
+  font-size: 14px;
+  margin-top: 3px;
+  cursor: pointer;
+
+  &:hover {
+    background: $frege-color;
+    color: $button-font-color;
+
+  }
+}
+
+.expandButton {
+  background: none;
+  color: $main-color;
+  border: 1px $main-color solid;
+  width: 30px;
+  height: 30px;
+  border-radius: 3px;
+  display: flex;
+  align-items: stretch;
+  justify-items: stretch;
+  justify-self: end;
+
+  svg{
+    width: 100%;
+    height: 100%;
+  }
+
+  &:hover {
+    background: $button-super-light;
+  }
+}
+
+.optionButton {
+  @extend .expandButton;
+  margin-right: 0.25rem;
+}
+
+.iconContainer {
+  flex: 0 0 30px;
+  height: 30px;
+  margin-left: 5px;
+  margin-right: 5px;
+  display: flex;
+  align-items: center;
+  justify-items: center;
+  justify-content: space-around;
+}
+
+.label {
+  flex: 1;
+  text-align: left;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.active {
+  color: $frege-color;
+  font-weight: bold;
+
+
+  &:hover {
+    color: $main-color;
+  }
+}
+
+.subNodes {
+  padding-left: 9px;
+  margin-left: 6px;
+  border-left: 2px $navbar-line-color solid;
+  border-radius: 10px;
+}
+
+
