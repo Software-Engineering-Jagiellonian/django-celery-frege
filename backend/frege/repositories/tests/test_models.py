@@ -2,15 +2,22 @@ import pytest
 from django.core.validators import URLValidator
 
 from frege.repositories.constants import (
+    CommitMessagesTypes,
     ProgrammingLanguages,
     get_extensions_for_language,
 )
 from frege.repositories.factories import (
     RepositoryFactory,
     RepositoryFileFactory,
-    EmptyRepositoryCommitMessagesQualityFactory
+    EmptyRepositoryCommitMessagesQualityFactory,
+    CommitMessageFactory,
 )
-from frege.repositories.models import Repository, RepositoryFile
+from frege.repositories.models import (
+    Repository, 
+    RepositoryFile,
+    CommitMessage,
+    RepositoryCommitMessagesQuality
+)
 
 
 @pytest.mark.django_db
@@ -42,7 +49,7 @@ class TestRepositoryFileModel:
 @pytest.mark.django_db
 class TestRepositoryCommitMessagesQuality:
     def test_create_commit_messages_quality(self):
-        empty_commit_messages_quality = EmptyRepositoryCommitMessagesQualityFactory()
+        empty_commit_messages_quality: RepositoryCommitMessagesQuality = EmptyRepositoryCommitMessagesQualityFactory()
         # The newly created commit messages quality must not be analyzed
         assert not empty_commit_messages_quality.analyzed
         # The fields realted to commit messages quality must be 0 at the beginning
@@ -57,3 +64,15 @@ class TestRepositoryCommitMessagesQuality:
         assert empty_commit_messages_quality.percentage_of_merge_pr_commits == 0
         assert empty_commit_messages_quality.percentage_of_unclassified_commits == 0
 
+@pytest.mark.django_db
+class TestCommitMessageModel:
+    def test_create_commit_message(self):
+        commit_message: CommitMessage = CommitMessageFactory()
+        # The newly created commit message must not be analyzed
+        assert not commit_message.analyzed
+        # The fields related to commit message analaze
+        assert commit_message.commit_type is CommitMessagesTypes.UNCLASSIFIED
+        assert commit_message.commit_message_char_length == 0
+        assert commit_message.words_amount == 0
+        assert commit_message.average_word_length == 0
+        assert commit_message.fog_index == 0
