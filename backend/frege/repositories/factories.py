@@ -8,7 +8,7 @@ from frege.repositories.constants import (
     ProgrammingLanguages,
     get_extensions_for_language,
 )
-from frege.repositories.models import Repository, RepositoryFile
+from frege.repositories.models import Repository, RepositoryFile, RepositoryCommitMessagesQuality
 
 faker_obj = Faker()
 
@@ -40,3 +40,9 @@ class RepositoryFileFactory(factory.django.DjangoModelFactory):
             )
         )
     )
+
+class EmptyRepositoryCommitMessagesQualityFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = RepositoryCommitMessagesQuality
+
+    repository = factory.SubFactory(RepositoryFactory)
