@@ -10,7 +10,7 @@ flower~=1.0.0
 PyGithub~=2.6
 lizard~=1.17.10
 factory-boy~=3.3.3
-django-filter~=21.1
+django-filter==25.1
 requests~=2.27.1
 beautifulsoup4~=4.9.3
 django-cors-headers~=3.11.0
@@ -22,6 +22,8 @@ django-health-check~=3.18.3
 psutil~=5.9.4
 nltk==3.9.1
 textstat==0.7.5
+gunicorn==23.0.0
+regex==2024.11.6
 
 # Development tools:
 black~=25.1.0
@@ -32,10 +34,11 @@ pyupgrade~=3.3.1
 gitlint==0.19.1
 
 # Testing
-pytest~=7.1.2
+pytest~=8.3.5
 pytest-mock~=3.14.0
 pytest-unordered~=0.6.1
 pytest-django~=4.10.0
-pytest-asyncio~=0.18.3
+pytest-asyncio==0.26.0
+daphne==4.1.2
 
 whitenoise==6.9.0

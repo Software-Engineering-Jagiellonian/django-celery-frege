@@ -84,19 +84,23 @@ def _finalize_repo_analysis(repo_obj):
 
 def _clone_repo(repo: Repository, local_path: Path) -> Optional[git.Repo]:
     _check_download_folder_size()
-    
+
     try:
         repo_obj = git.Repo.clone_from(repo.git_url, local_path)
         repo.fetch_time = timezone.now()
         repo.save(update_fields=["fetch_time"])
-        logger.info(f"Repository {repo.git_url} cloned")
+        logger.info("Repository %s cloned" % repo.git_url)
         return repo_obj
+    except git.exc.GitCommandError as e:
+        logger.error(f"Git error while cloning repository {repo.git_url}.")
+        repo.analysis_failed = True
+        repo.save(update_fields=["analysis_failed"])
     except Exception as e:
         logger.error(f"Unexpected error while processing repository {repo.git_url}: {e}")
         repo.analysis_failed = True
         repo.save(update_fields=["analysis_failed"])
-        
-        return None
+
+    return None
 
 def _check_download_folder_size(depth=0):
     """
@@ -219,6 +223,10 @@ def process_repo_task(repo_pk):
     _remove_database_entries(repo)
 
     repo_local_path = get_repo_local_path(repo)
+
+    if repo.analysis_failed:
+        logger.error(f"Repository {repo.git_url} marked as failed. Skipping.")
+        return
 
     if repo_local_path is None:
         logger.info(f"repo_local_path for {repo.git_url} is None. Aborting.")
