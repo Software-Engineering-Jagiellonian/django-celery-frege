@@ -353,45 +353,50 @@ def analyze_file_task(repo_file_pk):
                 # This should use more specific exception but some analyzer is
                 # raising undocumented exceptions
                 repo_file.repository.analysis_failed = True
-                repo_file.repository.save(update_fields=["analysis_failed"])
+                repo_file.repository.analyzed = True
+                repo_file.repository.save(update_fields=["analysis_failed", "analyzed"])
 
                 logger.error(
                     f"Failed to analyze {repo_file.repository.git_url} for "
                     f"analyzer {analyzer}, error: {e}"
                 )
 
-                return
+                break
 
-        with transaction.atomic():
-            repo_file.metrics = metrics_dict
-            repo_file.analyzed = True
-            repo_file.analyzed_time = timezone.now()
-            repo_file.lines_of_code = metrics_dict.get("lines_of_code", 0)
-            repo_file.token_count = metrics_dict.get("token_count", 0)
-            repo_file.function_count = metrics_dict.get("function_count", 0)
-            repo_file.average_function_name_length = metrics_dict.get("average_function_name_length", 0)
-            repo_file.average_lines_of_code = metrics_dict.get("average_lines_of_code", 0)
-            repo_file.average_token_count = metrics_dict.get("average_token_count", 0)
-            repo_file.average_cyclomatic_complexity = metrics_dict.get("average_cyclomatic_complexity", 0)
-            repo_file.average_parameter_count = metrics_dict.get("average_parameter_count", 0)
+        if not repo_file.repository.analysis_failed:
+            with transaction.atomic():
+                repo_file.metrics = metrics_dict
+                repo_file.analyzed = True
+                repo_file.analyzed_time = timezone.now()
+                repo_file.lines_of_code = metrics_dict.get("lines_of_code", 0)
+                repo_file.token_count = metrics_dict.get("token_count", 0)
+                repo_file.function_count = metrics_dict.get("function_count", 0)
+                repo_file.average_function_name_length = metrics_dict.get("average_function_name_length", 0)
+                repo_file.average_lines_of_code = metrics_dict.get("average_lines_of_code", 0)
+                repo_file.average_token_count = metrics_dict.get("average_token_count", 0)
+                repo_file.average_cyclomatic_complexity = metrics_dict.get("average_cyclomatic_complexity", 0)
+                repo_file.average_parameter_count = metrics_dict.get("average_parameter_count", 0)
 
-            repo_file.save(update_fields=["metrics",
-                                          "analyzed",
-                                          "analyzed_time",
-                                          "lines_of_code",
-                                          "token_count",
-                                          "function_count",
-                                          "average_function_name_length",
-                                          "average_lines_of_code",
-                                          "average_token_count",
-                                          "average_cyclomatic_complexity",
-                                          "average_parameter_count"
-                                          ])
+                repo_file.save(update_fields=[
+                    "metrics",
+                    "analyzed",
+                    "analyzed_time",
+                    "lines_of_code",
+                    "token_count",
+                    "function_count",
+                    "average_function_name_length",
+                    "average_lines_of_code",
+                    "average_token_count",
+                    "average_cyclomatic_complexity",
+                    "average_parameter_count"
+                ])
 
-        logger.info(f"repo_file {repo_file.repository.git_url} analyzed")
+            logger.info(f"repo_file {repo_file.repository.git_url} analyzed")
+
     except Exception as error:
         repo_file.repository.analysis_failed = True
-        repo_file.repository.save(update_fields=["analysis_failed"])
+        repo_file.repository.analyzed = True
+        repo_file.repository.save(update_fields=["analysis_failed", "analyzed"])
         
         logger.error(
             f"Can't analyze file {repo_file.repo_relative_file_path} for"
