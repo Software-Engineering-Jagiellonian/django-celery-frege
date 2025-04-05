@@ -87,8 +87,9 @@ class Client:
             yield projects_response.json()
 
     def _commit_hash(self, project_id):
-        url = f"https://gitlab.com/api/v4/projects/{project_id}/repository/commits"
-        response = self._get(url)
+        """Gets the latest commit hash in the default branch"""
+
+        response = self._get(f"{BASE_ENDPOINT}/{project_id}/repository/commits")
 
         if response.status_code != 200:
             logger.warning(f"Unable to fetch commits for project {project_id}, status code: {response.status_code}")
@@ -97,6 +98,7 @@ class Client:
         commits = response.json()
         if not commits:
             logger.warning(f"No commits found for project {project_id}")
+            
             return None
 
         return commits[0]['id']

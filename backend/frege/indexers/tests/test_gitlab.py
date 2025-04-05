@@ -26,47 +26,43 @@ def test_get_raises_rate_limit():
     with pytest.raises(RateLimitExceededException):
         client._get("https://example.com")
 
-
 @patch("frege.indexers.utils.gitlab.requests.get")
 def test_commit_hash_success(mock_get, client):
     mock_response = Mock()
     mock_response.status_code = 200
-    mock_response.json.return_value = [{"id": "commit123"}]
+    mock_response.json.return_value = [{"id": "abc123"}]
     mock_get.return_value = mock_response
 
-    commit_hash = client._commit_hash(123)
-
-    assert commit_hash == "commit123"
+    commit = client._commit_hash(project_id=101)
+    
+    assert commit == "abc123"
     mock_get.assert_called_once()
-    assert "projects/123/repository/commits" in mock_get.call_args[0][0]
-
+    assert "projects/101/repository/commits" in mock_get.call_args[0][0]
 
 @patch("frege.indexers.utils.gitlab.requests.get")
-def test_commit_hash_empty_response(mock_get, client, caplog):
+def test_commit_hash_handles_empty_commits(mock_get, client, caplog):
     mock_response = Mock()
     mock_response.status_code = 200
     mock_response.json.return_value = []
     mock_get.return_value = mock_response
 
     with caplog.at_level("WARNING"):
-        result = client._commit_hash(456)
-
-    assert result is None
-    assert "No commits found for project 456" in caplog.text
-
+        commit = client._commit_hash(project_id=202)
+    
+    assert commit is None
+    assert "No commits found for project 202" in caplog.text
 
 @patch("frege.indexers.utils.gitlab.requests.get")
-def test_commit_hash_non_200_response(mock_get, client, caplog):
+def test_commit_hash_handles_non_200(mock_get, client, caplog):
     mock_response = Mock()
-    mock_response.status_code = 403
+    mock_response.status_code = 404
     mock_get.return_value = mock_response
 
     with caplog.at_level("WARNING"):
-        result = client._commit_hash(789)
-
-    assert result is None
-    assert "Unable to fetch commits for project 789" in caplog.text
-
+        commit = client._commit_hash(project_id=303)
+    
+    assert commit is None
+    assert "Unable to fetch commits for project 303" in caplog.text
 
 @patch("frege.indexers.utils.gitlab.requests.get")
 def test_projects_pagination(mock_get, client):
