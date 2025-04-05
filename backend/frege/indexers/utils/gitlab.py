@@ -2,6 +2,9 @@ from itertools import chain
 from dataclasses import dataclass
 
 import requests
+import logging
+
+logger = logging.getLogger(__name__)
 
 __all__ = [
     "Client",
@@ -83,12 +86,17 @@ class Client:
             next_page = projects_response.links.get('next', {}).get('url')
             yield projects_response.json()
 
-    def _commit_hash(self, project_id: int):
-        """Gets the latest commit hash in the default branch"""
-        project_commits = self._get(f"{BASE_ENDPOINT}/{project_id}/repository/commits")
-        try:
-            return project_commits.json()[0]['id']
-        except KeyError:
+    def _commit_hash(self, project_id):
+        url = f"https://gitlab.com/api/v4/projects/{project_id}/repository/commits"
+        response = self._get(url)
+
+        if response.status_code != 200:
+            logger.warning(f"Unable to fetch commits for project {project_id}, status code: {response.status_code}")
             return None
 
+        commits = response.json()
+        if not commits:
+            logger.warning(f"No commits found for project {project_id}")
+            return None
 
+        return commits[0]['id']
