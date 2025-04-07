@@ -13,7 +13,7 @@ factory-boy~=3.3.3
 django-filter~=21.1
 requests~=2.27.1
 beautifulsoup4~=4.9.3
-django-cors-headers~=3.11.0
+django-cors-headers~=4.7.0
 djangorestframework-api-key~=3.0.0
 channels==4.1.0
 channels-redis==4.0.0
