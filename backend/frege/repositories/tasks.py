@@ -91,12 +91,12 @@ def _clone_repo(repo: Repository, local_path: Path) -> Optional[git.Repo]:
         repo.save(update_fields=["fetch_time"])
         logger.info("Repository %s cloned" % repo.git_url)
         return repo_obj
-    except git.exc.GitCommandError as e:
-        logger.error(f"Git error while cloning repository {repo.git_url}.")
-        repo.analysis_failed = True
-        repo.save(update_fields=["analysis_failed"])
     except Exception as e:
-        logger.error(f"Unexpected error while processing repository {repo.git_url}: {e}")
+        if isinstance(e, git.exc.GitCommandError):
+            logger.error(f"Git error while cloning repository {repo.git_url}.")
+        else:
+            logger.error(f"Unexpected error while processing repository {repo.git_url}: {e}")
+        
         repo.analysis_failed = True
         repo.save(update_fields=["analysis_failed"])
 
