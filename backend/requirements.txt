@@ -10,13 +10,13 @@ flower~=1.0.0
 PyGithub~=2.6
 lizard~=1.17.10
 factory-boy~=3.3.3
-django-filter==25.1
+django-filter~=25.1
 requests~=2.27.1
 beautifulsoup4~=4.9.3
-django-cors-headers~=3.11.0
+django-cors-headers~=4.7.0
 djangorestframework-api-key~=3.0.0
 channels==4.1.0
-channels-redis==4.0.0
+channels-redis==4.2.1
 djangochannelsrestframework==1.3.0
 django-health-check~=3.18.3
 psutil~=5.9.4
@@ -27,7 +27,7 @@ regex==2024.11.6
 
 # Development tools:
 black~=25.1.0
-isort~=5.10.1
+isort~=6.0.1
 flake8~=4.0.1
 pre-commit~=4.2.0
 pyupgrade~=3.3.1
