@@ -92,12 +92,13 @@ class Client:
         response = self._get(f"{BASE_ENDPOINT}/{project_id}/repository/commits")
 
         if response.status_code != 200:
-            logger.warning(f"Unable to fetch commits for project {project_id}, status code: {response.status_code}")
+            logger.info(f"Unable to fetch commits for project {project_id}, status code: {response.status_code}")
+            
             return None
 
         commits = response.json()
         if not commits:
-            logger.warning(f"No commits found for project {project_id}")
+            logger.info(f"No commits found for project {project_id}")
             
             return None
 
