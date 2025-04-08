@@ -15,36 +15,57 @@ from typing import (
 from frege.repositories.constants import ProgrammingLanguages
 from frege.repositories.models import RepositoryFile
 
+# Type variable for OutputType, which is a TypedDict.
 OutputType = TypeVar("OutputType", bound=TypedDict)
 
 
 @runtime_checkable
 class BaseAnalyzer(Protocol[OutputType]):
     """
-    The util protocol class for all the analyzers present in the system.
+    A protocol for all analyzers in the system.
+
+    This protocol defines the interface for language-specific file analysis classes.
+
+    Attributes:
+        None
     """
 
     @abstractmethod
     def analyze(self, repo_file_obj: RepositoryFile) -> OutputType:
         """
-        A method performing language-specific file analysis.
+        Analyzes a repository file according to its specific programming language.
+
+        Args:
+            repo_file_obj (RepositoryFile): The repository file object to analyze.
+
+        Returns:
+            OutputType: The result of the analysis.
         """
         ...
 
 
 class AnalyzerFactory:
     """
-    The factory for creating the analyzer instances
-    corresponding to the particular programming languages.
+    A factory class for creating analyzer instances corresponding to specific programming languages.
+
+    This singleton class manages the creation of analyzers for different programming languages.
+
+    Attributes:
+        analyzers (DefaultDict[str, list[Type[BaseAnalyzer]]]): A dictionary storing lists of analyzer classes 
+            for each programming language.
     """
 
     __instance: Optional["AnalyzerFactory"] = None
 
-    analyzers: ClassVar[
-        DefaultDict[str, list[Type[BaseAnalyzer]]]
-    ] = defaultdict(list)
+    analyzers: ClassVar[DefaultDict[str, list[Type[BaseAnalyzer]]]] = defaultdict(list)
 
     def __new__(cls):
+        """
+        Ensures that only one instance of AnalyzerFactory exists (singleton pattern).
+
+        Returns:
+            AnalyzerFactory: The singleton instance of the factory.
+        """
         if not cls.__instance:
             cls.__instance = super().__new__(cls)
         return cls.__instance
@@ -54,13 +75,13 @@ class AnalyzerFactory:
         cls, programming_language: ProgrammingLanguages
     ) -> list[BaseAnalyzer]:
         """
-        Creates a list of analyzer instances assigned
-        to a given programming language.
+        Creates a list of analyzer instances for a given programming language.
 
-        :param programming_language: The programming language
-        whose analyzers will get returned.
+        Args:
+            programming_language (ProgrammingLanguages): The programming language for which to create analyzers.
 
-        :return: The analyzer instances list.
+        Returns:
+            list[BaseAnalyzer]: A list of analyzer instances.
         """
         return [
             analyzer_cls()
@@ -70,13 +91,13 @@ class AnalyzerFactory:
     @classmethod
     def has_analyzers(cls, programming_language: ProgrammingLanguages) -> bool:
         """
-        Determines whether there are analyzers registered in the system
-        and dedicated to the given programming language.
+        Checks if analyzers are registered for the specified programming language.
 
-        :param programming_language: The programming language
-        whose analyzers will get looked up.
+        Args:
+            programming_language (ProgrammingLanguages): The programming language to check.
 
-        :return: Whether the corresponding analyzers were found.
+        Returns:
+            bool: True if analyzers are registered for the language, False otherwise.
         """
         return bool(cls.analyzers[programming_language])
 
@@ -85,12 +106,13 @@ class AnalyzerFactory:
         cls, programming_language: ProgrammingLanguages
     ) -> Callable[[Type[BaseAnalyzer]], Type[BaseAnalyzer]]:
         """
-        Assigns an analyzer class to a given programming language.
+        Registers an analyzer class for the specified programming language.
 
-        :param programming_language: The programming language
-        the analyzer class will get assigned to.
+        Args:
+            programming_language (ProgrammingLanguages): The programming language to register the analyzer for.
 
-        :return: A wrapper function.
+        Returns:
+            Callable[[Type[BaseAnalyzer]], Type[BaseAnalyzer]]: A decorator that registers the analyzer class.
         """
 
         def wrapper(analyzer_cls: BaseAnalyzer) -> BaseAnalyzer:
