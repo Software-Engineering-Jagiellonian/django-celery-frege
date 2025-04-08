@@ -356,7 +356,7 @@ def analyze_file_task(repo_file_pk):
                 repo_file.repository.analyzed = True
                 repo_file.repository.save(update_fields=["analysis_failed", "analyzed"])
 
-                logger.error(
+                logger.info(
                     f"Failed to analyze {repo_file.repository.git_url} for "
                     f"analyzer {analyzer}, error: {e}"
                 )
