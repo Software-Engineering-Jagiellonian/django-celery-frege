@@ -10,11 +10,6 @@ import os
 import sys
 
 sys.path.insert(0, os.path.abspath('../backend'))
-# sys.path.insert(0, os.path.abspath('../backend/frege/analyzers/core/'))
-# sys.path.insert(0, os.path.abspath('../backend/frege/indexers/'))
-# sys.path.insert(0, os.path.abspath('../backend/frege/management/'))
-# sys.path.insert(0, os.path.abspath('../backend/frege/repositories/'))
-
 
 project = 'FREGE'
 author = 'IG, DD'

@@ -5,8 +5,6 @@
 
 Welcome to the Frege project's documentation!
 
-This is a high-level description of the system, its components, and how to use them.
-
 Contents:
 
 .. toctree::
@@ -14,5 +12,3 @@ Contents:
    :caption: Contents:
 
    backend.rst
-   frontend.rst
-   grafana.rst
