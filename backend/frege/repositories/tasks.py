@@ -361,7 +361,7 @@ def analyze_file_task(repo_file_pk):
                     f"analyzer {analyzer}, error: {e}"
                 )
 
-                break
+                continue
 
         if not repo_file.repository.analysis_failed:
             with transaction.atomic():
