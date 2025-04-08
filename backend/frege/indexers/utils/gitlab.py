@@ -102,4 +102,7 @@ class Client:
             
             return None
 
-        return commits[0]['id']
+        mainBranch = commits[0]
+        hash = mainBranch['id']
+
+        return hash
