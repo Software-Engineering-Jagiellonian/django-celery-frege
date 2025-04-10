@@ -224,10 +224,6 @@ def process_repo_task(repo_pk):
 
     repo_local_path = get_repo_local_path(repo)
 
-    if repo.analysis_failed:
-        logger.error(f"Repository {repo.git_url} marked as failed. Skipping.")
-        return
-
     if repo_local_path is None:
         logger.info(f"repo_local_path for {repo.git_url} is None. Aborting.")
         return
