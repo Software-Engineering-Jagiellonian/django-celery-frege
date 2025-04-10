@@ -329,80 +329,71 @@ def analyze_commit_message_quality_task(commit_message_pk):
 
 @shared_task
 def analyze_file_task(repo_file_pk):
-    # TODO: docstring & cleanup
-
     try:
         repo_file = RepositoryFile.objects.get(pk=repo_file_pk)
     except RepositoryFile.DoesNotExist:
         logger.error(f"repo_file for pk {repo_file_pk} does not exist")
-        return
+        return {"status": "error", "reason": "file not found"}
+
+    file_failed = False
 
     try:
         analyzers = AnalyzerFactory.make_analyzers(repo_file.language)
         if not analyzers:
+            logger.warning(f"No analyzers for language {repo_file.language}, deleting file")
             repository = repo_file.repository
             repo_file.delete()
             _finalize_repo_analysis(repository)
-            return
+            return {"status": "skipped", "reason": "no analyzers"}
 
         metrics_dict = {}
         for analyzer in analyzers:
             try:
                 metrics_dict |= analyzer.analyze(repo_file)
             except Exception as e:
-                # This should use more specific exception but some analyzer is
-                # raising undocumented exceptions
-                repo_file.repository.analysis_failed = True
-                repo_file.repository.analyzed = True
-                repo_file.repository.save(update_fields=["analysis_failed", "analyzed"])
-
-                logger.info(
-                    f"Failed to analyze {repo_file.repository.git_url} for "
-                    f"analyzer {analyzer}, error: {e}"
+                logger.warning(
+                    f"Analyzer {analyzer} failed for file {repo_file.repo_relative_file_path}: {e}"
                 )
+                file_failed = True
 
-                continue
+        with transaction.atomic():
+            repo_file.metrics = metrics_dict
+            repo_file.analyzed = True
+            repo_file.analyzed_time = timezone.now()
+            repo_file.analysis_failed = file_failed
+            repo_file.lines_of_code = metrics_dict.get("lines_of_code", 0)
+            repo_file.token_count = metrics_dict.get("token_count", 0)
+            repo_file.function_count = metrics_dict.get("function_count", 0)
+            repo_file.average_function_name_length = metrics_dict.get("average_function_name_length", 0)
+            repo_file.average_lines_of_code = metrics_dict.get("average_lines_of_code", 0)
+            repo_file.average_token_count = metrics_dict.get("average_token_count", 0)
+            repo_file.average_cyclomatic_complexity = metrics_dict.get("average_cyclomatic_complexity", 0)
+            repo_file.average_parameter_count = metrics_dict.get("average_parameter_count", 0)
 
-        if not repo_file.repository.analysis_failed:
-            with transaction.atomic():
-                repo_file.metrics = metrics_dict
-                repo_file.analyzed = True
-                repo_file.analyzed_time = timezone.now()
-                repo_file.lines_of_code = metrics_dict.get("lines_of_code", 0)
-                repo_file.token_count = metrics_dict.get("token_count", 0)
-                repo_file.function_count = metrics_dict.get("function_count", 0)
-                repo_file.average_function_name_length = metrics_dict.get("average_function_name_length", 0)
-                repo_file.average_lines_of_code = metrics_dict.get("average_lines_of_code", 0)
-                repo_file.average_token_count = metrics_dict.get("average_token_count", 0)
-                repo_file.average_cyclomatic_complexity = metrics_dict.get("average_cyclomatic_complexity", 0)
-                repo_file.average_parameter_count = metrics_dict.get("average_parameter_count", 0)
+            repo_file.save(update_fields=[
+                "metrics",
+                "analyzed",
+                "analyzed_time",
+                "analysis_failed",
+                "lines_of_code",
+                "token_count",
+                "function_count",
+                "average_function_name_length",
+                "average_lines_of_code",
+                "average_token_count",
+                "average_cyclomatic_complexity",
+                "average_parameter_count"
+            ])
 
-                repo_file.save(update_fields=[
-                    "metrics",
-                    "analyzed",
-                    "analyzed_time",
-                    "lines_of_code",
-                    "token_count",
-                    "function_count",
-                    "average_function_name_length",
-                    "average_lines_of_code",
-                    "average_token_count",
-                    "average_cyclomatic_complexity",
-                    "average_parameter_count"
-                ])
-
-            logger.info(f"repo_file {repo_file.repository.git_url} analyzed")
+        logger.info(f"File {repo_file.repo_relative_file_path} analyzed (failed={file_failed})")
 
     except Exception as error:
-        repo_file.repository.analysis_failed = True
-        repo_file.repository.analyzed = True
-        repo_file.repository.save(update_fields=["analysis_failed", "analyzed"])
-        
-        logger.error(
-            f"Can't analyze file {repo_file.repo_relative_file_path} for"
-            f" the repository: {repo_file.repository.name}"
-        )
-        logger.error(error, exc_info=True)
+        repo_file.analyzed = True
+        repo_file.analysis_failed = True
+        repo_file.save(update_fields=["analyzed", "analysis_failed"])
+
+        logger.error(f"Unexpected error during analysis of file {repo_file.repo_relative_file_path}", exc_info=True)
+
     finally:
         absolute_file_path = (
                 get_repo_local_path(repo_file.repository)
