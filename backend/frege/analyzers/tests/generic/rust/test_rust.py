@@ -1,6 +1,4 @@
 import pytest
-
-from frege.analyzers.tests.generic.rust.constants import MOCKED_RUST_FILES
 from frege.analyzers.tests.generic.util.generic_test_util import (
     generic_test,
 )
@@ -41,7 +39,6 @@ class TestRustAnalyzer:
     def test(
         self,
         repo_file_params,
-        settings,
         dummy_repo,
         expected_loc,
         expected_cyc,
@@ -60,9 +57,7 @@ class TestRustAnalyzer:
         generic_test(
             repo_file_params,
             expected,
-            settings,
             dummy_repo,
-            MOCKED_RUST_FILES,
             ProgrammingLanguages.RUST,
             tested_parameter_types,
             mock_lizard_result(

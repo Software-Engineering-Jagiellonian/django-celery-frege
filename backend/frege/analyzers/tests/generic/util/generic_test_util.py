@@ -10,14 +10,11 @@ from frege.repositories.factories import RepositoryFileFactory
 def generic_test(
     repo_file_params,
     expected_values,
-    settings,
     dummy_repo,
-    mocked_files_path,
     programming_language,
     parameter_types,
     mock_lizard_result,
 ):
-    settings.DOWNLOAD_PATH = mocked_files_path
     analyzers = AnalyzerFactory.make_analyzers(programming_language)
     repo_file = RepositoryFileFactory(
         repository=dummy_repo,

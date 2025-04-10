@@ -1,6 +1,4 @@
 import pytest
-
-from frege.analyzers.tests.generic.java.constants import MOCKED_JAVA_FILES
 from frege.analyzers.tests.generic.util.generic_test_util import (
     generic_test,
 )
@@ -44,7 +42,6 @@ class TestJavaAnalyzer:
     def test(
         self,
         repo_file_params,
-        settings,
         dummy_repo,
         expected_cyc,
         expected_average_loc,
@@ -65,9 +62,7 @@ class TestJavaAnalyzer:
         generic_test(
             repo_file_params,
             expected,
-            settings,
             dummy_repo,
-            MOCKED_JAVA_FILES,
             ProgrammingLanguages.JAVA,
             tested_parameter_types,
             mock_lizard_result(        

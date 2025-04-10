@@ -1,8 +1,4 @@
 import pytest
-
-from frege.analyzers.tests.generic.golang.constants import (
-    MOCKED_GOLANG_FILES,
-)
 from frege.analyzers.tests.generic.util.generic_test_util import (
     generic_test,
 )
@@ -49,7 +45,6 @@ class TestGolangAnalyzer:
     def test(
         self,
         repo_file_params,
-        settings,
         dummy_repo,
         expected_average_cyc,
         expected_average_loc,
@@ -72,9 +67,7 @@ class TestGolangAnalyzer:
         generic_test(
             repo_file_params,
             expected,
-            settings,
             dummy_repo,
-            MOCKED_GOLANG_FILES,
             ProgrammingLanguages.GOLANG,
             tested_parameter_types,
             mock_lizard_result(
