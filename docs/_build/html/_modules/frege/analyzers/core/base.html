@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+
+<html lang="Eng" data-content_root="../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>frege.analyzers.core.base &#8212; FREGE  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/alabaster.css?v=cb25574f" />
+    <script src="../../../../_static/documentation_options.js?v=8f7392b4"></script>
+    <script src="../../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for frege.analyzers.core.base</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Callable</span><span class="p">,</span>
+    <span class="n">ClassVar</span><span class="p">,</span>
+    <span class="n">DefaultDict</span><span class="p">,</span>
+    <span class="n">Optional</span><span class="p">,</span>
+    <span class="n">Protocol</span><span class="p">,</span>
+    <span class="n">Type</span><span class="p">,</span>
+    <span class="n">TypedDict</span><span class="p">,</span>
+    <span class="n">TypeVar</span><span class="p">,</span>
+    <span class="n">runtime_checkable</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">frege.repositories.constants</span> <span class="kn">import</span> <span class="n">ProgrammingLanguages</span>
+<span class="kn">from</span> <span class="nn">frege.repositories.models</span> <span class="kn">import</span> <span class="n">RepositoryFile</span>
+
+<span class="c1"># Type variable for OutputType, which is a TypedDict.</span>
+<span class="n">OutputType</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;OutputType&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">TypedDict</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="BaseAnalyzer">
+<a class="viewcode-back" href="../../../../backend.html#frege.analyzers.core.base.BaseAnalyzer">[docs]</a>
+<span class="nd">@runtime_checkable</span>
+<span class="k">class</span> <span class="nc">BaseAnalyzer</span><span class="p">(</span><span class="n">Protocol</span><span class="p">[</span><span class="n">OutputType</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A protocol for all analyzers in the system.</span>
+
+<span class="sd">    This protocol defines the interface for language-specific file analysis classes.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">analyze</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo_file_obj</span><span class="p">:</span> <span class="n">RepositoryFile</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OutputType</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Analyzes a repository file according to its specific programming language.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            repo_file_obj (RepositoryFile): The repository file object to analyze.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            OutputType: The result of the analysis.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="o">...</span></div>
+
+
+
+<span class="k">class</span> <span class="nc">AnalyzerFactory</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A factory class for creating analyzer instances corresponding to specific programming languages.</span>
+
+<span class="sd">    This singleton class manages the creation of analyzers for different programming languages.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        analyzers (DefaultDict[str, list[Type[BaseAnalyzer]]]): A dictionary storing lists of analyzer classes </span>
+<span class="sd">            for each programming language.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">__instance</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;AnalyzerFactory&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">analyzers</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="n">DefaultDict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">BaseAnalyzer</span><span class="p">]]]]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Ensures that only one instance of AnalyzerFactory exists (singleton pattern).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            AnalyzerFactory: The singleton instance of the factory.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__instance</span><span class="p">:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">__instance</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__instance</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">make_analyzers</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">programming_language</span><span class="p">:</span> <span class="n">ProgrammingLanguages</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">BaseAnalyzer</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a list of analyzer instances for a given programming language.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            programming_language (ProgrammingLanguages): The programming language for which to create analyzers.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list[BaseAnalyzer]: A list of analyzer instances.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">analyzer_cls</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">analyzer_cls</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">analyzers</span><span class="p">[</span><span class="n">programming_language</span><span class="p">]</span>
+        <span class="p">]</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">has_analyzers</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">programming_language</span><span class="p">:</span> <span class="n">ProgrammingLanguages</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if analyzers are registered for the specified programming language.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            programming_language (ProgrammingLanguages): The programming language to check.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if analyzers are registered for the language, False otherwise.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">analyzers</span><span class="p">[</span><span class="n">programming_language</span><span class="p">])</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">register</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">programming_language</span><span class="p">:</span> <span class="n">ProgrammingLanguages</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Type</span><span class="p">[</span><span class="n">BaseAnalyzer</span><span class="p">]],</span> <span class="n">Type</span><span class="p">[</span><span class="n">BaseAnalyzer</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Registers an analyzer class for the specified programming language.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            programming_language (ProgrammingLanguages): The programming language to register the analyzer for.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Callable[[Type[BaseAnalyzer]], Type[BaseAnalyzer]]: A decorator that registers the analyzer class.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="n">analyzer_cls</span><span class="p">:</span> <span class="n">BaseAnalyzer</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BaseAnalyzer</span><span class="p">:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">analyzers</span><span class="p">[</span><span class="n">programming_language</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">analyzer_cls</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">analyzer_cls</span>
+
+        <span class="k">return</span> <span class="n">wrapper</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../index.html">FREGE</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../backend.html">Backend Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../frontend.html">Frontend Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../grafana.html">Grafana Documentation</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
