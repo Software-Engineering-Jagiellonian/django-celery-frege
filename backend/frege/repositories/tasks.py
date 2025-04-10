@@ -333,7 +333,7 @@ def analyze_file_task(repo_file_pk):
         repo_file = RepositoryFile.objects.get(pk=repo_file_pk)
     except RepositoryFile.DoesNotExist:
         logger.error(f"repo_file for pk {repo_file_pk} does not exist")
-        return {"status": "error", "reason": "file not found"}
+        return
 
     file_failed = False
 
