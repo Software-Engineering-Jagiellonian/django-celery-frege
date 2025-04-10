@@ -1,6 +1,4 @@
 import pytest
-
-from frege.analyzers.tests.generic.scala.constants import MOCKED_SCALA_FILES
 from frege.analyzers.tests.generic.util.generic_test_util import (
     generic_test,
 )
@@ -47,7 +45,6 @@ class TestScalaAnalyzer:
     def test(
         self,
         repo_file_params,
-        settings,
         dummy_repo,
         expected_cyc,
         expected_average_function_name_length,
@@ -70,9 +67,7 @@ class TestScalaAnalyzer:
         generic_test(
             repo_file_params,
             expected,
-            settings,
             dummy_repo,
-            MOCKED_SCALA_FILES,
             ProgrammingLanguages.SCALA,
             tested_parameter_types,
             mock_lizard_result(

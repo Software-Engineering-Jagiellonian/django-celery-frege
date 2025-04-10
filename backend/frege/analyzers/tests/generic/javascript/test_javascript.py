@@ -1,8 +1,4 @@
 import pytest
-
-from frege.analyzers.tests.generic.javascript.constants import (
-    MOCKED_JAVASCRIPT_FILES,
-)
 from frege.analyzers.tests.generic.util.generic_test_util import (
     generic_test,
 )
@@ -23,15 +19,13 @@ class TestJavascriptAnalyzer:
             ),
         ],
     )
-    def test(self, repo_file_params, settings, dummy_repo, expected_loc):
+    def test(self, repo_file_params, dummy_repo, expected_loc):
         expected = [expected_loc]
 
         generic_test(
             repo_file_params,
             expected,
-            settings,
             dummy_repo,
-            MOCKED_JAVASCRIPT_FILES,
             ProgrammingLanguages.JS,
             tested_parameter_types,
             mock_lizard_result(nloc=expected_loc),

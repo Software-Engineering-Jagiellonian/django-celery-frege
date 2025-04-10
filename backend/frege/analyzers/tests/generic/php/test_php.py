@@ -1,6 +1,4 @@
 import pytest
-
-from frege.analyzers.tests.generic.php.constans import MOCKED_PHP_FILES
 from frege.analyzers.tests.generic.util.generic_test_util import (
     generic_test,
 )
@@ -29,7 +27,6 @@ class TestPhpAnalyzer:
     def test(
         self,
         repo_file_params,
-        settings,
         dummy_repo,
         expected_average_loc,
         expected_average_parameter_count,
@@ -39,9 +36,7 @@ class TestPhpAnalyzer:
         generic_test(
             repo_file_params,
             expected,
-            settings,
             dummy_repo,
-            MOCKED_PHP_FILES,
             ProgrammingLanguages.PHP,
             tested_parameter_types,
             mock_lizard_result(average_nloc=expected_average_loc, average_parameter_count=expected_average_parameter_count),
