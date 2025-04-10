@@ -128,6 +128,10 @@ class SourceforgeIndexer(BaseIndexer):
             finally:
                 self.current_page += 1
                 if self.current_page >= 1000:
+                    # The maximum page on the SourceForge is 999.
+                    # When we reach the limit, we just start over.
+                    # In the future, we may want to change by using
+                    # some filters (categories) to scrap more data.
                     self.current_page = 0
                 self.save(update_fields=["current_page"])
 

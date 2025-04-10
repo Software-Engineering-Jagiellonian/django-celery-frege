@@ -33,7 +33,7 @@ def get_next_page(
     after_datetime: datetime.datetime,
 ) -> tuple[RepositoryData | None, datetime.datetime | None]:
     """
-    Fetch the next Bitbucket repository created after a specific datetime.
+    Fetch the next Bitbucket repository created after a given datetime.
 
     Args:
         after_datetime (datetime.datetime): The timestamp after which to look for repositories.
