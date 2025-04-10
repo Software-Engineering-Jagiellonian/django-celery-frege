@@ -9,7 +9,7 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath('../backend'))
+sys.path.insert(0, os.path.abspath('../../backend'))
 
 project = 'FREGE'
 author = 'IG, DD'
@@ -23,8 +23,6 @@ extensions = [
     'sphinx.ext.viewcode',
 ]
 
-html_theme = 'sphinx_rtd_theme'
-
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
@@ -33,4 +31,4 @@ language = 'Eng'
 html_theme = 'alabaster'
 html_static_path = ['_static']
 
-autodoc_mock_imports = ['celery', 'django', 'lizard', 'lizard_ext', 'github', 'radon']
+autodoc_mock_imports = ['celery', 'django', 'lizard', 'lizard_ext', 'github', 'radon', 'conf']
