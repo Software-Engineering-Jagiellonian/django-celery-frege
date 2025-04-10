@@ -394,7 +394,7 @@ def analyze_file_task(repo_file_pk):
         repo_file.analysis_failed = True
         repo_file.save(update_fields=["analyzed", "analysis_failed"])
 
-        logger.error(f"Unexpected error during analysis of file {repo_file.repo_relative_file_path}", exc_info=True)
+        logger.error(f"Unexpected error during analysis of file {repo_file.repo_relative_file_path}, error: {error}", exc_info=True)
 
     finally:
         absolute_file_path = (
