@@ -22,7 +22,8 @@ class Repository(models.Model):
         help_text="Indicates whether the repository has been analyzed.",
     )
     git_url = models.URLField(
-        _("git url"), help_text=_("The url used to clone the repository")
+        _("git url"), help_text=_("The url used to clone the repository"),
+        unique=True,
     )
     repo_url = models.URLField(
         _("repo url"),
