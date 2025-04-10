@@ -329,6 +329,8 @@ def analyze_commit_message_quality_task(commit_message_pk):
 
 @shared_task
 def analyze_file_task(repo_file_pk):
+    # TODO: docstring & cleanup
+
     try:
         repo_file = RepositoryFile.objects.get(pk=repo_file_pk)
     except RepositoryFile.DoesNotExist:
