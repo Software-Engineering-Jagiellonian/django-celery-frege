@@ -29,6 +29,9 @@ class TestRepositoryModel:
         ), "The newly created repo must not be analyzed"
         url_validator = URLValidator()
         url_validator(repo_obj.repo_url)
+    def test_str_method(self):
+        repo_obj: Repository = RepositoryFactory()
+        assert str(repo_obj) == repo_obj.name, "The __str__ method must return the name of the repo"
 
 
 @pytest.mark.django_db
@@ -45,6 +48,14 @@ class TestRepositoryFileModel:
                 ProgrammingLanguages(repo_file_obj.language)
             )
         )
+    def test_str_method(self):
+        repo_file_obj: RepositoryFile = RepositoryFileFactory()
+        #method
+        # def __str__(self):
+        # return f"file: {self.repository.name}/{self.repo_relative_file_path}"
+        assert (
+            str(repo_file_obj) == f"file: {repo_file_obj.repository.name}/{repo_file_obj.repo_relative_file_path}"
+        ), "The __str__ method must return the name of the repo and the relative file path"
 
 @pytest.mark.django_db
 class TestRepositoryCommitMessagesQuality:
