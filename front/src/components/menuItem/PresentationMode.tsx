@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import { CaretRight, Easel3 } from 'react-bootstrap-icons';
 // import { useNavigate } from 'react-router-dom';
@@ -5,17 +7,12 @@ import styles from './MenuItem.module.scss';
 import FullscreenDashboards from '../FullScreenDashboards/FullscreenDashboards';
 import { savedFullscreenDashboardId } from '../pages/presentationMode/PresentationMode';
 import { createRoot, Root } from 'react-dom/client';
+import Link from 'next/link';
 
 const fullscreenElementId = 'fullscreen-view-wrapper';
 
 const PresentationMode = () => {
-  // const navigate = useNavigate();
   const [fullscreenRoot, setFullscreenRoot] = useState<Root | null>(null);
-
-  // const onMenuItemClick = (e: { stopPropagation: () => void }) => {
-  //   navigate('/presentation');
-  //   e.stopPropagation();
-  // };
 
   const handleFullScreenChange = () => {
     if (!document.fullscreenElement && fullscreenRoot !== null) {
@@ -45,16 +42,17 @@ const PresentationMode = () => {
   }, [fullscreenRoot]);
 
   return (
-    // <div className={styles.menuItem} onClick={onMenuItemClick}>
-    <div className={styles.menuItem}>
-      <div className={styles.iconContainer}>
-        <Easel3 />
+    <Link href="/presentationMode">
+      <div className={styles.menuItem}>
+        <div className={styles.iconContainer}>
+          <Easel3 />
+        </div>
+        <div className={styles.label}>Presentation Mode</div>
+        <button onClick={onPlayClick} type="button" className={styles.expandButton}>
+          <CaretRight />
+        </button>
       </div>
-      <div className={styles.label}>Presentation Mode</div>
-      <button onClick={onPlayClick} type="button" className={styles.expandButton}>
-        <CaretRight />
-      </button>
-    </div>
+    </Link>
   );
 };
 
