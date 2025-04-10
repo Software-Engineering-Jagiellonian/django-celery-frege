@@ -1,17 +1,21 @@
 from collections.abc import Generator
 
 from django.db import models
+from enum import Enum
 
 
-class CommitMessagesTypes(models.TextChoices):
+class CommitMessagesTypes(Enum):
     FEATURE = "FEATURE"
     FIX = "FIX"
     CONFIG = "CONFIG CHANGE"
     MERGE_PR = "MERGE PR"
     UNCLASSIFIED = "UNCLASSIFIED"
+    @classmethod
+    def choices(cls):
+        return [(lang.name, lang.value) for lang in cls]
 
 
-class ProgrammingLanguages(models.TextChoices):
+class ProgrammingLanguages(Enum):
     PYTHON = "Python"
     C = "C"
     CPP = "C++"
@@ -27,6 +31,9 @@ class ProgrammingLanguages(models.TextChoices):
     SCALA = "Scala"
     SWIFT = "Swift"
     TYPESCRIPT = "TypeScript"
+    @classmethod
+    def choices(cls):
+        return [(lang.name, lang.value) for lang in cls]
 
 
 file_extensions_registry: dict[ProgrammingLanguages, list[str]] = {}
