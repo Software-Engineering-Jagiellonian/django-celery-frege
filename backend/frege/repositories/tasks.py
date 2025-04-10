@@ -89,7 +89,7 @@ def _clone_repo(repo: Repository, local_path: Path) -> Optional[git.Repo]:
         repo_obj = git.Repo.clone_from(repo.git_url, local_path)
         repo.fetch_time = timezone.now()
         repo.save(update_fields=["fetch_time"])
-        logger.info("Repository %s cloned" % repo.git_url)
+        logger.info(f"Repository {repo.git_url} cloned")
         return repo_obj
     except Exception as e:
         if isinstance(e, git.exc.GitCommandError):
