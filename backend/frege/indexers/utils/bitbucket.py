@@ -1,3 +1,11 @@
+"""
+Utilities for interacting with Bitbucket repository data using the Bitbucket API.
+
+This module includes functions to:
+- Fetch the next created repository after a certain datetime
+- Get repository metadata such as forks count, clone URL, web URL, and last commit hash
+"""
+
 import datetime
 from typing import Any, NewType
 from urllib import parse
@@ -17,6 +25,7 @@ BITBUCKET_HOSTNAME = "bitbucket.org"
 API_REPOSITORIES_ENDPOINT = "https://api.bitbucket.org/2.0/repositories"
 RepositoryData = NewType("RepositoryData", dict[str, str | dict])
 
+# Default timestamp used when no other datetime is available
 DEFAULT_DATE = datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc)
 
 
@@ -24,12 +33,16 @@ def get_next_page(
     after_datetime: datetime.datetime,
 ) -> tuple[RepositoryData | None, datetime.datetime | None]:
     """
-    Fetches the next repository created after a given datetime.
+    Fetch the next Bitbucket repository created after a specific datetime.
 
-    Returns data concerning the repository and a datetime that can be used to
-    fetch the next one.
+    Args:
+        after_datetime (datetime.datetime): The timestamp after which to look for repositories.
+
+    Returns:
+        tuple: A tuple containing:
+            - RepositoryData | None: The repository data dictionary or None if not found.
+            - datetime.datetime | None: The datetime of the next repository, or None if not available.
     """
-
     after_datetime_as_iso = datetime.datetime.isoformat(after_datetime)
 
     response = requests.get(
@@ -56,7 +69,15 @@ def get_next_page(
 
 
 def get_forks_count(repository_data: RepositoryData) -> int:
-    """Retuns the number of forks of given repository or `0` on error."""
+    """
+    Return the number of forks for a given repository.
+
+    Args:
+        repository_data (RepositoryData): The repository metadata dictionary.
+
+    Returns:
+        int: Number of forks, or 0 if unavailable.
+    """
     url = _safe_get(repository_data, ["links", "forks", "href"])
 
     if not url:
@@ -73,7 +94,15 @@ def get_forks_count(repository_data: RepositoryData) -> int:
 
 
 def get_clone_url(repository_data: RepositoryData) -> str | None:
-    """Retuns the clone URL for a repository if it's hosted on BitBucket."""
+    """
+    Return the HTTPS clone URL of the repository, if hosted on Bitbucket.
+
+    Args:
+        repository_data (RepositoryData): The repository metadata dictionary.
+
+    Returns:
+        str | None: Clone URL if found and hosted on Bitbucket, otherwise None.
+    """
     clone_objects = _safe_get(repository_data, ["links", "clone"]) or []
 
     for clone_details in clone_objects:
@@ -91,12 +120,28 @@ def get_clone_url(repository_data: RepositoryData) -> str | None:
 
 
 def get_repo_url(repository_data: RepositoryData) -> str | None:
-    """Retuns the URL of a repository's webpage."""
+    """
+    Return the URL of the repository’s webpage.
+
+    Args:
+        repository_data (RepositoryData): The repository metadata dictionary.
+
+    Returns:
+        str | None: Web URL of the repository, or None if not available.
+    """
     return _safe_get(repository_data, ["links", "html", "href"])
 
 
 def get_last_commit_hash(repository_data: RepositoryData) -> str | None:
-    """Retuns the SHA256 hash of the repository's latest commit."""
+    """
+    Return the hash of the latest commit in the repository.
+
+    Args:
+        repository_data (RepositoryData): The repository metadata dictionary.
+
+    Returns:
+        str | None: The latest commit hash, or None if unavailable.
+    """
     url = _safe_get(repository_data, ["links", "commits", "href"])
 
     if not url:
@@ -115,10 +160,13 @@ def get_last_commit_hash(repository_data: RepositoryData) -> str | None:
 
 def _parse_datetime_from_next_url(url: str) -> datetime.datetime | None:
     """
-    Given a URL, parses the datetime included as its querystring parameter.
+    Extract the datetime value from the 'after' query parameter in a URL.
 
-    The datetime is expected to be present under 'after' parameter and
-    represented in ISO 8601 format.
+    Args:
+        url (str): URL containing the query parameters.
+
+    Returns:
+        datetime.datetime | None: Parsed datetime object, or None if not found.
     """
     parsed_url = parse.urlparse(url)
     query_string = parse.parse_qs(parsed_url.query)
@@ -130,15 +178,17 @@ def _parse_datetime_from_next_url(url: str) -> datetime.datetime | None:
 
 def _safe_get(root: dict, keys: list) -> Any:
     """
-    Given a (nested) dictionary and a list of keys, returns a nested value.
+    Safely access a nested value in a dictionary using a list of keys.
 
-    The function will traverse the dictionary on key-by-key manner, returning
-    the last value. Returns None immediately if encounters a falsy value.
+    Args:
+        root (dict): The base dictionary.
+        keys (list): List of keys to traverse.
+
+    Returns:
+        Any: The nested value if found, otherwise None.
     """
     for key in keys:
         if not root:
             break
-
         root = root.get(key)
-
     return root
