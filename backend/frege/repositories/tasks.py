@@ -84,24 +84,19 @@ def _finalize_repo_analysis(repo_obj):
 
 def _clone_repo(repo: Repository, local_path: Path) -> Optional[git.Repo]:
     _check_download_folder_size()
+    
     try:
         repo_obj = git.Repo.clone_from(repo.git_url, local_path)
         repo.fetch_time = timezone.now()
         repo.save(update_fields=["fetch_time"])
         logger.info(f"Repository {repo.git_url} cloned")
         return repo_obj
-    except git.exc.GitCommandError:
-        try:
-            repo_obj = git.Repo(local_path)
-            logger.info(
-                f"Repo {repo.git_url} already exists, fetched from disk"
-            )
-            return repo_obj
-        except git.exc.NoSuchPathError:
-            logger.error(
-                f"Tried fetching {repo.git_url} from disk, but repository does not exist."
-            )
-            return None
+    except Exception as e:
+        logger.error(f"Unexpected error while processing repository {repo.git_url}: {e}")
+        repo.analysis_failed = True
+        repo.save(update_fields=["analysis_failed"])
+        
+        return None
 
 def _check_download_folder_size(depth=0):
     """
@@ -199,7 +194,7 @@ def crawl_repos_task(indexer_class_name):
     logger.info(f"Scheduling batch of {len(batch)} repositories")
     for repo in batch:
         repo.refresh_from_db()
-        if not repo.analyzed:
+        if not repo.analyzed and not repo.analysis_failed:
             process_repo_task.apply_async(args=(repo.pk,))
 
 
@@ -220,7 +215,7 @@ def process_repo_task(repo_pk):
         return
     
     logger.info(f"Processing repository {repo.git_url}")
-    
+
     _remove_database_entries(repo)
 
     repo_local_path = get_repo_local_path(repo)
@@ -232,7 +227,13 @@ def process_repo_task(repo_pk):
     logger.info(f"Fetching repository via url: {repo.git_url}")
     repo_obj = _clone_repo(repo, repo_local_path)
     if repo_obj is None:
-        logger.error(f"Failed to obtain repository {repo.git_url}. This has unknown consequences.")
+        if not repo.analysis_failed:
+            error_message = f"Failed to obtain repository {repo.git_url}. This has unknown consequences."
+        else:
+            error_message = f"Repository {repo.git_url} marked as failed. Skipping."
+            
+        logger.error(error_message)
+
         return
 
     with closing(repo_obj) as cloned_repo:
@@ -439,6 +440,8 @@ def _reschedule_unanalyzed_repos():
             unanalyzed_repos = Repository.objects.filter(analyzed=False)
             logger.info(f"Rescheduling {unanalyzed_repos.count()} unanalyzed repositories")
             for repo in unanalyzed_repos:
+                repo.analysis_failed = False
+                repo.save(update_fields=["analysis_failed"])
                 process_repo_task.apply_async(args=(repo.pk,))
         else:
             logger.info("No repositories found")

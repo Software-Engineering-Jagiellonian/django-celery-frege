@@ -33,19 +33,21 @@ class Client:
     def ratelimit_remaining(self, v: str) -> None:
         self._ratelimit_remaining = int(v)
 
-    def repositories(self):
-        """Returns repository and the projects id"""
+    def repositories(self):     
         for project in chain.from_iterable(self._projects()):
-            if project['star_count'] >= self.min_stars and project['forks_count'] >= self.min_forks:
+            star_count = project.get('star_count', 0)
+            forks_count = project.get('forks_count', 0)
+            
+            if star_count >= self.min_stars and forks_count >= self.min_forks:
                 commit_hash = self._commit_hash(project['id'])
                 if not commit_hash:
                     continue
 
                 repo_data = dict(
-                    name=project['name'],
-                    description=project['description'],
-                    git_url=project['http_url_to_repo'],
-                    repo_url=project['web_url'],
+                    name=project.get('name', 'Unnamed Project'),
+                    description=project.get('description', 'No description'),
+                    git_url=project.get('http_url_to_repo', ''),
+                    repo_url=project.get('web_url', ''),
                     commit_hash=commit_hash
                 )
                 yield repo_data, project['id']
