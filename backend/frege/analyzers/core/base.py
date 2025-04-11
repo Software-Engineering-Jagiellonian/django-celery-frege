@@ -25,9 +25,6 @@ class BaseAnalyzer(Protocol[OutputType]):
     A protocol for all analyzers in the system.
 
     This protocol defines the interface for language-specific file analysis classes.
-
-    Attributes:
-        None
     """
 
     @abstractmethod
