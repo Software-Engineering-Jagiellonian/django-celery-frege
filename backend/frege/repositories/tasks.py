@@ -84,7 +84,7 @@ def _finalize_repo_analysis(repo_obj):
 
 def _clone_repo(repo: Repository, local_path: Path) -> Optional[git.Repo]:
     _check_download_folder_size()
-    
+
     try:
         repo_obj = git.Repo.clone_from(repo.git_url, local_path)
         repo.fetch_time = timezone.now()
@@ -92,11 +92,15 @@ def _clone_repo(repo: Repository, local_path: Path) -> Optional[git.Repo]:
         logger.info(f"Repository {repo.git_url} cloned")
         return repo_obj
     except Exception as e:
-        logger.error(f"Unexpected error while processing repository {repo.git_url}: {e}")
+        if isinstance(e, git.exc.GitCommandError):
+            logger.error(f"Git error while cloning repository {repo.git_url}.")
+        else:
+            logger.error(f"Unexpected error while processing repository {repo.git_url}: {e}")
+        
         repo.analysis_failed = True
         repo.save(update_fields=["analysis_failed"])
-        
-        return None
+
+    return None
 
 def _check_download_folder_size(depth=0):
     """
