@@ -31,7 +31,7 @@ x-backend: &backend
     - .env
 
 services:
-# === [Common] ===
+  # === [Common] ===
 
   frege-redis:
     container_name: frege-redis
@@ -124,7 +124,7 @@ services:
       - frege-main
     profiles: ["dev", "prod"]
 
-# === [Dev] ===
+  # === [Dev] ===
 
   frege-backend-dev:
     <<: *backend
@@ -133,7 +133,8 @@ services:
       - frege_tmp:${DJANGO_DOWNLOAD_PATH}
       - ./backend/static:/app/static
     command: >
-      sh -c "python manage.py migrate --noinput
+      sh -c "python manage.py makemigrations
+      && python manage.py migrate --noinput
       && python manage.py initadmin
       && python manage.py collectstatic --noinput
       && python manage.py runserver 0.0.0.0:${DOCKER_BACKEND_PORT}"
@@ -265,7 +266,7 @@ services:
       retries: 2
       start_period: 40s
 
-# === [Prod] ===
+  # === [Prod] ===
 
   frege-frontend-prod:
     <<: *frontend
@@ -285,7 +286,7 @@ services:
       - LETSENCRYPT_HOST=${FRONTEND_HOSTNAME}
     depends_on:
       - frege-grafana-prod
-    profiles: [ "prod" ]
+    profiles: ["prod"]
 
   frege-backend-prod:
     <<: *backend
@@ -299,7 +300,7 @@ services:
     volumes:
       - frege_tmp:${DJANGO_DOWNLOAD_PATH}
       - frege_static_files:/app/static
-    profiles: [ "prod" ]
+    profiles: ["prod"]
     ports: []
     expose:
       - ${DOCKER_BACKEND_PORT}
@@ -347,7 +348,7 @@ services:
       - frege-celery-downloads-worker-prod
       - frege-celery-crawl-worker-prod
       - frege-redis
-    profiles: [ "prod" ]
+    profiles: ["prod"]
     healthcheck:
       test: "curl -f http://localhost:${DOCKER_FLOWER_PORT} || exit 1"
       interval: 10s
