@@ -1,4 +1,4 @@
-import styles from './[home]/home.module.scss';
+import styles from './home/home.module.scss';
 import ContributorsList from '@/src/components/autorsList/ContributorsList';
 
 export default function Home() {
