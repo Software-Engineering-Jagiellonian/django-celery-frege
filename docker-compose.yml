@@ -1,6 +1,9 @@
 x-backend: &backend
   image: frege-backend-image
-  build: ./backend
+  build:
+    context: ./backend
+    args:
+      DJANGO_DOWNLOAD_PATH: ${DJANGO_DOWNLOAD_PATH}
   hostname: &host backend
   networks: &network
     - frege-main
@@ -251,37 +254,37 @@ services:
   frege-celery-crawl-worker-dev:
     <<: *celery
     container_name: frege-celery-crawl-worker-dev
-    command: celery --app frege worker --loglevel=${CELERY_LOG_LEVEL_DEV} --queues crawl --concurrency=${CELERY_WORKER_CRAWL_CONCURRENCY} --hostname worker_crawl
+    command: celery --app frege worker --loglevel=${CELERY_LOG_LEVEL_DEV} --queues crawl --concurrency=${CELERY_WORKER_CRAWL_CONCURRENCY} --hostname worker_crawl --uid=nobody --gid=nogroup
     profiles: ["dev"]
 
   frege-celery-downloads-worker-dev:
     <<: [*backend, *celery]
     container_name: frege-celery-downloads-worker-dev
-    command: celery --app frege worker --loglevel=${CELERY_LOG_LEVEL_DEV} --queues downloads --concurrency=${CELERY_WORKER_DOWNLOADS_CONCURRENCY} --hostname worker_downloads
+    command: celery --app frege worker --loglevel=${CELERY_LOG_LEVEL_DEV} --queues downloads --concurrency=${CELERY_WORKER_DOWNLOADS_CONCURRENCY} --hostname worker_downloads --uid=nobody --gid=nogroup
     profiles: ["dev"]
 
   frege-celery-worker-dev:
     <<: [*backend, *celery]
     container_name: frege-celery-worker-dev
-    command: celery --app frege worker --loglevel=${CELERY_LOG_LEVEL_DEV} --queues celery --concurrency=${CELERY_WORKER_BASE_CONCURRENCY} --hostname worker_celery
+    command: celery --app frege worker --loglevel=${CELERY_LOG_LEVEL_DEV} --queues celery --concurrency=${CELERY_WORKER_BASE_CONCURRENCY} --hostname worker_celery --uid=nobody --gid=nogroup
     profiles: ["dev"]
 
   frege-celery-crawl-worker-prod:
     <<: [*backend, *celery]
     container_name: frege-celery-crawl-worker-prod
-    command: celery --app frege worker --loglevel=${CELERY_LOG_LEVEL_PROD} --queues crawl --concurrency=${CELERY_WORKER_CRAWL_CONCURRENCY} --hostname worker_crawl
+    command: celery --app frege worker --loglevel=${CELERY_LOG_LEVEL_PROD} --queues crawl --concurrency=${CELERY_WORKER_CRAWL_CONCURRENCY} --hostname worker_crawl --uid=nobody --gid=nogroup
     profiles: ["prod"]
 
   frege-celery-downloads-worker-prod:
     <<: [*backend, *celery]
     container_name: frege-celery-downloads-worker-prod
-    command: celery --app frege worker --loglevel=${CELERY_LOG_LEVEL_PROD} --queues downloads --concurrency=${CELERY_WORKER_DOWNLOADS_CONCURRENCY} --hostname worker_downloads
+    command: celery --app frege worker --loglevel=${CELERY_LOG_LEVEL_PROD} --queues downloads --concurrency=${CELERY_WORKER_DOWNLOADS_CONCURRENCY} --hostname worker_downloads --uid=nobody --gid=nogroup
     profiles: ["prod"]
 
   frege-celery-worker-prod:
     <<: *celery
     container_name: frege-celery-worker-prod
-    command: celery --app frege worker --loglevel=${CELERY_LOG_LEVEL_PROD} --queues celery --concurrency=${CELERY_WORKER_BASE_CONCURRENCY} --hostname worker_celery
+    command: celery --app frege worker --loglevel=${CELERY_LOG_LEVEL_PROD} --queues celery --concurrency=${CELERY_WORKER_BASE_CONCURRENCY} --hostname worker_celery --uid=nobody --gid=nogroup
     profiles: ["prod"]
 
   # === [Grafana] ===
