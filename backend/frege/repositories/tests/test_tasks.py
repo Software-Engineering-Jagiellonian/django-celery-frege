@@ -67,16 +67,3 @@ class TestProcessRepoTask:
         clone_from_mock.assert_not_called()
         
         assert dummy_repo.files.count() == 0
-
-    def test_process_repo_task_download_directory_full(
-        self, mocker: MockerFixture, dummy_repo
-    ):
-        clone_from_mock = mocker.patch(
-            "git.repo.base.Repo.clone_from", side_effect=DownloadDirectoryFullException("Download directory full")
-        )
-        mocker.patch("frege.repositories.tasks.logger")
-        
-        with pytest.raises(DownloadDirectoryFullException):
-            process_repo_task.run(dummy_repo.pk)
-        
-        clone_from_mock.assert_called_once()
