@@ -43,15 +43,15 @@ EXTERNAL_APPS = [
     "corsheaders",
     "django_filters",
     "channels",
-    'health_check',                             # required
-    'health_check.db',                          # stock Django health checkers
-    'health_check.cache',
-    'health_check.storage',
-    'health_check.contrib.migrations',
-    'health_check.contrib.celery',              # requires celery
-    'health_check.contrib.celery_ping',         # requires celery
-    'health_check.contrib.psutil',              # disk and memory utilization; requires psutil
-    'health_check.contrib.redis',               # requires Redis broker
+    "health_check",  # required
+    "health_check.db",  # stock Django health checkers
+    "health_check.cache",
+    "health_check.storage",
+    "health_check.contrib.migrations",
+    "health_check.contrib.celery",  # requires celery
+    "health_check.contrib.celery_ping",  # requires celery
+    "health_check.contrib.psutil",  # disk and memory utilization; requires psutil
+    "health_check.contrib.redis",  # requires Redis broker
 ]
 
 INSTALLED_APPS = EXTERNAL_APPS + PROJECT_APPS
@@ -123,11 +123,11 @@ USE_I18N = True
 
 USE_TZ = True
 
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
@@ -148,20 +148,24 @@ DATABASES = {
 
 REDIS_HOST = os.environ.get("DJANGO_REDIS_HOST", "127.0.0.1")
 REDIS_PORT = os.environ.get("DJANGO_REDIS_PORT", "6379")
-REDIS_PERSISTENCE_ENABLED: bool = os.environ.get("REDIS_PERSISTENCE_ENABLED", "False").lower() == "true"
+REDIS_PERSISTENCE_ENABLED: bool = (
+    os.environ.get("REDIS_PERSISTENCE_ENABLED", "False").lower() == "true"
+)
 
 # CELERY STUFF
 CELERY_BROKER_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/"
 CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_TASK_SERIALIZER = "json"
-# CELERY_IMPORTS = ("frege.repositories.celery_tasks",)
+CELERY_IMPORTS = ("frege.repositories.tasks.task_crawl",)
 
 CELERY_RESULT_BACKEND = f"redis://{REDIS_HOST}:{REDIS_PORT}/"
 CELERY_CACHE_BACKEND = f"redis://{REDIS_HOST}:{REDIS_PORT}/"
 
 CELERY_TASK_ROUTES = {
-    "frege.repositories.tasks.process_repo_task": {"queue": "downloads"},
-    "frege.repositories.tasks.crawl_repos_task": {"queue": "crawl"},
+    "frege.repositories.tasks.task_repo.process_repo_task": {
+        "queue": "downloads"
+    },
+    "frege.repositories.tasks.task_crawl.crawl_repos_task": {"queue": "crawl"},
 }
 
 
@@ -198,16 +202,14 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated"
     ],
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework.authentication.TokenAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
     ),
     "DEFAULT_FILTER_BACKENDS": [
         "django_filters.rest_framework.DjangoFilterBackend"
     ],
-    "DEFAULT_THROTTLE_CLASSES": [
-        "frege.utils.throttling.ApiKeyRateThrottle"
-    ],
+    "DEFAULT_THROTTLE_CLASSES": ["frege.utils.throttling.ApiKeyRateThrottle"],
     "DEFAULT_THROTTLE_RATES": {"apikey": "500/minute"},
 }
 
@@ -216,16 +218,12 @@ REST_FRAMEWORK = {
 
 CORS_ALLOWED_ORIGINS = [
     # set for production
-    'http://localhost:3000',
-    'http://localhost:3001',
-    'http://localhost:3030'
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://localhost:3030",
 ]
 
-CORS_ALLOW_METHODS = [
-    'GET',
-    'POST',
-    'OPTIONS'
-]
+CORS_ALLOW_METHODS = ["GET", "POST", "OPTIONS"]
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -244,8 +242,8 @@ CHANNEL_LAYERS = {
 # HEALTHCHECK
 
 HEALTH_CHECK = {
-    'DISK_USAGE_MAX': 70,  # percent
-    'MEMORY_MIN': 100,    # in MB
+    "DISK_USAGE_MAX": 70,  # percent
+    "MEMORY_MIN": 100,  # in MB
 }
 
 REDIS_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/"
