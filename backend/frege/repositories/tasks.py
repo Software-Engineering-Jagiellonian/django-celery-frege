@@ -342,7 +342,7 @@ def analyze_file_task(repo_file_pk):
     try:
         analyzers = AnalyzerFactory.make_analyzers(repo_file.language)
         if not analyzers:
-            logger.warning(f"No analyzers for language {repo_file.language}, deleting file")
+            logger.debug(f"No analyzers for language {repo_file.language}, deleting file")
             repository = repo_file.repository
             repo_file.delete()
             _finalize_repo_analysis(repository)
