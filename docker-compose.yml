@@ -25,14 +25,13 @@ x-backend: &backend
     - frege_tmp:${DJANGO_DOWNLOAD_PATH}
   networks:
     - frege-main
-  profiles: [ "dev", "local-be-dev" ]
+  profiles: ["dev", "prod"]
   restart: on-failure
   env_file:
     - .env
 
 services:
-
-# === [Common] ===
+  # === [Common] ===
 
   frege-redis:
     container_name: frege-redis
@@ -45,7 +44,7 @@ services:
       - "${DOCKER_REDIS_PORT}"
     ports:
       - "${DOCKER_REDIS_PORT}:${DOCKER_REDIS_PORT}"
-    profiles: [ "dev", "prod", "local-be-dev" ]
+    profiles: ["dev", "prod"]
     restart: on-failure
     healthcheck:
       test: "redis-cli ping || exit 1"
@@ -67,7 +66,7 @@ services:
       - "${DOCKER_POSTGRES_PORT}"
     ports:
       - "${DOCKER_POSTGRES_PORT}:${DOCKER_POSTGRES_PORT}"
-    profiles: [ "dev", "prod", "local-be-dev" ]
+    profiles: ["dev", "prod"]
     restart: on-failure
     volumes:
       - frege_postgresql_data:/var/lib/postgresql/data
@@ -90,7 +89,7 @@ services:
       - ${DOCKER_PROMETHEUS_PORT}
     networks:
       - frege-main
-    profiles: [ "dev", "prod" ]
+    profiles: ["dev", "prod"]
     restart: on-failure
     healthcheck:
       test: "wget -nv -t1 --spider http://localhost:${DOCKER_PROMETHEUS_PORT} || exit 1"
@@ -110,7 +109,7 @@ services:
     # command: -config.file=/etc/loki/local-config.yaml
     networks:
       - frege-main
-    profiles: [ "dev", "prod" ]
+    profiles: ["dev", "prod"]
 
   frege-promtail:
     image: grafana/promtail:2.6.1
@@ -123,9 +122,9 @@ services:
       - /var/lib/docker/containers:/var/lib/docker/containers
     networks:
       - frege-main
-    profiles: [ "dev", "prod" ]
+    profiles: ["dev", "prod"]
 
-# === [Dev] ===
+  # === [Dev] ===
 
   frege-backend-dev:
     <<: *backend
@@ -134,7 +133,8 @@ services:
       - frege_tmp:${DJANGO_DOWNLOAD_PATH}
       - ./backend/static:/app/static
     command: >
-      sh -c "python manage.py migrate --noinput
+      sh -c "python manage.py makemigrations
+      && python manage.py migrate --noinput
       && python manage.py initadmin
       && python manage.py collectstatic --noinput
       && python manage.py runserver 0.0.0.0:${DOCKER_BACKEND_PORT}"
@@ -160,7 +160,7 @@ services:
       - frege-celery-downloads-worker-dev
       - frege-celery-crawl-worker-dev
       - frege-redis
-    profiles: [ "dev" ]
+    profiles: ["dev"]
     healthcheck:
       test: "curl -f http://localhost:${DOCKER_FLOWER_PORT} || exit 1"
       interval: 10s
@@ -181,21 +181,21 @@ services:
     container_name: frege-celery-crawl-worker-dev
     ports: []
     command: celery --app frege worker --loglevel=${CELERY_LOG_LEVEL_DEV} --queues crawl --concurrency=${CELERY_WORKER_CRAWL_CONCURRENCY} --hostname worker_crawl
-    profiles: [ "dev", "local-be-dev" ]
+    profiles: ["dev"]
 
   frege-celery-downloads-worker-dev:
     <<: [*backend, *celery-healthcheck]
     container_name: frege-celery-downloads-worker-dev
     ports: []
     command: celery --app frege worker --loglevel=${CELERY_LOG_LEVEL_DEV} --queues downloads --concurrency=${CELERY_WORKER_DOWNLOADS_CONCURRENCY} --hostname worker_downloads
-    profiles: [ "dev", "local-be-dev" ]
+    profiles: ["dev"]
 
   frege-celery-worker-dev:
     <<: [*backend, *celery-healthcheck]
     container_name: frege-celery-worker-dev
     ports: []
     command: celery --app frege worker --loglevel=${CELERY_LOG_LEVEL_DEV} --queues celery --concurrency=${CELERY_WORKER_BASE_CONCURRENCY} --hostname worker_celery
-    profiles: [ "dev", "local-be-dev" ]
+    profiles: ["dev"]
 
   frege-grafana-dev: &grafana
     image: grafana/grafana:8.5.2
@@ -224,7 +224,7 @@ services:
       - frege-main
     env_file:
       - .env
-    profiles: [ "dev" ]
+    profiles: ["dev"]
     restart: on-failure
     healthcheck:
       test: "wget -nv -t1 --spider http://localhost:${DOCKER_GRAFANA_PORT}/api/health || exit 1"
@@ -257,7 +257,7 @@ services:
       - frege-grafana-dev
     networks:
       - frege-main
-    profiles: [ "dev" ]
+    profiles: ["dev"]
     restart: on-failure
     healthcheck:
       test: "wget -nv -t1 --spider http://localhost:${DOCKER_FRONTEND_PORT} || exit 1"
@@ -266,7 +266,7 @@ services:
       retries: 2
       start_period: 40s
 
-# === [Prod] ===
+  # === [Prod] ===
 
   frege-frontend-prod:
     <<: *frontend
@@ -286,20 +286,21 @@ services:
       - LETSENCRYPT_HOST=${FRONTEND_HOSTNAME}
     depends_on:
       - frege-grafana-prod
-    profiles: [ "prod" ]
+    profiles: ["prod"]
 
   frege-backend-prod:
     <<: *backend
     container_name: frege-backend-prod
     command: >
-      sh -c "python manage.py migrate --noinput
+      sh -c "python manage.py makemigrations
+      && python manage.py migrate --noinput
       && python manage.py initadmin
       && python manage.py collectstatic --noinput
       && gunicorn frege.wsgi:application --bind 0.0.0.0:${DOCKER_BACKEND_PORT}"
     volumes:
       - frege_tmp:${DJANGO_DOWNLOAD_PATH}
       - frege_static_files:/app/static
-    profiles: [ "prod" ]
+    profiles: ["prod"]
     ports: []
     expose:
       - ${DOCKER_BACKEND_PORT}
@@ -327,7 +328,7 @@ services:
       # - GF_SERVER_SERVE_FROM_SUB_PATH=true
       - VIRTUAL_HOST=${FRONTEND_HOSTNAME}
       - LETSENCRYPT_HOST=${FRONTEND_HOSTNAME}
-    profiles: [ "prod" ]
+    profiles: ["prod"]
     expose:
       - ${DOCKER_FRONTEND_PORT}
     ports: []
@@ -347,7 +348,7 @@ services:
       - frege-celery-downloads-worker-prod
       - frege-celery-crawl-worker-prod
       - frege-redis
-    profiles: [ "prod" ]
+    profiles: ["prod"]
     healthcheck:
       test: "curl -f http://localhost:${DOCKER_FLOWER_PORT} || exit 1"
       interval: 10s
@@ -359,21 +360,21 @@ services:
     container_name: frege-celery-crawl-worker-prod
     ports: []
     command: celery --app frege worker --queues crawl --loglevel=${CELERY_LOG_LEVEL_PROD} --concurrency=${CELERY_WORKER_CRAWL_CONCURRENCY} --hostname worker_crawl
-    profiles: [ "prod" ]
+    profiles: ["prod"]
 
   frege-celery-downloads-worker-prod:
     <<: [*backend, *celery-healthcheck]
     container_name: frege-celery-downloads-worker-prod
     ports: []
     command: celery --app frege worker --queues downloads --loglevel=${CELERY_LOG_LEVEL_PROD} --concurrency=${CELERY_WORKER_DOWNLOADS_CONCURRENCY} --hostname worker_downloads
-    profiles: [ "prod" ]
+    profiles: ["prod"]
 
   frege-celery-worker-prod:
     <<: [*backend, *celery-healthcheck]
     container_name: frege-celery-worker-prod
     ports: []
     command: celery --app frege worker --queues celery --loglevel=${CELERY_LOG_LEVEL_PROD} --concurrency=${CELERY_WORKER_BASE_CONCURRENCY} --hostname worker_celery
-    profiles: [ "prod" ]
+    profiles: ["prod"]
 
   nginx-proxy:
     image: nginx
@@ -393,7 +394,7 @@ services:
       #       location rule in egress.ngins.conf) - should be fixed
       - frege_static_files:/var/www/backend/static
     restart: always
-    profiles: [ "prod" ]
+    profiles: ["prod"]
     networks:
       - frege-main
     healthcheck:
@@ -415,7 +416,7 @@ services:
       - ./nginx/egress.nginx.conf:/etc/docker-gen/templates/nginx.tmpl:ro
       - /var/run/docker.sock:/tmp/docker.sock:ro
     restart: on-failure
-    profiles: [ "prod" ]
+    profiles: ["prod"]
     networks:
       - frege-main
 
@@ -435,7 +436,7 @@ services:
     environment:
       - DEFAULT_EMAIL=${LETSENCRYPT_EMAIL}
       - NGINX_PROXY_CONTAINER=frege-proxy
-    profiles: [ "tls" ]
+    profiles: ["tls"]
 
 networks:
   frege-main:

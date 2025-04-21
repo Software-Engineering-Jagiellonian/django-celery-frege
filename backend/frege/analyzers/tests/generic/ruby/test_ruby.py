@@ -1,6 +1,4 @@
 import pytest
-
-from frege.analyzers.tests.generic.ruby.constans import MOCKED_RUBY_FILES
 from frege.analyzers.tests.generic.util.generic_test_util import (
     generic_test,
 )
@@ -29,7 +27,6 @@ class TestRubyAnalyzer:
     def test(
         self,
         repo_file_params,
-        settings,
         dummy_repo,
         expected_average_loc,
         expected_average_parameter_count,
@@ -39,9 +36,7 @@ class TestRubyAnalyzer:
         generic_test(
             repo_file_params,
             expected,
-            settings,
             dummy_repo,
-            MOCKED_RUBY_FILES,
             ProgrammingLanguages.RUBY,
             tested_parameter_types,
             mock_lizard_result(average_nloc=expected_average_loc, average_parameter_count=expected_average_parameter_count),
