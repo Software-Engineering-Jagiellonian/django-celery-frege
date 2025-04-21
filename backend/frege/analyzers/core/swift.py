@@ -5,4 +5,6 @@ from frege.repositories.constants import ProgrammingLanguages
 
 @AnalyzerFactory.register(ProgrammingLanguages.SWIFT)
 class SwiftAnalyzer(GenericAnalyzer):
+    """Analyzer for Swift source files using generic metrics."""
+
     pass

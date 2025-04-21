@@ -1,8 +1,4 @@
 import pytest
-
-from frege.analyzers.tests.generic.typescript.constants import (
-    MOCKED_TYPESCRIPT_FILES,
-)
 from frege.analyzers.tests.generic.util.generic_test_util import (
     generic_test,
 )
@@ -43,7 +39,6 @@ class TestTypescriptAnalyzer:
     def test(
         self,
         repo_file_params,
-        settings,
         dummy_repo,
         expected_avg_cyclomatic_complexity,
         expected_average_loc,
@@ -62,9 +57,7 @@ class TestTypescriptAnalyzer:
         generic_test(
             repo_file_params,
             expected,
-            settings,
             dummy_repo,
-            MOCKED_TYPESCRIPT_FILES,
             ProgrammingLanguages.TYPESCRIPT,
             tested_parameter_types,
             mock_lizard_result(

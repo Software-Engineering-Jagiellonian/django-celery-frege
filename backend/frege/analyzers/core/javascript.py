@@ -5,4 +5,9 @@ from frege.repositories.constants import ProgrammingLanguages
 
 @AnalyzerFactory.register(ProgrammingLanguages.JS)
 class JavascriptAnalyzer(GenericAnalyzer):
+    """
+    Analyzer for JavaScript source files.
+
+    Uses GenericAnalyzer to collect standard code metrics.
+    """
     pass
