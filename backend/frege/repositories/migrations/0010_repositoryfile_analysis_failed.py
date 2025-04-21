@@ -4,7 +4,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('repositories', '0008_repository_analysis_failed'),
+        ('repositories', '0009_alter_repository_git_url'),
     ]
 
     operations = [
