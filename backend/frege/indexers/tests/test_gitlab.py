@@ -106,7 +106,8 @@ def test_repositories_filters_and_yields(mock_commit_hash, mock_get, client):
     mock_commit_hash.return_value = "abc123"
 
     repos = list(client.repositories())
-    assert len(repos) == 1
+    
+    assert len(repos) == 1 
     repo_data, repo_id = repos[0]
     assert repo_data["name"] == "test"
     assert repo_data["commit_hash"] == "abc123"
