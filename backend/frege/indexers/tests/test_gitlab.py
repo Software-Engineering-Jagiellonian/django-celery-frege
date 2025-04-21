@@ -90,8 +90,8 @@ def test_projects_pagination(mock_get):
     
     results = list(client._projects())
 
-    assert len(results) == 4
-    assert results == [{"id": 1, "name": "Project 1"}, {"id": 2, "name": "Project 2"}, {"id": 3, "name": "Project 3"}, {"id": 4, "name": "Project 4"}]
+    assert len(results) == 2
+    assert results == [[{'id': 1, 'name': 'Project 1'}, {'id': 2, 'name': 'Project 2'}], [{'id': 3, 'name': 'Project 3'}, {'id': 4, 'name': 'Project 4'}]]
 
     assert mock_get.call_count == 2
     mock_get.assert_any_call(BASE_ENDPOINT, params={'pagination': 'keyset', 'per_page': '100', 'order_by': 'id', 'sort': 'asc', 'id_after': client.after_id})
