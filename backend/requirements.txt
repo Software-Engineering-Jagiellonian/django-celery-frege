@@ -1,5 +1,5 @@
 Django==5.1.7
-djangorestframework==3.15.2
+djangorestframework==3.16.0
 django-extensions~=3.2.3
 celery[redis]==5.5.1
 psycopg2~=2.9.10
