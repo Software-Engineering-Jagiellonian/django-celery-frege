@@ -217,6 +217,10 @@ def process_repo_task(repo_pk):
         logger.error(f"Repository does not exist ({repo_pk = })")
         return
     
+    if repo.analysis_failed:
+        logger.info(f"Repository {repo.git_url} marked as failed. Skipping processing.")
+        return
+    
     logger.info(f"Processing repository {repo.git_url}")
 
     _remove_database_entries(repo)
