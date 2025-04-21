@@ -2,6 +2,9 @@ from itertools import chain
 from dataclasses import dataclass
 
 import requests
+import logging
+
+logger = logging.getLogger(__name__)
 
 __all__ = [
     "Client",
@@ -83,12 +86,23 @@ class Client:
             next_page = projects_response.links.get('next', {}).get('url')
             yield projects_response.json()
 
-    def _commit_hash(self, project_id: int):
+    def _commit_hash(self, project_id):
         """Gets the latest commit hash in the default branch"""
-        project_commits = self._get(f"{BASE_ENDPOINT}/{project_id}/repository/commits")
-        try:
-            return project_commits.json()[0]['id']
-        except KeyError:
+
+        response = self._get(f"{BASE_ENDPOINT}/{project_id}/repository/commits")
+
+        if response.status_code != 200:
+            logger.info(f"Unable to fetch commits for project {project_id}, status code: {response.status_code}")
+            
             return None
 
+        commits = response.json()
+        if not commits:
+            logger.info(f"No commits found for project {project_id}")
+            
+            return None
 
+        mainBranch = commits[0]
+        hash = mainBranch['id']
+
+        return hash
