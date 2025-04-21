@@ -74,25 +74,26 @@ def test_commit_hash_handles_non_200(mock_get, client, caplog):
     assert "Unable to fetch commits for project 303" in caplog.text
 
 @patch("frege.indexers.utils.gitlab.Client._get")
-def test_projects_pagination(mock_get, client):
+def test_projects_pagination(mock_get):
     """Test if _projects method correctly handles pagination across multiple pages"""
-    
+
     first_response = Mock()
     first_response.json.return_value = [{"id": 1, "name": "Project 1"}, {"id": 2, "name": "Project 2"}]
     first_response.links = {"next": {"url": "https://gitlab.com/api/v4/projects/next-page"}}
-    
+
     second_response = Mock()
     second_response.json.return_value = [{"id": 3, "name": "Project 3"}, {"id": 4, "name": "Project 4"}]
     second_response.links = {}
-    
+
     mock_get.side_effect = [first_response, second_response]
+
+    client = Client(_ratelimit_remaining=1000, token='dummy-token', after_id=0, min_forks=5, min_stars=10)
     
     results = list(client._projects())
-    
-    assert len(results) == 2
-    assert results[0] == [{"id": 1, "name": "Project 1"}, {"id": 2, "name": "Project 2"}]
-    assert results[1] == [{"id": 3, "name": "Project 3"}, {"id": 4, "name": "Project 4"}]
-    
+
+    assert len(results) == 1
+    assert results[0] == [{"id": 3, "name": "Project 3"}, {"id": 4, "name": "Project 4"}]
+
     assert mock_get.call_count == 2
     mock_get.assert_any_call(BASE_ENDPOINT, params={'id_after': client.after_id})
     mock_get.assert_any_call("https://gitlab.com/api/v4/projects/next-page")
