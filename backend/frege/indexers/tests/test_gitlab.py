@@ -51,7 +51,7 @@ def test_commit_hash_handles_empty_commits(mock_get, client, caplog):
     mock_response.headers = {}
     mock_get.return_value = mock_response
 
-    with caplog.at_level("WARNING"):
+    with caplog.at_level("INFO"):
         commit = client._commit_hash(project_id=202)
 
     assert commit is None
@@ -65,7 +65,7 @@ def test_commit_hash_handles_non_200(mock_get, client, caplog):
     mock_response.headers = {}
     mock_get.return_value = mock_response
 
-    with caplog.at_level("WARNING"):
+    with caplog.at_level("INFO"):
         commit = client._commit_hash(project_id=303)
 
     assert commit is None
