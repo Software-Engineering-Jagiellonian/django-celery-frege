@@ -1,6 +1,7 @@
 import pytest
 from unittest.mock import patch, Mock
 from frege.indexers.utils.gitlab import Client, RateLimitExceededException
+from itertools import chain
 
 @pytest.fixture
 def client():
@@ -26,43 +27,50 @@ def test_get_raises_rate_limit():
     with pytest.raises(RateLimitExceededException):
         client._get("https://example.com")
 
+
 @patch("frege.indexers.utils.gitlab.requests.get")
 def test_commit_hash_success(mock_get, client):
     mock_response = Mock()
     mock_response.status_code = 200
     mock_response.json.return_value = [{"id": "abc123"}]
+    mock_response.headers = {}
     mock_get.return_value = mock_response
 
     commit = client._commit_hash(project_id=101)
-    
+
     assert commit == "abc123"
     mock_get.assert_called_once()
     assert "projects/101/repository/commits" in mock_get.call_args[0][0]
+
 
 @patch("frege.indexers.utils.gitlab.requests.get")
 def test_commit_hash_handles_empty_commits(mock_get, client, caplog):
     mock_response = Mock()
     mock_response.status_code = 200
     mock_response.json.return_value = []
+    mock_response.headers = {}
     mock_get.return_value = mock_response
 
     with caplog.at_level("WARNING"):
         commit = client._commit_hash(project_id=202)
-    
+
     assert commit is None
     assert "No commits found for project 202" in caplog.text
+
 
 @patch("frege.indexers.utils.gitlab.requests.get")
 def test_commit_hash_handles_non_200(mock_get, client, caplog):
     mock_response = Mock()
     mock_response.status_code = 404
+    mock_response.headers = {}
     mock_get.return_value = mock_response
 
     with caplog.at_level("WARNING"):
         commit = client._commit_hash(project_id=303)
-    
+
     assert commit is None
     assert "Unable to fetch commits for project 303" in caplog.text
+
 
 @patch("frege.indexers.utils.gitlab.requests.get")
 def test_projects_pagination(mock_get, client):
@@ -81,7 +89,7 @@ def test_projects_pagination(mock_get, client):
     projects = list(client._projects())
     flat = list(chain.from_iterable(projects))
 
-    assert [p["id"] for p in flat] == [2]
+    assert [p["id"] for p in flat] == [1, 2]
 
 
 @patch("frege.indexers.utils.gitlab.Client._get")
