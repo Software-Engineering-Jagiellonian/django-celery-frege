@@ -79,6 +79,9 @@ class Client:
 
         if self.ratelimit_remaining <= 0:
             raise RateLimitExceededException()
+        
+        # returns the first page of projects
+        yield projects_response.json()
 
         next_page = projects_response.links.get('next', {}).get('url')
         while next_page:
