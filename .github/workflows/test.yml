@@ -24,4 +24,4 @@ jobs:
       - name: Ensure Containers are Running
         run: docker compose ps
       - name: Run tests
-        run: docker compose exec -T frege-backend-dev pytest
+        run: docker compose exec --no-TTY frege-django-dev pytest
