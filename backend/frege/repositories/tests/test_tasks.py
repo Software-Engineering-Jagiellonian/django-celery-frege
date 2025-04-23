@@ -21,7 +21,7 @@ class TestProcessRepoTask:
         repo_obj_mock.git.ls_files = lambda: "ans.cpp\nhello_world.py"
         clone_from_mock.return_value = repo_obj_mock
         mocker.patch(
-            "frege.repositories.tasks.analyze_file_task.apply_async",
+            "frege.repositories.tasks.task_file.analyze_file_task.apply_async",
             analyze_file_task_mock,
         )
         mocker.patch("frege.repositories.tasks.logger")
