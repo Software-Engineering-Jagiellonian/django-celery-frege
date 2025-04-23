@@ -1,45 +1,36 @@
-x-celery-healthcheck: &celery-healthcheck
+x-backend: &backend
+  image: frege-backend-image
+  build:
+    context: ./backend
+    args:
+      DJANGO_DOWNLOAD_PATH: ${DJANGO_DOWNLOAD_PATH}
+  hostname: &host backend
+  networks: &network
+    - frege-main
+  restart: on-failure
+  env_file: &env
+    - .env
+
+x-celery: &celery
+  <<: *backend
+  volumes:
+    - ./backend:/app
+    - frege_tmp:${DJANGO_DOWNLOAD_PATH}
   healthcheck:
     test: "celery -b redis://${DOCKER_REDIS_HOST}:${DOCKER_REDIS_PORT} inspect ping || exit 1"
     interval: 10s
     timeout: 10s
     retries: 2
 
-x-backend: &backend
-  container_name: frege-backend
-  image: frege-backend-image
-  build: ./backend
-  hostname: backend
-  command: >
-    sh -c "python manage.py migrate --noinput
-    && python manage.py initadmin
-    && python manage.py runserver
-    0.0.0.0:${DOCKER_BACKEND_PORT}"
-  ports:
-    - "${DOCKER_EGRESS_IP}:${DOCKER_BACKEND_PORT}:${DOCKER_BACKEND_PORT}"
-  depends_on:
-    - frege-postgres
-    - frege-redis
-  volumes:
-    - ./backend:/app
-    - frege_tmp:${DJANGO_DOWNLOAD_PATH}
-  networks:
-    - frege-main
-  profiles: ["dev", "prod"]
-  restart: on-failure
-  env_file:
-    - .env
-
 services:
   # === [Common] ===
 
   frege-redis:
     container_name: frege-redis
-    hostname: frege-redis
+    hostname: ${DOCKER_REDIS_HOST}
     image: redis:7.0
     command: sh -c "if [ \"$REDIS_PERSISTENCE_ENABLED\" = \"True\" ]; then redis-server; else redis-server --save \"\" --appendonly no; fi"
-    networks:
-      - frege-main
+    networks: *network
     expose:
       - "${DOCKER_REDIS_PORT}"
     ports:
@@ -60,13 +51,11 @@ services:
       - POSTGRES_USER=${DJANGO_DATABASE_USER}
       - POSTGRES_PASSWORD=${DJANGO_DATABASE_PASSWORD}
       - POSTGRES_DB=${DJANGO_DATABASE_NAME}
-    networks:
-      - frege-main
+    networks: *network
     expose:
       - "${DOCKER_POSTGRES_PORT}"
     ports:
       - "${DOCKER_POSTGRES_PORT}:${DOCKER_POSTGRES_PORT}"
-    profiles: ["dev", "prod"]
     restart: on-failure
     volumes:
       - frege_postgresql_data:/var/lib/postgresql/data
@@ -87,9 +76,7 @@ services:
       - "${DOCKER_PROMETHEUS_PORT}:${DOCKER_PROMETHEUS_PORT}"
     expose:
       - ${DOCKER_PROMETHEUS_PORT}
-    networks:
-      - frege-main
-    profiles: ["dev", "prod"]
+    networks: *network
     restart: on-failure
     healthcheck:
       test: "wget -nv -t1 --spider http://localhost:${DOCKER_PROMETHEUS_PORT} || exit 1"
@@ -102,14 +89,12 @@ services:
     user: "1000"
     container_name: frege-loki
     ports:
-      - 3100:3100
+      - ${DOCKER_LOKI_PORT}:${DOCKER_LOKI_PORT}
     volumes:
       - ./loki/data:/loki
       # - ./loki/loki-config.yaml:/etc/loki/local-config.yaml
     # command: -config.file=/etc/loki/local-config.yaml
-    networks:
-      - frege-main
-    profiles: ["dev", "prod"]
+    networks: *network
 
   frege-promtail:
     image: grafana/promtail:2.6.1
@@ -120,261 +105,7 @@ services:
       - ./loki/promtail-config.yaml:/etc/promtail/config.yml
       - /var/run/docker.sock:/var/run/docker.sock
       - /var/lib/docker/containers:/var/lib/docker/containers
-    networks:
-      - frege-main
-    profiles: ["dev", "prod"]
-
-  # === [Dev] ===
-
-  frege-backend-dev:
-    <<: *backend
-    volumes:
-      - ./backend:/app
-      - frege_tmp:${DJANGO_DOWNLOAD_PATH}
-      - ./backend/static:/app/static
-    command: >
-      sh -c "python manage.py makemigrations
-      && python manage.py migrate --noinput
-      && python manage.py initadmin
-      && python manage.py collectstatic --noinput
-      && python manage.py runserver 0.0.0.0:${DOCKER_BACKEND_PORT}"
-    healthcheck:
-      test: "curl -f http://localhost:${DOCKER_BACKEND_PORT}/ht || exit 1"
-      interval: 10s
-      timeout: 10s
-      retries: 2
-
-  frege-flower-dev:
-    <<: *backend
-    container_name: frege-flower-dev
-    command: celery -A frege flower
-    ports:
-      - 5555:5555
-    expose:
-      - 5555
-    environment:
-      CELERY_BROKER_URL: redis://frege-redis
-      CELERY_RESULT_BACKEND: redis://frege-redis
-    depends_on:
-      - frege-celery-worker-dev
-      - frege-celery-downloads-worker-dev
-      - frege-celery-crawl-worker-dev
-      - frege-redis
-    profiles: ["dev"]
-    healthcheck:
-      test: "curl -f http://localhost:${DOCKER_FLOWER_PORT} || exit 1"
-      interval: 10s
-      timeout: 10s
-      retries: 2
-
-  # Autoreload on code change won't work without this setup
-  #
-  # frege-celery-worker-dev:
-  #   <<: [*backend, *celery-healthcheck]
-  #   container_name: frege-celery-worker-dev
-  #   ports: []
-  #   command: sh -c "python3 manage.py celery_dev_autoreload"
-  #   profiles: [ "dev" ]
-
-  frege-celery-crawl-worker-dev:
-    <<: [*backend, *celery-healthcheck]
-    container_name: frege-celery-crawl-worker-dev
-    ports: []
-    command: celery --app frege worker --loglevel=${CELERY_LOG_LEVEL_DEV} --queues crawl --concurrency=${CELERY_WORKER_CRAWL_CONCURRENCY} --hostname worker_crawl
-    profiles: ["dev"]
-
-  frege-celery-downloads-worker-dev:
-    <<: [*backend, *celery-healthcheck]
-    container_name: frege-celery-downloads-worker-dev
-    ports: []
-    command: celery --app frege worker --loglevel=${CELERY_LOG_LEVEL_DEV} --queues downloads --concurrency=${CELERY_WORKER_DOWNLOADS_CONCURRENCY} --hostname worker_downloads
-    profiles: ["dev"]
-
-  frege-celery-worker-dev:
-    <<: [*backend, *celery-healthcheck]
-    container_name: frege-celery-worker-dev
-    ports: []
-    command: celery --app frege worker --loglevel=${CELERY_LOG_LEVEL_DEV} --queues celery --concurrency=${CELERY_WORKER_BASE_CONCURRENCY} --hostname worker_celery
-    profiles: ["dev"]
-
-  frege-grafana-dev: &grafana
-    image: grafana/grafana:8.5.2
-    container_name: frege-grafana-dev
-    depends_on:
-      - frege-prometheus
-      - frege-postgres
-      - frege-loki
-      - frege-promtail
-    volumes:
-      - frege_grafana_storage:/var/lib/grafana
-      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
-      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
-    environment:
-      - GF_USERS_DEFAULT_THEME=dark
-      - GF_USERS_ALLOW_SIGN_UP=false
-      - GF_USERS_ALLOW_ORG_CREATE=false
-      - GF_AUTH_ANONYMOUS_ENABLED=true
-      - GF_AUTH_DISABLE_LOGIN_FORM=true
-      - GF_SECURITY_ALLOW_EMBEDDING=true
-      - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/grafana/
-      - GF_SERVER_SERVE_FROM_SUB_PATH=true
-    ports:
-      - ${DOCKER_GRAFANA_PORT}:${DOCKER_GRAFANA_PORT}
-    networks:
-      - frege-main
-    env_file:
-      - .env
-    profiles: ["dev"]
-    restart: on-failure
-    healthcheck:
-      test: "wget -nv -t1 --spider http://localhost:${DOCKER_GRAFANA_PORT}/api/health || exit 1"
-      interval: 10s
-      timeout: 10s
-      retries: 2
-
-  frege-frontend-dev: &frontend
-    container_name: frege-frontend-dev
-    hostname: frege-frontend-dev
-    build:
-      context: frontend
-      dockerfile: Dockerfile
-    environment:
-      - PORT=${DOCKER_FRONTEND_PORT}
-      - REACT_APP_DOCKER_GRAFANA_HOST=frege-grafana-dev
-      - REACT_APP_DOCKER_GRAFANA_PORT=3000
-      - DOCKER_FLOWER_HOST=frege-flower-dev
-      - DOCKER_FLOWER_PORT=5555
-      - DJANGO_SUPERUSER_USERNAME=django_admin
-      - DJANGO_SUPERUSER_PASSWORD=pass
-      - CHOKIDAR_USEPOLLING=true
-    volumes:
-      - /app/node_modules
-      - ./frontend:/app
-    command: npm start
-    ports:
-      - ${DOCKER_FRONTEND_PORT}:${DOCKER_FRONTEND_PORT}
-    depends_on:
-      - frege-grafana-dev
-    networks:
-      - frege-main
-    profiles: ["dev"]
-    restart: on-failure
-    healthcheck:
-      test: "wget -nv -t1 --spider http://localhost:${DOCKER_FRONTEND_PORT} || exit 1"
-      interval: 10s
-      timeout: 10s
-      retries: 2
-      start_period: 40s
-
-  # === [Prod] ===
-
-  frege-frontend-prod:
-    <<: *frontend
-    container_name: frege-frontend-prod
-    hostname: frege-frontend-prod
-    ports: []
-    expose:
-      - ${DOCKER_FRONTEND_PORT}
-    environment:
-      - PORT=${DOCKER_FRONTEND_PORT}
-      - REACT_APP_DOCKER_GRAFANA_HOST=frege-grafana-prod
-      - REACT_APP_DOCKER_GRAFANA_PORT=3000
-      - DOCKER_FLOWER_HOST=frege-flower-dev
-      - DOCKER_FLOWER_PORT=5555
-      - NODE_ENV=production
-      - VIRTUAL_HOST=${FRONTEND_HOSTNAME}
-      - LETSENCRYPT_HOST=${FRONTEND_HOSTNAME}
-    depends_on:
-      - frege-grafana-prod
-    profiles: ["prod"]
-
-  frege-backend-prod:
-    <<: *backend
-    container_name: frege-backend-prod
-    command: >
-      sh -c "python manage.py makemigrations
-      && python manage.py migrate --noinput
-      && python manage.py initadmin
-      && python manage.py collectstatic --noinput
-      && gunicorn frege.wsgi:application --bind 0.0.0.0:${DOCKER_BACKEND_PORT}"
-    volumes:
-      - frege_tmp:${DJANGO_DOWNLOAD_PATH}
-      - frege_static_files:/app/static
-    profiles: ["prod"]
-    ports: []
-    expose:
-      - ${DOCKER_BACKEND_PORT}
-    environment:
-      - VIRTUAL_HOST=${BACKEND_HOSTNAME}
-      - LETSENCRYPT_HOST=${BACKEND_HOSTNAME}
-    healthcheck:
-      test: "curl -f http://localhost:${DOCKER_BACKEND_PORT}/ht || exit 1"
-      interval: 10s
-      timeout: 10s
-      retries: 2
-
-  frege-grafana-prod:
-    <<: *grafana
-    container_name: frege-grafana-prod
-    environment:
-      - GF_USERS_DEFAULT_THEME=dark
-      - GF_USERS_ALLOW_SIGN_UP=false
-      - GF_USERS_ALLOW_ORG_CREATE=false
-      - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
-      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
-      # - GF_AUTH_ANONYMOUS_ENABLED=true
-      # - GF_SECURITY_ALLOW_EMBEDDING=true
-      # - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/grafana/
-      # - GF_SERVER_SERVE_FROM_SUB_PATH=true
-      - VIRTUAL_HOST=${FRONTEND_HOSTNAME}
-      - LETSENCRYPT_HOST=${FRONTEND_HOSTNAME}
-    profiles: ["prod"]
-    expose:
-      - ${DOCKER_FRONTEND_PORT}
-    ports: []
-    env_file: []
-
-  frege-flower-prod:
-    <<: *backend
-    container_name: frege-flower-prod
-    command: celery -A frege flower
-    expose:
-      - ${DOCKER_FLOWER_PORT}
-    environment:
-      CELERY_BROKER_URL: redis://frege-redis
-      CELERY_RESULT_BACKEND: redis://frege-redis
-    depends_on:
-      - frege-celery-worker-prod
-      - frege-celery-downloads-worker-prod
-      - frege-celery-crawl-worker-prod
-      - frege-redis
-    profiles: ["prod"]
-    healthcheck:
-      test: "curl -f http://localhost:${DOCKER_FLOWER_PORT} || exit 1"
-      interval: 10s
-      timeout: 10s
-      retries: 2
-
-  frege-celery-crawl-worker-prod:
-    <<: [*backend, *celery-healthcheck]
-    container_name: frege-celery-crawl-worker-prod
-    ports: []
-    command: celery --app frege worker --queues crawl --loglevel=${CELERY_LOG_LEVEL_PROD} --concurrency=${CELERY_WORKER_CRAWL_CONCURRENCY} --hostname worker_crawl
-    profiles: ["prod"]
-
-  frege-celery-downloads-worker-prod:
-    <<: [*backend, *celery-healthcheck]
-    container_name: frege-celery-downloads-worker-prod
-    ports: []
-    command: celery --app frege worker --queues downloads --loglevel=${CELERY_LOG_LEVEL_PROD} --concurrency=${CELERY_WORKER_DOWNLOADS_CONCURRENCY} --hostname worker_downloads
-    profiles: ["prod"]
-
-  frege-celery-worker-prod:
-    <<: [*backend, *celery-healthcheck]
-    container_name: frege-celery-worker-prod
-    ports: []
-    command: celery --app frege worker --queues celery --loglevel=${CELERY_LOG_LEVEL_PROD} --concurrency=${CELERY_WORKER_BASE_CONCURRENCY} --hostname worker_celery
-    profiles: ["prod"]
+    networks: *network
 
   nginx-proxy:
     image: nginx
@@ -437,6 +168,231 @@ services:
       - DEFAULT_EMAIL=${LETSENCRYPT_EMAIL}
       - NGINX_PROXY_CONTAINER=frege-proxy
     profiles: ["tls"]
+
+  # === [Django] ===
+
+  frege-django-dev: &django
+    <<: *backend
+    container_name: frege-django-dev
+    profiles: ["dev"]
+    command: >
+      sh -c "python manage.py makemigrations
+      && python manage.py migrate --noinput
+      && python manage.py initadmin
+      && python manage.py collectstatic --noinput
+      && python manage.py runserver 0.0.0.0:${DOCKER_BACKEND_PORT}"
+    volumes:
+      - ./backend:/app
+      - frege_tmp:${DJANGO_DOWNLOAD_PATH}
+      - ./backend/static:/app/static
+    environment:
+      - DJANGO_DEBUG=True
+    depends_on:
+      - frege-postgres
+      - frege-redis
+    ports:
+      # TODO: Consider if it should be hidden in production
+      - ${DOCKER_BACKEND_PORT}:${DOCKER_BACKEND_PORT}
+    healthcheck:
+      test: "curl -f http://localhost:${DOCKER_BACKEND_PORT}/ht || exit 1"
+      interval: 10s
+      timeout: 10s
+      retries: 2
+
+  frege-django-prod:
+    <<: *django
+    container_name: frege-django-prod
+    profiles: ["prod"]
+    command: >
+      sh -c "python manage.py makemigrations
+      && python manage.py migrate --noinput
+      && python manage.py initadmin
+      && python manage.py collectstatic --noinput
+      && gunicorn frege.wsgi:application --bind 0.0.0.0:${DOCKER_BACKEND_PORT}"
+    environment:
+      - VIRTUAL_HOST=${BACKEND_HOSTNAME}
+      - LETSENCRYPT_HOST=${BACKEND_HOSTNAME}
+      - DJANGO_DEBUG=False
+
+  # === [Flower] ===
+
+  frege-flower-dev: &flower
+    <<: *backend
+    container_name: frege-flower-dev
+    profiles: ["dev"]
+    command: celery -A frege flower
+    expose:
+      - ${DOCKER_FLOWER_PORT}
+    ports:
+      - ${DOCKER_FLOWER_PORT}:${DOCKER_FLOWER_PORT}
+    environment:
+      CELERY_BROKER_URL: redis://${DOCKER_REDIS_HOST}:${DOCKER_REDIS_PORT}
+      CELERY_RESULT_BACKEND: redis://${DOCKER_REDIS_HOST}:${DOCKER_REDIS_PORT}
+    depends_on:
+      - frege-redis
+      - frege-celery-worker-dev
+      - frege-celery-downloads-worker-dev
+      - frege-celery-crawl-worker-dev
+    healthcheck:
+      test: "curl -f http://localhost:${DOCKER_FLOWER_PORT} || exit 1"
+      interval: 10s
+      timeout: 10s
+      retries: 2
+
+  frege-flower-prod:
+    <<: *flower
+    container_name: frege-flower-prod
+    depends_on:
+      - frege-redis
+      - frege-celery-worker-prod
+      - frege-celery-downloads-worker-prod
+      - frege-celery-crawl-worker-prod
+    profiles: ["prod"]
+
+  # === [Celery] ===
+
+  frege-celery-crawl-worker-dev:
+    <<: *celery
+    container_name: frege-celery-crawl-worker-dev
+    command: celery --app frege worker --loglevel=${CELERY_LOG_LEVEL_DEV} --queues crawl --concurrency=${CELERY_WORKER_CRAWL_CONCURRENCY} --hostname worker_crawl --uid=nobody --gid=nogroup
+    profiles: ["dev"]
+
+  frege-celery-downloads-worker-dev:
+    <<: [*backend, *celery]
+    container_name: frege-celery-downloads-worker-dev
+    command: celery --app frege worker --loglevel=${CELERY_LOG_LEVEL_DEV} --queues downloads --concurrency=${CELERY_WORKER_DOWNLOADS_CONCURRENCY} --hostname worker_downloads --uid=nobody --gid=nogroup
+    profiles: ["dev"]
+
+  frege-celery-worker-dev:
+    <<: [*backend, *celery]
+    container_name: frege-celery-worker-dev
+    command: celery --app frege worker --loglevel=${CELERY_LOG_LEVEL_DEV} --queues celery --concurrency=${CELERY_WORKER_BASE_CONCURRENCY} --hostname worker_celery --uid=nobody --gid=nogroup
+    profiles: ["dev"]
+
+  frege-celery-crawl-worker-prod:
+    <<: [*backend, *celery]
+    container_name: frege-celery-crawl-worker-prod
+    command: celery --app frege worker --loglevel=${CELERY_LOG_LEVEL_PROD} --queues crawl --concurrency=${CELERY_WORKER_CRAWL_CONCURRENCY} --hostname worker_crawl --uid=nobody --gid=nogroup
+    profiles: ["prod"]
+
+  frege-celery-downloads-worker-prod:
+    <<: [*backend, *celery]
+    container_name: frege-celery-downloads-worker-prod
+    command: celery --app frege worker --loglevel=${CELERY_LOG_LEVEL_PROD} --queues downloads --concurrency=${CELERY_WORKER_DOWNLOADS_CONCURRENCY} --hostname worker_downloads --uid=nobody --gid=nogroup
+    profiles: ["prod"]
+
+  frege-celery-worker-prod:
+    <<: *celery
+    container_name: frege-celery-worker-prod
+    command: celery --app frege worker --loglevel=${CELERY_LOG_LEVEL_PROD} --queues celery --concurrency=${CELERY_WORKER_BASE_CONCURRENCY} --hostname worker_celery --uid=nobody --gid=nogroup
+    profiles: ["prod"]
+
+  # === [Grafana] ===
+
+  frege-grafana-dev: &grafana
+    image: grafana/grafana:8.5.2
+    hostname: *host
+    container_name: frege-grafana-dev
+    profiles: ["dev"]
+    networks: *network
+    depends_on:
+      - frege-prometheus
+      - frege-postgres
+      - frege-loki
+      - frege-promtail
+    volumes:
+      - frege_grafana_storage:/var/lib/grafana
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+      - GF_SECURITY_ALLOW_EMBEDDING=true
+      - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/grafana/
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true
+    ports:
+      - ${DOCKER_GRAFANA_PORT}:${DOCKER_GRAFANA_PORT}
+    expose:
+      - ${DOCKER_FRONTEND_PORT}
+    env_file: *env
+    restart: on-failure
+    healthcheck:
+      test: "wget -nv -t1 --spider http://localhost:${DOCKER_GRAFANA_PORT}/api/health || exit 1"
+      interval: 10s
+      timeout: 10s
+      retries: 2
+
+  frege-grafana-prod:
+    <<: *grafana
+    container_name: frege-grafana-prod
+    profiles: ["prod"]
+    environment:
+      - GF_USERS_DEFAULT_THEME=dark
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_USERS_ALLOW_ORG_CREATE=false
+      - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
+      # - GF_AUTH_ANONYMOUS_ENABLED=true
+      # - GF_SECURITY_ALLOW_EMBEDDING=true
+      # - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/grafana/
+      # - GF_SERVER_SERVE_FROM_SUB_PATH=true
+      - VIRTUAL_HOST=${FRONTEND_HOSTNAME}
+      - LETSENCRYPT_HOST=${FRONTEND_HOSTNAME}
+    env_file: []
+
+  # === [Frontend] ===
+
+  frege-frontend-dev: &frontend
+    container_name: frege-frontend-dev
+    hostname: frege-frontend-dev
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+    environment:
+      - PORT=${DOCKER_FRONTEND_PORT}
+      - REACT_APP_DOCKER_GRAFANA_HOST=frege-grafana-dev
+      - REACT_APP_DOCKER_GRAFANA_PORT=3000
+      - DOCKER_FLOWER_HOST=frege-flower-dev
+      - DOCKER_FLOWER_PORT=5555
+      - DJANGO_SUPERUSER_USERNAME=django_admin
+      - DJANGO_SUPERUSER_PASSWORD=pass
+      - CHOKIDAR_USEPOLLING=true
+    volumes:
+      - /app/node_modules
+      - ./frontend:/app
+    command: npm start
+    expose:
+      - ${DOCKER_FRONTEND_PORT}
+    ports:
+      - ${DOCKER_FRONTEND_PORT}:${DOCKER_FRONTEND_PORT}
+    depends_on:
+      - frege-grafana-dev
+    networks: *network
+    profiles: ["dev"]
+    restart: on-failure
+    healthcheck:
+      test: "wget -nv -t1 --spider http://localhost:${DOCKER_FRONTEND_PORT} || exit 1"
+      interval: 10s
+      timeout: 10s
+      retries: 2
+      start_period: 40s
+
+  frege-frontend-prod:
+    <<: *frontend
+    container_name: frege-frontend-prod
+    hostname: frege-frontend-prod
+    environment:
+      - PORT=${DOCKER_FRONTEND_PORT}
+      - REACT_APP_DOCKER_GRAFANA_HOST=frege-grafana-prod
+      - REACT_APP_DOCKER_GRAFANA_PORT=3000
+      - DOCKER_FLOWER_HOST=frege-flower-dev
+      - DOCKER_FLOWER_PORT=5555
+      - NODE_ENV=production
+      - VIRTUAL_HOST=${FRONTEND_HOSTNAME}
+      - LETSENCRYPT_HOST=${FRONTEND_HOSTNAME}
+    depends_on:
+      - frege-grafana-prod
+    profiles: ["prod"]
 
 networks:
   frege-main:
