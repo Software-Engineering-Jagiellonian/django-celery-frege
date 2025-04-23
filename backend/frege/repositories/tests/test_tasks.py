@@ -4,7 +4,7 @@ import pytest
 from pytest_mock import MockerFixture
 
 from frege.repositories.models import RepositoryFile
-from frege.repositories.tasks import process_repo_task
+from frege.repositories.tasks.task_repo import process_repo_task
 from frege.repositories.utils.paths import get_repo_local_path
 from frege.repositories.utils.tests import MOCK_DOWNLOAD_PATH
 
