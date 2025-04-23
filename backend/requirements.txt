@@ -22,6 +22,8 @@ django-health-check~=3.18.3
 psutil~=7.0.0
 nltk==3.9.1
 textstat==0.7.5
+gunicorn==23.0.0
+regex==2024.11.6
 
 # Development tools:
 black~=25.1.0
@@ -36,8 +38,7 @@ pytest~=8.3.5
 pytest-mock~=3.14.0
 pytest-unordered~=0.6.1
 pytest-django~=4.10.0
-pytest-asyncio~=0.26.0
+pytest-asyncio==0.26.0
+daphne==4.1.2
 
 whitenoise==6.9.0
-
-gunicorn==20.1.0

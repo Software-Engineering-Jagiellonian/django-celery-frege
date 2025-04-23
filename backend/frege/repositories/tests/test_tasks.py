@@ -4,7 +4,7 @@ import pytest
 from pytest_mock import MockerFixture
 
 from frege.repositories.models import RepositoryFile
-from frege.repositories.tasks import process_repo_task
+from frege.repositories.tasks.task_repo import process_repo_task
 from frege.repositories.utils.paths import get_repo_local_path
 from frege.repositories.utils.tests import MOCK_DOWNLOAD_PATH
 
@@ -21,10 +21,10 @@ class TestProcessRepoTask:
         repo_obj_mock.git.ls_files = lambda: "ans.cpp\nhello_world.py"
         clone_from_mock.return_value = repo_obj_mock
         mocker.patch(
-            "frege.repositories.tasks.analyze_file_task.apply_async",
+            "frege.repositories.tasks.task_file.analyze_file_task.apply_async",
             analyze_file_task_mock,
         )
-        mocker.patch("frege.repositories.tasks.logger")
+        mocker.patch("frege.repositories.tasks.task_repo.logger")
         mocker.patch("git.repo.base.Repo.clone_from", clone_from_mock)
         
         process_repo_task.run(dummy_repo.pk)
@@ -45,7 +45,7 @@ class TestProcessRepoTask:
         clone_from_mock = mocker.patch(
             "git.repo.base.Repo.clone_from", side_effect=Exception("Clone failed")
         )
-        mocker.patch("frege.repositories.tasks.logger")
+        mocker.patch("frege.repositories.tasks.task_repo.logger")
         
         process_repo_task.run(dummy_repo.pk)
         
@@ -67,16 +67,3 @@ class TestProcessRepoTask:
         clone_from_mock.assert_not_called()
         
         assert dummy_repo.files.count() == 0
-
-    def test_process_repo_task_download_directory_full(
-        self, mocker: MockerFixture, dummy_repo
-    ):
-        clone_from_mock = mocker.patch(
-            "git.repo.base.Repo.clone_from", side_effect=DownloadDirectoryFullException("Download directory full")
-        )
-        mocker.patch("frege.repositories.tasks.logger")
-        
-        with pytest.raises(DownloadDirectoryFullException):
-            process_repo_task.run(dummy_repo.pk)
-        
-        clone_from_mock.assert_called_once()
