@@ -28,5 +28,3 @@ app.autodiscover_tasks(
         "frege.repositories.tasks",
     ],
 )
-
-app.conf.broker_connection_retry_on_startup = True

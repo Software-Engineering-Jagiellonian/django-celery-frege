@@ -76,6 +76,11 @@ class RepositoryFile(models.Model):
         default=False,
         help_text="Whether the file has been analyzed or not.",
     )
+    analysis_failed = models.BooleanField(
+        _("Analysis failed"),
+        default=False,
+        help_text="Whether the file analysis failed.",
+    )
     language = models.CharField(
         max_length=20,
         verbose_name=_("programming language"),
