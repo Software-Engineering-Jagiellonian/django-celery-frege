@@ -24,7 +24,7 @@ class TestProcessRepoTask:
             "frege.repositories.tasks.task_file.analyze_file_task.apply_async",
             analyze_file_task_mock,
         )
-        mocker.patch("frege.repositories.tasks.logger")
+        mocker.patch("frege.repositories.tasks.task_repo.logger")
         mocker.patch("git.repo.base.Repo.clone_from", clone_from_mock)
         
         process_repo_task.run(dummy_repo.pk)
@@ -45,7 +45,7 @@ class TestProcessRepoTask:
         clone_from_mock = mocker.patch(
             "git.repo.base.Repo.clone_from", side_effect=Exception("Clone failed")
         )
-        mocker.patch("frege.repositories.tasks.logger")
+        mocker.patch("frege.repositories.tasks.task_repo.logger")
         
         process_repo_task.run(dummy_repo.pk)
         
