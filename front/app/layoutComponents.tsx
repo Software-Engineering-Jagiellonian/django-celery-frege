@@ -2,10 +2,14 @@
 
 import { Navbar } from '@/src/components/navbar/Navbar';
 import { SideMenu } from '@/src/components/sideMenu/SideMenu';
-import { useState, useEffect } from 'react';
-import styles from '../src//App.module.scss';
+import { useState, useEffect, ReactNode } from 'react';
+import styles from '../src/App.module.scss';
 
-export default function NavigationBar({ children }) {
+interface NavigationBarProps {
+  children: ReactNode;
+}
+
+export default function NavigationBar({ children }: NavigationBarProps) {
   const [isMenuCollapsed, setIsMenuCollapsed] = useState(false);
   useEffect(() => {
     document.title = 'Frege';
