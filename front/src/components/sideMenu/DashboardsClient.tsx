@@ -21,7 +21,6 @@ export type GrafanaCatalog = {
 
 export const getGrafanaData = async (): Promise<GrafanaCatalog[]> => {
   let dashboardsData: GrafanaCatalog[] = [];
-  return dashboardsData;
 
   await axios.get(`/grafana/api/folders`).then(async (response) => {
     const folders: Folder[] = response.data;
