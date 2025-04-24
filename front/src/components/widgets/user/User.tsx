@@ -6,6 +6,7 @@ import styles from './user.module.scss';
 import { StyledButton } from '../../styledButton/StyledButton';
 import axios from 'axios';
 // import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 
 export const getUser = async () => {
   let result: any;
@@ -34,33 +35,38 @@ export interface minimalUserI {
 }
 
 export const User = () => {
-  // const [user, setUser] = useState<null | minimalUserI>(null);
+  const [user, setUser] = useState<null | minimalUserI>(null);
   // const navigate = useNavigate();
+  const router = useRouter();
 
-  // useEffect(() => {
-  //     getUser()
-  //     .then(r => {
-  //         if (r === null) setUser(null)
-  //         else setUser({
-  //             name: r.login,
-  //             avatarUrl: r.avatarUrl
-  //         })
-  //     })
-  // }, []);
+  useEffect(() => {
+    getUser().then((r) => {
+      if (r === null) setUser(null);
+      else
+        setUser({
+          name: r.login,
+          avatarUrl: r.avatarUrl
+        });
+    });
+  }, []);
 
-  // if (user === null) return (
-  //     <>
-  //         <div className={styles.userWrapper}>
-  //             <a href="/grafana/login"><StyledButton className={styles.loginButton}>Login</StyledButton></a>
-  //         </div>
-  //     </>
-  // )
+  if (user === null)
+    return (
+      <>
+        <div className={styles.userWrapper}>
+          <a href="/grafana/login">
+            <StyledButton className={styles.loginButton}>Login</StyledButton>
+          </a>
+        </div>
+      </>
+    );
 
   return (
-    // <div className={styles.userWrapper} onClick={() => navigate("/sessions")}>
-    //     <div className={styles.userName}>{user.name}</div>
-    //     <div className={styles.userIcon}><img src={user.avatarUrl} alt="user icon" /></div>
-    // </div>
-    <div />
+    <div className={styles.userWrapper} onClick={() => router.push('/sessions')}>
+      <div className={styles.userName}>{user.name}</div>
+      <div className={styles.userIcon}>
+        <img src={user.avatarUrl} alt="user icon" />
+      </div>
+    </div>
   );
 };
