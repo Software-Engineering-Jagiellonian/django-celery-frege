@@ -38,8 +38,13 @@ logger = get_task_logger(__name__)
     max_retries=None,
     default_retry_delay=15,
 )
-def process_repo_task(repo_pk):
-    # TODO: docstring & cleanup
+def process_repo_task(repo_pk) -> None:
+    """
+    Process a repository by cloning it and scheduling analysis tasks for its files and commit messages.
+    
+    Args:
+        repo_pk: Primary key of the repository to process
+    """
 
     try:
         repo = Repository.objects.get(pk=repo_pk)
@@ -76,7 +81,6 @@ def process_repo_task(repo_pk):
         return
 
     with closing(repo_obj) as cloned_repo:
-        repo_path = get_repo_local_path(repo)
         files = []
         all_commit_messages = []
 
@@ -151,7 +155,7 @@ def _clone_repo(repo: Repository, local_path: Path) -> Optional[git.Repo]:
         return None
 
 
-def _check_download_folder_size(depth=0):
+def _check_download_folder_size(depth: int = 0):
     """
     Check if the size of downloads folder < DOWNLOAD_DIR_MAX_SIZE_BYTES.
     If not, raise DownloadDirectoryFullException
