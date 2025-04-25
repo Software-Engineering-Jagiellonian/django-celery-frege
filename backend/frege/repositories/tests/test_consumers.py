@@ -11,14 +11,21 @@ from frege.repositories.factories import (
 from frege.repositories.serializers import (
     RepositoryFileSerializer,
     RepositorySerializer,
-)
+)   
 
+async def show_queue(self):
+    messages = []
+    while not await self.receive_nothing():
+        mess = await self.receive_json_from()
+        messages.append(str(mess))
+    return ",\n".join(messages)
+
+WebsocketCommunicator.show_queue = show_queue
 
 @pytest.fixture()
 def api_key():
     _, key = APIKey.objects.create_key(name="test-key")
     return key
-
 
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio
@@ -46,7 +53,7 @@ class TestLiveStatusConsumer:
             await communicator.send_json_to(
                 {"api_key": api_key, "action": request_action, "request_id": 1}
             )
-            assert await communicator.receive_nothing()
+            assert await communicator.receive_nothing(), await communicator.show_queue()
             file = await create_fn()
             response = await communicator.receive_json_from()
             assert response["response_status"] == 200
@@ -55,7 +62,7 @@ class TestLiveStatusConsumer:
             expected_data = serializer(file).data
             actual_data = response["data"]
             assert expected_data == actual_data
-            assert await communicator.receive_nothing()
+            assert await communicator.receive_nothing(), await communicator.show_queue()
         finally:
             await communicator.disconnect()
 
