@@ -26,7 +26,7 @@ DEBUG = os.environ.get("DJANGO_DEBUG", "true").lower() == "true"
 ALLOWED_HOSTS = [os.environ.get("BACKEND_HOSTNAME"), ".localhost", "127.0.0.1"]
 
 DJANGO_CORS_ALLOWED_HOSTS = [
-    os.environ.get("FRONTEND_URL", "http://localhost:4200")
+    os.environ.get("FRONTEND_URL", "http://localhost:4200"), "https://localhost:3040"
 ]
 
 # Application definition
