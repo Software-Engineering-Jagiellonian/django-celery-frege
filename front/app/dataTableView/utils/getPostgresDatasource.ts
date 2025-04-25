@@ -13,14 +13,6 @@ export const getPostgresDatasource = async () => {
     headers: {}
   };
 
-  await axios({method: 'GET', url: 'http://localhost:3000/api/user', headers: {}}).then(
-    (response) => {
-      console.log(response.data)
-    }
-  ).catch((error) => {
-    console.log(error)
-  })
-
   await axios(config)
     .then(function (response) {
       const tmp = response.data.find((el: { type: string }) => el.type === 'postgres');
@@ -30,15 +22,7 @@ export const getPostgresDatasource = async () => {
       }
     })
     .catch(function (error) {
-      if (axios.isAxiosError(error)) {
-        console.log("AxiosError:", {
-          message: error.message,
-          status: error.response?.status,
-          data: error.response?.data
-        });
-      } else {
-        console.log(error);
-      }
+      console.log(error);
     });
 
   return { ds, dsid };
