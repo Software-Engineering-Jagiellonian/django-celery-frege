@@ -16,8 +16,13 @@ logger = get_task_logger(__name__)
 
 
 @shared_task
-def analyze_file_task(repo_file_pk):
-    # TODO: docstring & cleanup
+def analyze_file_task(repo_file_pk) -> None:
+    """
+    Analyze a repository file using appropriate analyzers for its language.
+    
+    Args:
+        repo_file_pk: Primary key of the RepositoryFile to analyze
+    """
 
     try:
         repo_file = RepositoryFile.objects.get(pk=repo_file_pk)
