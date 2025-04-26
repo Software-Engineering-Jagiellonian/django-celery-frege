@@ -86,7 +86,7 @@ services:
 
   frege-loki:
     image: grafana/loki:2.7.4
-    user: "1000"
+    user: root
     container_name: frege-loki
     ports:
       - ${DOCKER_LOKI_PORT}:${DOCKER_LOKI_PORT}
