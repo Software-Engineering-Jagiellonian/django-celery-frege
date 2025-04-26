@@ -1,3 +1,5 @@
+'use client';
+
 import React, { FC, useState, MouseEvent } from 'react';
 import { SideMenuItemDTO } from '../sideMenu/SideMenuStruct';
 import { ArrowDownShort, ArrowUpShort } from 'react-bootstrap-icons';
