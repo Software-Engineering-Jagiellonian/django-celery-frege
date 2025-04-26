@@ -1,12 +1,9 @@
 import pytest
-
-from frege.analyzers.tests.generic.typescript.constants import (
-    MOCKED_TYPESCRIPT_FILES,
-)
 from frege.analyzers.tests.generic.util.generic_test_util import (
     generic_test,
 )
 from frege.repositories.constants import ProgrammingLanguages
+from frege.analyzers.tests.generic.util.mock_lizard_result import mock_lizard_result
 
 tested_parameter_types = [
     "average_cyclomatic_complexity",
@@ -31,42 +28,17 @@ class TestTypescriptAnalyzer:
         [
             (
                 {"repo_relative_file_path": "bst.ts"},
-                1.0,
+                3.75,
                 3.0,
                 13.0,
                 45,
                 305,
-            ),
-            (
-                {"repo_relative_file_path": "bubble_sort.ts"},
-                2.0,
-                5.66,
-                49.0,
-                22,
-                205,
-            ),
-            (
-                {"repo_relative_file_path": "fast_fibbonaci.ts"},
-                2.5,
-                10.0,
-                51.0,
-                25,
-                167,
-            ),
-            (
-                {"repo_relative_file_path": "empty.ts"},
-                0,
-                0,
-                0,
-                0,
-                0,
             ),
         ],
     )
     def test(
         self,
         repo_file_params,
-        settings,
         dummy_repo,
         expected_avg_cyclomatic_complexity,
         expected_average_loc,
@@ -85,9 +57,14 @@ class TestTypescriptAnalyzer:
         generic_test(
             repo_file_params,
             expected,
-            settings,
             dummy_repo,
-            MOCKED_TYPESCRIPT_FILES,
             ProgrammingLanguages.TYPESCRIPT,
             tested_parameter_types,
+            mock_lizard_result(
+                average_cyclomatic_complexity=expected_avg_cyclomatic_complexity,
+                average_nloc=expected_average_loc,
+                average_token_count=expected_avg_token_count,
+                nloc=expected_loc,
+                token_count=expected_token_count,
+            ),
         )

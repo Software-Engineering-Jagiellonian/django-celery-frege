@@ -22,7 +22,8 @@ class Repository(models.Model):
         help_text="Indicates whether the repository has been analyzed.",
     )
     git_url = models.URLField(
-        _("git url"), help_text=_("The url used to clone the repository")
+        _("git url"), help_text=_("The url used to clone the repository"),
+        unique=True,
     )
     repo_url = models.URLField(
         _("repo url"),
@@ -54,6 +55,8 @@ class Repository(models.Model):
         help_text=_("The time when the repository was analyzed."),
     )
 
+    analysis_failed = models.BooleanField(default=False)
+
     def __str__(self):
         return self.name
 
@@ -72,6 +75,11 @@ class RepositoryFile(models.Model):
         _("Analyzed"),
         default=False,
         help_text="Whether the file has been analyzed or not.",
+    )
+    analysis_failed = models.BooleanField(
+        _("Analysis failed"),
+        default=False,
+        help_text="Whether the file analysis failed.",
     )
     language = models.CharField(
         max_length=20,

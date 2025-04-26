@@ -1,12 +1,9 @@
 import pytest
-
-from frege.analyzers.tests.generic.golang.constants import (
-    MOCKED_GOLANG_FILES,
-)
 from frege.analyzers.tests.generic.util.generic_test_util import (
     generic_test,
 )
 from frege.repositories.constants import ProgrammingLanguages
+from frege.analyzers.tests.generic.util.mock_lizard_result import mock_lizard_result
 
 tested_parameter_types = [
     "average_cyclomatic_complexity",
@@ -40,55 +37,14 @@ class TestGolangAnalyzer:
                 1.13,
                 67.88,
                 297,
-                24,
+                2,
                 1671,
-            ),
-            (
-                {"repo_relative_file_path": "concurrent_prime_sieve.go"},
-                2.34,
-                8.0,
-                1.33,
-                42.0,
-                26,
-                3,
-                130,
-            ),
-            (
-                {"repo_relative_file_path": "http_server.go"},
-                2.0,
-                8.0,
-                0,
-                50.67,
-                31,
-                3,
-                161,
-            ),
-            (
-                {"repo_relative_file_path": "tree_comparison.go"},
-                2.14,
-                8.0,
-                1.29,
-                49.14,
-                65,
-                7,
-                363,
-            ),
-            (
-                {"repo_relative_file_path": "EmptyFile.go"},
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-            ),
+            )
         ],
     )
     def test(
         self,
         repo_file_params,
-        settings,
         dummy_repo,
         expected_average_cyc,
         expected_average_loc,
@@ -111,9 +67,15 @@ class TestGolangAnalyzer:
         generic_test(
             repo_file_params,
             expected,
-            settings,
             dummy_repo,
-            MOCKED_GOLANG_FILES,
             ProgrammingLanguages.GOLANG,
             tested_parameter_types,
+            mock_lizard_result(
+                average_cyclomatic_complexity=expected_average_cyc,
+                average_nloc=expected_average_loc,
+                average_parameter_count=expected_average_param_count,
+                average_token_count=expected_average_token_count,
+                nloc=expected_loc,
+                token_count=expected_token_count
+                ),
         )

@@ -5,4 +5,10 @@ from frege.repositories.constants import ProgrammingLanguages
 
 @AnalyzerFactory.register(ProgrammingLanguages.JAVA)
 class JavaAnalyzer(GenericAnalyzer):
+    """
+    Analyzer for Java source files.
+
+    Uses GenericAnalyzer to collect standard code metrics.
+    """
+    
     pass

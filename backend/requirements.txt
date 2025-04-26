@@ -1,47 +1,44 @@
-# Project dependencies:
-Django~=4.0.4
-djangorestframework~=3.13.1
-django-extensions~=3.1.5
-celery[redis]~=5.2.6
-psycopg2~=2.9.3
+Django==5.1.7
+djangorestframework==3.16.0
+django-extensions~=3.2.3
+celery[redis]==5.5.1
+psycopg2~=2.9.10
 Faker~=13.6.0
 GitPython~=3.1.27
 radon~=5.1.0
 flower~=1.0.0
-django-jazzmin~=2.5.0
-PyGithub~=1.55
+PyGithub~=2.6
 lizard~=1.17.10
-factory-boy~=3.2.1
-django-filter~=21.1
-requests~=2.27.1
+factory-boy~=3.3.3
+django-filter~=25.1
+requests~=2.32.3
 beautifulsoup4~=4.9.3
-django-cors-headers~=3.11.0
-djangorestframework-api-key~=2.2.0
-channels~=3.0.4
-channels-redis~=3.4.0
-djangochannelsrestframework~=1.0.0
-django-health-check~=3.17.0
-psutil~=5.9.4
-nltk==3.8.1
-textstat==0.7.3
+django-cors-headers~=4.7.0
+djangorestframework-api-key~=3.0.0
+channels==4.1.0
+channels-redis==4.2.1
+djangochannelsrestframework==1.3.0
+django-health-check~=3.18.3
+psutil~=7.0.0
+nltk==3.9.1
+textstat==0.7.5
+gunicorn==23.0.0
+regex==2024.11.6
 
-# Currently unused/useful for later:
-# django-redis
-
-# django-celery-beat==2.1.0
-# django-celery-results
-# websockets
 # Development tools:
-black~=22.3.0
-isort~=5.10.1
+black~=25.1.0
+isort~=6.0.1
 flake8~=4.0.1
-pre-commit~=2.18.1
+pre-commit~=4.2.0
 pyupgrade~=3.3.1
-gitlint~=0.18.0
+gitlint==0.19.1
 
 # Testing
-pytest~=7.1.2
-pytest-mock~=3.7.0
-pytest-unordered~=0.4.1
-pytest-django~=4.5.2
-pytest-asyncio~=0.18.3
+pytest~=8.3.5
+pytest-mock~=3.14.0
+pytest-unordered~=0.6.1
+pytest-django~=4.10.0
+pytest-asyncio==0.26.0
+daphne==4.1.2
+
+whitenoise==6.9.0

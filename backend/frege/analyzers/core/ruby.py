@@ -5,4 +5,6 @@ from frege.repositories.constants import ProgrammingLanguages
 
 @AnalyzerFactory.register(ProgrammingLanguages.RUBY)
 class RubyAnalyzer(GenericAnalyzer):
+    """Analyzer for Ruby source files using generic metrics."""
+
     pass

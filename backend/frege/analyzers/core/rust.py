@@ -5,4 +5,6 @@ from frege.repositories.constants import ProgrammingLanguages
 
 @AnalyzerFactory.register(ProgrammingLanguages.RUST)
 class RustAnalyzer(GenericAnalyzer):
+    """Analyzer for Rust source files using generic metrics."""
+
     pass

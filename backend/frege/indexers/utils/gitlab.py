@@ -2,6 +2,9 @@ from itertools import chain
 from dataclasses import dataclass
 
 import requests
+import logging
+
+logger = logging.getLogger(__name__)
 
 __all__ = [
     "Client",
@@ -33,19 +36,21 @@ class Client:
     def ratelimit_remaining(self, v: str) -> None:
         self._ratelimit_remaining = int(v)
 
-    def repositories(self):
-        """Returns repository and the projects id"""
+    def repositories(self):     
         for project in chain.from_iterable(self._projects()):
-            if project['star_count'] >= self.min_stars and project['forks_count'] >= self.min_forks:
+            star_count = project.get('star_count', 0)
+            forks_count = project.get('forks_count', 0)
+            
+            if star_count >= self.min_stars and forks_count >= self.min_forks:
                 commit_hash = self._commit_hash(project['id'])
                 if not commit_hash:
                     continue
 
                 repo_data = dict(
-                    name=project['name'],
-                    description=project['description'],
-                    git_url=project['http_url_to_repo'],
-                    repo_url=project['web_url'],
+                    name=project.get('name', 'Unnamed Project'),
+                    description=project.get('description', 'No description'),
+                    git_url=project.get('http_url_to_repo', ''),
+                    repo_url=project.get('web_url', ''),
                     commit_hash=commit_hash
                 )
                 yield repo_data, project['id']
@@ -74,6 +79,9 @@ class Client:
 
         if self.ratelimit_remaining <= 0:
             raise RateLimitExceededException()
+        
+        # returns the first page of projects
+        yield projects_response.json()
 
         next_page = projects_response.links.get('next', {}).get('url')
         while next_page:
@@ -81,12 +89,23 @@ class Client:
             next_page = projects_response.links.get('next', {}).get('url')
             yield projects_response.json()
 
-    def _commit_hash(self, project_id: int):
+    def _commit_hash(self, project_id):
         """Gets the latest commit hash in the default branch"""
-        project_commits = self._get(f"{BASE_ENDPOINT}/{project_id}/repository/commits")
-        try:
-            return project_commits.json()[0]['id']
-        except KeyError:
+
+        response = self._get(f"{BASE_ENDPOINT}/{project_id}/repository/commits")
+
+        if response.status_code != 200:
+            logger.info(f"Unable to fetch commits for project {project_id}, status code: {response.status_code}")
+            
             return None
 
+        commits = response.json()
+        if not commits:
+            logger.info(f"No commits found for project {project_id}")
+            
+            return None
 
+        mainBranch = commits[0]
+        hash = mainBranch['id']
+
+        return hash

@@ -84,24 +84,22 @@ def _finalize_repo_analysis(repo_obj):
 
 def _clone_repo(repo: Repository, local_path: Path) -> Optional[git.Repo]:
     _check_download_folder_size()
+
     try:
         repo_obj = git.Repo.clone_from(repo.git_url, local_path)
         repo.fetch_time = timezone.now()
         repo.save(update_fields=["fetch_time"])
         logger.info(f"Repository {repo.git_url} cloned")
         return repo_obj
-    except git.exc.GitCommandError:
-        try:
-            repo_obj = git.Repo(local_path)
-            logger.info(
-                f"Repo {repo.git_url} already exists, fetched from disk"
-            )
-            return repo_obj
-        except git.exc.NoSuchPathError:
-            logger.error(
-                f"Tried fetching {repo.git_url} from disk, but repository does not exist."
-            )
-            return None
+    except git.exc.GitCommandError as e:
+        logger.error(f"Git error while cloning repository {repo.git_url}.")
+    except Exception as e:
+        logger.error(f"Unexpected error while processing repository {repo.git_url}: {e}")
+        
+    repo.analysis_failed = True
+    repo.save(update_fields=["analysis_failed"])
+
+    return None
 
 def _check_download_folder_size(depth=0):
     """
@@ -199,7 +197,7 @@ def crawl_repos_task(indexer_class_name):
     logger.info(f"Scheduling batch of {len(batch)} repositories")
     for repo in batch:
         repo.refresh_from_db()
-        if not repo.analyzed:
+        if not repo.analyzed and not repo.analysis_failed:
             process_repo_task.apply_async(args=(repo.pk,))
 
 
@@ -219,8 +217,12 @@ def process_repo_task(repo_pk):
         logger.error(f"Repository does not exist ({repo_pk = })")
         return
     
-    logger.info(f"Processing repository {repo.git_url}")
+    if repo.analysis_failed:
+        logger.info(f"Repository {repo.git_url} marked as failed. Skipping processing.")
+        return
     
+    logger.info(f"Processing repository {repo.git_url}")
+
     _remove_database_entries(repo)
 
     repo_local_path = get_repo_local_path(repo)
@@ -232,7 +234,13 @@ def process_repo_task(repo_pk):
     logger.info(f"Fetching repository via url: {repo.git_url}")
     repo_obj = _clone_repo(repo, repo_local_path)
     if repo_obj is None:
-        logger.error(f"Failed to obtain repository {repo.git_url}. This has unknown consequences.")
+        if not repo.analysis_failed:
+            error_message = f"Failed to obtain repository {repo.git_url}. This has unknown consequences."
+        else:
+            error_message = f"Repository {repo.git_url} marked as failed. Skipping."
+            
+        logger.error(error_message)
+
         return
 
     with closing(repo_obj) as cloned_repo:
@@ -329,30 +337,32 @@ def analyze_file_task(repo_file_pk):
         logger.error(f"repo_file for pk {repo_file_pk} does not exist")
         return
 
+    file_failed = False
+
     try:
         analyzers = AnalyzerFactory.make_analyzers(repo_file.language)
         if not analyzers:
+            logger.debug(f"No analyzers for language {repo_file.language}, deleting file")
             repository = repo_file.repository
             repo_file.delete()
             _finalize_repo_analysis(repository)
-            return
+            return {"status": "skipped", "reason": "no analyzers"}
 
         metrics_dict = {}
         for analyzer in analyzers:
             try:
                 metrics_dict |= analyzer.analyze(repo_file)
-            except Exception:
-                # This should use more specific exception but some analyzer is
-                # raising undocumented exceptions
-                logger.error(
-                    f"Failed to analyze {repo_file.repository.git_url} for "
-                    f"analyzer {analyzer}"
+            except Exception as e:
+                logger.warning(
+                    f"Analyzer {analyzer} failed for file {repo_file.repo_relative_file_path}: {e}"
                 )
+                file_failed = True
 
         with transaction.atomic():
             repo_file.metrics = metrics_dict
             repo_file.analyzed = True
             repo_file.analyzed_time = timezone.now()
+            repo_file.analysis_failed = file_failed
             repo_file.lines_of_code = metrics_dict.get("lines_of_code", 0)
             repo_file.token_count = metrics_dict.get("token_count", 0)
             repo_file.function_count = metrics_dict.get("function_count", 0)
@@ -362,28 +372,30 @@ def analyze_file_task(repo_file_pk):
             repo_file.average_cyclomatic_complexity = metrics_dict.get("average_cyclomatic_complexity", 0)
             repo_file.average_parameter_count = metrics_dict.get("average_parameter_count", 0)
 
-            repo_file.save(update_fields=["metrics",
-                                          "analyzed",
-                                          "analyzed_time",
-                                          "lines_of_code",
-                                          "token_count",
-                                          "function_count",
-                                          "average_function_name_length",
-                                          "average_lines_of_code",
-                                          "average_token_count",
-                                          "average_cyclomatic_complexity",
-                                          "average_parameter_count"
-                                          ])
+            repo_file.save(update_fields=[
+                "metrics",
+                "analyzed",
+                "analyzed_time",
+                "analysis_failed",
+                "lines_of_code",
+                "token_count",
+                "function_count",
+                "average_function_name_length",
+                "average_lines_of_code",
+                "average_token_count",
+                "average_cyclomatic_complexity",
+                "average_parameter_count"
+            ])
 
-        logger.info(f"repo_file {repo_file.repository.git_url} analyzed")
+        logger.info(f"File {repo_file.repo_relative_file_path} analyzed (failed={file_failed})")
+
     except Exception as error:
         repo_file.analyzed = True
-        repo_file.save(update_fields=["analyzed"])
-        logger.error(
-            f"Can't analyze file {repo_file.repo_relative_file_path} for"
-            f" the repository: {repo_file.repository.name}"
-        )
-        logger.error(error, exc_info=True)
+        repo_file.analysis_failed = True
+        repo_file.save(update_fields=["analyzed", "analysis_failed"])
+
+        logger.error(f"Unexpected error during analysis of file {repo_file.repo_relative_file_path}, error: {error}", exc_info=True)
+
     finally:
         absolute_file_path = (
                 get_repo_local_path(repo_file.repository)
@@ -439,6 +451,8 @@ def _reschedule_unanalyzed_repos():
             unanalyzed_repos = Repository.objects.filter(analyzed=False)
             logger.info(f"Rescheduling {unanalyzed_repos.count()} unanalyzed repositories")
             for repo in unanalyzed_repos:
+                repo.analysis_failed = False
+                repo.save(update_fields=["analysis_failed"])
                 process_repo_task.apply_async(args=(repo.pk,))
         else:
             logger.info("No repositories found")
