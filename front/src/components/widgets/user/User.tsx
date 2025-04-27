@@ -1,12 +1,13 @@
 'use client';
 
-import React, { FC, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from './user.module.scss';
 import { StyledButton } from '../../styledButton/StyledButton';
 import axios from 'axios';
 // import { useNavigate } from 'react-router-dom';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export const getUser = async () => {
   let result: any;
@@ -52,13 +53,11 @@ export const User = () => {
 
   if (user === null)
     return (
-      <>
-        <div className={styles.userWrapper}>
-          <a href="/grafana/login">
-            <StyledButton className={styles.loginButton}>Login</StyledButton>
-          </a>
-        </div>
-      </>
+      <div className={styles.userWrapper}>
+        <Link href="/grafana/login">
+          <StyledButton className={styles.loginButton}>Login</StyledButton>
+        </Link>
+      </div>
     );
 
   return (

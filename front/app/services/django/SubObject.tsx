@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import styles from './Django.module.scss';
-import Sublist, { handleDataTypes as handleSubListDataTypes } from './Sublist';
+import { handleDataTypes as handleSubListDataTypes } from './Sublist';
 
 export const handleDataTypes = (property: string, obj: any, setData: any) => {
   switch (typeof obj) {

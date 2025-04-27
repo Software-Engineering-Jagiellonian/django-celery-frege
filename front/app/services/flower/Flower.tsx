@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styles from './Flower.module.scss';
 import FlowerAPIBrowser from './components/FlowerAPIBrowser';
 import WorkerShutdown from './components/WorkerShutdown';

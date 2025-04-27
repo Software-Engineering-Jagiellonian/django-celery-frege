@@ -1,6 +1,6 @@
 'use client';
 
-import axios, { AxiosRequestConfig } from 'axios';
+import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { ArrowRepeat } from 'react-bootstrap-icons';
 import styles from './Flower.module.scss';

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styles from '../Flower.module.scss';
 import { Arrow90degDown, Arrow90degUp } from 'react-bootstrap-icons';
 

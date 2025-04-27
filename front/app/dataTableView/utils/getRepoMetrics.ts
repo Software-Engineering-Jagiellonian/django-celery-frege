@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { rowLimit } from '../DataTableView';
 import { getPostgresDatasource } from './getPostgresDatasource';
 import { getRawSqlQuery } from './getRawSqlQuery';
 import { RepositoryFileItem } from './RepositoryFileItem';

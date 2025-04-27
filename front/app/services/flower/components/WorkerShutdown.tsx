@@ -1,8 +1,8 @@
-import axios, { AxiosRequestConfig } from 'axios';
+import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import styles from '../Flower.module.scss';
 import { targetFlower, portFlower } from '@/app/logs/flower/Flower';
-import { X, XLg } from 'react-bootstrap-icons';
+import { XLg } from 'react-bootstrap-icons';
 
 export const getFlowerWorkerData = async (): Promise<Array<string>> => {
   const url = `http://${targetFlower}:${portFlower}/api/workers`;
