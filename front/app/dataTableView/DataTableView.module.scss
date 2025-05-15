@@ -1,0 +1,114 @@
+@import "@/src/colors.module.scss";
+
+.selectDropdown{
+  background: transparent;
+  color: $main-color;
+  border: 1px $main-color solid;
+  border-radius: 5px;
+  height: 30px;
+  padding: 0rem 0.5rem;
+}
+
+.selectOption{
+  color: black;
+}
+
+.languageSelected{
+  border: 1px $main-color solid;
+  color: $main-color;
+  border-radius: 5px;
+  padding: 0.25rem 0.5rem;
+
+  :hover{
+    cursor: pointer;
+    background: $main-color-dimmed;;
+  }
+}
+
+.languageNotSelected{
+  border: 1px $main-color-dimmed solid;
+  color: $main-color-dimmed;
+  border-radius: 5px;
+  padding: 0.25rem 0.5rem;
+
+  :hover{
+    cursor: pointer;
+    background: $main-color-dimmed;
+  }
+}
+
+.optionsRow{
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.languageOptionsRow{
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.languageRow{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.pageSelector{
+  border: none;
+  border: 1px $main-color solid;
+  background: transparent;
+  color: $main-color;
+  border-radius: 5px;
+  height: 30px;
+  padding: 0 0.5rem;
+  width: 6rem;
+}
+
+.metricsTable{
+  max-width: 100%;
+  border: 1px solid $main-borders-color;
+  border-collapse: collapse;
+}
+
+.row{
+  border: solid;
+  border-width: 1px 0;
+}
+
+.cell{
+  border-left: 1px solid $main-borders-color;
+  padding: 0.25rem;
+  max-width: 14%;
+}
+
+.rowHeader{
+  border-left: 1px solid $main-borders-color;
+}
+
+.refreshOptions{
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-end;
+}
+
+.metricsCell{
+  font-size: 0.75em;
+
+  hr{
+    margin: 0.25rem 0;
+  }
+}
+
+.metricsInfo{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
