@@ -5,7 +5,7 @@ import { CaretRight, Easel3 } from 'react-bootstrap-icons';
 // import { useNavigate } from 'react-router-dom';
 import styles from './MenuItem.module.scss';
 import FullscreenDashboards from '../FullScreenDashboards/FullscreenDashboards';
-import { savedFullscreenDashboardId } from '../pages/presentationMode/PresentationMode';
+import { savedFullscreenDashboardId } from '@/app/presentationMode/PresentationMode';
 import { createRoot, Root } from 'react-dom/client';
 import Link from 'next/link';
 
@@ -42,7 +42,7 @@ const PresentationMode = () => {
   }, [fullscreenRoot]);
 
   return (
-    <Link href="/presentationMode">
+    <Link href="/presentationMode" className={styles.link}>
       <div className={styles.menuItem}>
         <div className={styles.iconContainer}>
           <Easel3 />

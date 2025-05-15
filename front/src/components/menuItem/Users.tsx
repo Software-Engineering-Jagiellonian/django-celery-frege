@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 const Users = () => {
   return (
-    <Link href="/users">
+    <Link href="/users" className={styles.link}>
       <div className={styles.menuItem}>
         <div className={styles.iconContainer}>
           <PeopleFill />

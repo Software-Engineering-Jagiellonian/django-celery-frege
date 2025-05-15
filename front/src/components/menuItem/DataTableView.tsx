@@ -7,16 +7,14 @@ import Link from 'next/link';
 
 const DataTableView = () => {
   return (
-    <div className={styles.menuItem}>
-      <Link href="/dataTableView">
-        <div className={styles.menuItem}>
-          <div className={styles.iconContainer}>
-            <Table />
-          </div>
-          <div className={styles.label}>Data Table View</div>
+    <Link href="/dataTableView" className={styles.link}>
+      <div className={styles.menuItem}>
+        <div className={styles.iconContainer}>
+          <Table />
         </div>
-      </Link>
-    </div>
+        <div className={styles.label}>Data Table View</div>
+      </div>
+    </Link>
   );
 };
 
