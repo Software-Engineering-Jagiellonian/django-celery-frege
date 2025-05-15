@@ -1,3 +1,5 @@
+'use client';
+
 import React, { ReactNode } from 'react';
 import { useParams } from 'next/navigation';
 import Flower from './flower/Flower';

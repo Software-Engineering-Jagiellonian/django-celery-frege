@@ -16,11 +16,14 @@ export const savedFullscreenDashboardId = 'frege-fullscreen-dashboardId';
 const PresentationMode = () => {
   const [structure, setStructure] = useState<UnwrappedItemDTO[]>([]);
   const [grafanaData, setGrafanaData] = useState<GrafanaCatalog[]>([]);
-  const [dashboardId, setDashboardId] = useState<string>(
-    localStorage.getItem(savedFullscreenDashboardId) || ''
-  );
+  const [dashboardId, setDashboardId] = useState<string>('');
   const [chosenDashboard, setChosenDashboard] = useState<string>(dashboardId);
   const [selectAtLeastOne, setSelectAtLeastOne] = useState<boolean>(false);
+
+  useEffect(() => {
+    const savedId = localStorage.getItem('savedFullscreenDashboardId') || '';
+    setDashboardId(savedId);
+  }, []);
 
   useEffect(() => {
     const automatic = unwrapStructure(retrieveAutomaticDashboardsData(grafanaData));
