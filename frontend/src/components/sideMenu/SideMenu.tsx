@@ -53,16 +53,19 @@ export const SideMenu: FC<{ className: string }> = ({ className }) => {
         label: 'Manual',
         icon: <Boxes />,
         subNodes: retrieveManualDashboards(),
-        structOptions: [<Plus key={1}
-          onClick={e => {
-            e.stopPropagation();
-            setDashboardName('');
-            setChosenDashboard(new Set());
-            setShowNameUsed(false);
-            setShowAtLeastOne(false);
-            setAddModalVisible(true);
-          }}
-        />]
+        structOptions: [
+          <Plus
+            key={1}
+            onClick={(e) => {
+              e.stopPropagation();
+              setDashboardName('');
+              setChosenDashboard(new Set());
+              setShowNameUsed(false);
+              setShowAtLeastOne(false);
+              setAddModalVisible(true);
+            }}
+          />
+        ]
       }
     ]);
   }, [grafanaData]);
@@ -115,7 +118,6 @@ export const SideMenu: FC<{ className: string }> = ({ className }) => {
         <div className={styles.menuContainer}>
           <Users />
         </div>
-
       </div>
       <StyledModal
         show={addModalVisible}
@@ -141,8 +143,7 @@ export const SideMenu: FC<{ className: string }> = ({ className }) => {
               ]);
             } else setShowNameUsed(true);
           }
-        }}
-      >
+        }}>
         <input
           type="text"
           placeholder="Name"
@@ -171,8 +172,7 @@ export const SideMenu: FC<{ className: string }> = ({ className }) => {
                   else updatedDashboards.add(node.id);
 
                   setChosenDashboard(updatedDashboards);
-                }}
-              >
+                }}>
                 {chosenDashboards.has(node.id) ? 'Unpin' : 'Pin'}
               </StyledButton>
             </div>
