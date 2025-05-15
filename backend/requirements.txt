@@ -12,7 +12,7 @@ lizard~=1.17.10
 factory-boy~=3.3.3
 django-filter~=25.1
 requests~=2.32.3
-beautifulsoup4~=4.9.3
+beautifulsoup4~=4.13.4
 django-cors-headers~=4.7.0
 djangorestframework-api-key~=3.0.0
 channels==4.1.0
