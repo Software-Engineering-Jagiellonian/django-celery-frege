@@ -1,6 +1,7 @@
 import pytest
 from unittest.mock import patch, Mock
 from frege.indexers.utils.gitlab import Client, RateLimitExceededException
+from frege.indexers.models import GitLabIndexer
 
 BASE_ENDPOINT = "https://gitlab.com/api/v4/projects"
 
@@ -117,3 +118,57 @@ def test_repositories_filters_and_yields(mock_commit_hash, mock_get, client):
     assert repo_data["name"] == "test"
     assert repo_data["commit_hash"] == "abc123"
     assert repo_id == 1
+
+
+@pytest.mark.django_db
+@patch("frege.indexers.models.Repository.objects.create")
+@patch("frege.indexers.models._is_repo_unique", return_value=True)
+@patch("frege.indexers.models.gitlab.Client.repositories")
+def test_indexer_iter_yields_repo(mock_repositories, mock_unique, mock_create):
+    mock_repo_data = {
+        "git_url": "http://example.com/repo.git",
+        "name": "Test Repo",
+    }
+    mock_repo = Mock()
+    mock_create.return_value = mock_repo
+    mock_repositories.return_value = iter([ (mock_repo_data, 1234) ])
+    
+    indexer = GitLabIndexer()
+    indexer.save()
+
+    result = list(indexer)
+    
+    assert result == [[mock_repo]]
+    assert indexer.last_project_id == 1234
+    mock_create.assert_called_once_with(**mock_repo_data)
+
+@patch("frege.indexers.models._is_repo_unique", return_value=False)
+@patch("frege.indexers.models.gitlab.Client.repositories")
+def test_indexer_iter_skips_non_unique(mock_repositories, mock_unique):
+    mock_repositories.return_value = iter([
+        ({"git_url": "http://example.com/repo.git"}, 100)
+    ])
+    
+    indexer = GitLabIndexer()
+    result = list(indexer)
+    
+    assert result == []
+
+@patch("frege.indexers.models.gitlab.Client.repositories", return_value=iter([]))
+def test_indexer_iter_no_repos(mock_repositories):
+    indexer = GitLabIndexer()
+    result = list(indexer)
+    assert result == []
+
+@patch("frege.indexers.models.GitLabIndexer.save")
+@patch("frege.indexers.models._is_repo_unique", return_value=True)
+@patch("frege.indexers.models.gitlab.Client.repositories")
+@patch("frege.indexers.models.Repository.objects.create", return_value=Mock())
+def test_indexer_saves_after_repo(mock_create, mock_repositories, mock_unique, mock_save):
+    mock_repositories.return_value = iter([
+        ({"git_url": "http://example.com/repo.git"}, 42)
+    ])
+    indexer = GitLabIndexer()
+    list(indexer)
+
+    mock_save.assert_called_once_with(update_fields=["last_project_id"])
