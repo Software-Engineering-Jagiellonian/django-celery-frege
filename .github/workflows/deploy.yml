@@ -1,0 +1,45 @@
+name: Deploy
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Build and tag Docker image via Compose
+      run: |
+        docker compose --profile prod build
+
+    - name: Save Docker image to tar
+      run: docker save ${{ secrets.DOCKER_IMAGE_NAME }} -o image.tar
+
+    - name: Copy image to server via SSH
+      uses: appleboy/scp-action@v0.1.4
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        password: ${{ secrets.SSH_PASSWORD }}
+        source: "image.tar"
+        target: "~/deploy"
+
+    - name: Load and run container on server
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        password: ${{ secrets.SSH_PASSWORD }}
+        script: |
+          cd ~/deploy
+          docker load -i image.tar
+          docker stop frege || true
+          docker rm frege || true
+          docker run -d --name frege -p 8000:8000 ${{ secrets.DOCKER_IMAGE_NAME }}
