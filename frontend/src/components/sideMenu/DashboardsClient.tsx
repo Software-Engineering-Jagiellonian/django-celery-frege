@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { SideMenuItemDTO } from './SideMenuStruct';
 import axios from 'axios';
@@ -22,19 +24,25 @@ export const getGrafanaData = async (): Promise<GrafanaCatalog[]> => {
 
   await axios.get(`/grafana/api/folders`).then(async (response) => {
     const folders: Folder[] = response.data;
-    const folderName = folders.reduce((prev, curr) => {
-      prev[curr.id] = curr.title;
-      return prev;
-    }, {} as Record<string, string>);
+    const folderName = folders.reduce(
+      (prev, curr) => {
+        prev[curr.id] = curr.title;
+        return prev;
+      },
+      {} as Record<string, string>
+    );
     await axios
       .get(`/grafana/api/search?${folders.map((folder) => `folderIds=${folder.id}`).join('&')}`)
       .then((res) => {
         const folderDetails: FolderDetails[] = res.data;
-        const catalogsStruct = folderDetails.reduce((prev, curr) => {
-          const currentDashboards: FolderDetails[] | undefined = prev[curr.folderId];
-          prev[curr.folderId] = currentDashboards ? [...currentDashboards, curr] : [curr];
-          return prev;
-        }, {} as Record<string, FolderDetails[]>);
+        const catalogsStruct = folderDetails.reduce(
+          (prev, curr) => {
+            const currentDashboards: FolderDetails[] | undefined = prev[curr.folderId];
+            prev[curr.folderId] = currentDashboards ? [...currentDashboards, curr] : [curr];
+            return prev;
+          },
+          {} as Record<string, FolderDetails[]>
+        );
 
         dashboardsData = Object.keys(catalogsStruct).map((catalogId) => ({
           label: folderName[catalogId],
