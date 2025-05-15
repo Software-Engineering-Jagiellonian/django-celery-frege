@@ -8,4 +8,5 @@ from frege.analyzers.core.ruby import *
 from frege.analyzers.core.rust import *
 from frege.analyzers.core.scala import *
 from frege.analyzers.core.swift import *
+from frege.analyzers.core.javascript import *
 from frege.analyzers.core.typescript import *

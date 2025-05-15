@@ -18,7 +18,8 @@ DEBUG = os.environ.get("DJANGO_DEBUG", "true").lower() == "true"
 ALLOWED_HOSTS = [os.environ.get("BACKEND_HOSTNAME"), ".localhost", "127.0.0.1"]
 
 DJANGO_CORS_ALLOWED_HOSTS = [
-    os.environ.get("FRONTEND_URL", "http://localhost:4200"), "https://localhost:3040"
+    os.environ.get("FRONTEND_URL", "http://localhost:4200"),
+    "https://localhost:3040",
 ]
 
 # Application definition
@@ -156,7 +157,10 @@ REDIS_PERSISTENCE_ENABLED: bool = (
 CELERY_BROKER_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/"
 CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_TASK_SERIALIZER = "json"
-CELERY_IMPORTS = ("frege.repositories.tasks.task_crawl",)
+CELERY_IMPORTS = (
+    "frege.repositories.tasks.task_crawl",
+    "frege.repositories.tasks.task_profiling",
+)
 
 CELERY_RESULT_BACKEND = f"redis://{REDIS_HOST}:{REDIS_PORT}/"
 CELERY_CACHE_BACKEND = f"redis://{REDIS_HOST}:{REDIS_PORT}/"
@@ -166,6 +170,12 @@ CELERY_TASK_ROUTES = {
         "queue": "downloads"
     },
     "frege.repositories.tasks.task_crawl.crawl_repos_task": {"queue": "crawl"},
+    "frege.repositories.tasks.task_profiling.create_repos_task": {
+        "queue": "profiling"
+    },
+    "frege.repositories.tasks.task_profiling.summarize": {
+        "queue": "profiling"
+    },
 }
 
 
