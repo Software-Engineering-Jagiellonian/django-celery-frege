@@ -3,7 +3,7 @@ djangorestframework==3.16.0
 django-extensions~=3.2.3
 celery[redis]==5.5.1
 psycopg2~=2.9.10
-Faker~=13.6.0
+Faker~=37.3.0
 GitPython~=3.1.27
 radon~=6.0.1
 flower~=1.0.0
