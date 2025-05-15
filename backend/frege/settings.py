@@ -221,6 +221,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:3001",
     "http://localhost:3030",
+    "http://localhost:3040",
 ]
 
 CORS_ALLOW_METHODS = ["GET", "POST", "OPTIONS"]
