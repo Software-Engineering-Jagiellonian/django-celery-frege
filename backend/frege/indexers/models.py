@@ -13,7 +13,21 @@ from frege.indexers.sourceforge import SourceforgeProjectsExtractor
 from frege.indexers.utils import bitbucket, gitlab
 from frege.repositories.models import Repository
 
+
 class GitHubIndexer(BaseIndexer):
+    """
+    Indexer for GitHub repositories. This class is responsible for searching and indexing
+    public repositories on GitHub that meet specific criteria such as minimum forks and stars.
+    
+    Attributes:
+        min_forks (int): Minimum number of forks required for repositories to be indexed.
+        min_stars (int): Minimum number of stars required for repositories to be indexed.
+        current_page (int): Tracks the current page in the GitHub API search results.
+    
+    Methods:
+        __iter__(self): Iterates through repositories that match the specified criteria 
+                         (min forks, min stars) and adds them to the database.
+    """
     min_forks = models.PositiveIntegerField(
         _("min forks"),
         default=100,
@@ -29,6 +43,14 @@ class GitHubIndexer(BaseIndexer):
     )
 
     def __iter__(self):
+        """
+        Iterates through GitHub repositories matching the specified criteria (min forks,
+        min stars). It fetches repositories in pages, checks if they are unique, and stores 
+        them in the `Repository` model.
+        
+        Yields:
+            List[Repository]: A list of repositories that match the criteria.
+        """
         github_token = os.environ.get("GITHUB_TOKEN")
         g = Github(github_token) if github_token else Github()
         while True:
@@ -70,6 +92,18 @@ class GitHubIndexer(BaseIndexer):
 
 
 class SourceforgeIndexer(BaseIndexer):
+    """
+    Indexer for Sourceforge projects. This class is responsible for indexing projects 
+    on Sourceforge by using the `SourceforgeProjectsExtractor` and iterating through them.
+    
+    Attributes:
+        current_page (int): Tracks the current page in the Sourceforge project list.
+        projects_extractor (SourceforgeProjectsExtractor): Extractor used to pull Sourceforge project data.
+    
+    Methods:
+        __iter__(self): Iterates through Sourceforge projects and adds them to the database.
+        main_loop(self) -> List[Repository]: Processes the project data and returns a list of repositories.
+    """
     current_page = models.PositiveIntegerField(
         _("current page"),
         default=1,
@@ -79,6 +113,13 @@ class SourceforgeIndexer(BaseIndexer):
     projects_extractor = SourceforgeProjectsExtractor()
 
     def __iter__(self):
+        """
+        Iterates through Sourceforge projects, extracting data using the `projects_extractor`.
+        It adds projects to the `Repository` model and handles pagination.
+        
+        Yields:
+            List[Repository]: A list of repositories scraped from Sourceforge.
+        """
         while True:
             try:
                 yield self.main_loop()
@@ -95,6 +136,13 @@ class SourceforgeIndexer(BaseIndexer):
                 self.save(update_fields=["current_page"])
 
     def main_loop(self) -> List[Repository]:
+        """
+        Extracts Sourceforge project data for the current page and processes it into
+        `Repository` model instances.
+
+        Returns:
+            List[Repository]: A list of repositories processed from Sourceforge data.
+        """
         projects = self.projects_extractor.extract(self.current_page)
 
         repos_to_process = []
@@ -134,6 +182,17 @@ class SourceforgeIndexer(BaseIndexer):
 
 
 class BitbucketIndexer(BaseIndexer):
+    """
+    Indexer for Bitbucket repositories. This class is responsible for indexing repositories 
+    on Bitbucket based on the creation date, minimum forks, and other criteria.
+    
+    Attributes:
+        min_forks (int): Minimum number of forks required for repositories to be indexed.
+        current_date (datetime): The creation date of the repository from which to start searching.
+    
+    Methods:
+        __iter__(self): Iterates through Bitbucket repositories and adds them to the database.
+    """
     min_forks = models.PositiveIntegerField(
         _("min forks"),
         default=1,
@@ -150,6 +209,13 @@ class BitbucketIndexer(BaseIndexer):
     )
 
     def __iter__(self):
+        """
+        Iterates through Bitbucket repositories, fetching them in pages and filtering based 
+        on the minimum forks. Repositories are added to the `Repository` model.
+        
+        Yields:
+            List[Repository]: A list of repositories scraped from Bitbucket.
+        """
         while True:
             repository_data, next_date = bitbucket.get_next_page(
                 self.current_date
@@ -194,6 +260,18 @@ class BitbucketIndexer(BaseIndexer):
 
 
 class GitLabIndexer(BaseIndexer):
+    """
+    Indexer for GitLab repositories. This class is responsible for indexing GitLab repositories
+    based on the minimum number of forks and stars, iterating through repositories by project ID.
+    
+    Attributes:
+        min_forks (int): Minimum number of forks required for repositories to be indexed.
+        min_stars (int): Minimum number of stars required for repositories to be indexed.
+        last_project_id (int): The last processed GitLab project ID used for pagination.
+    
+    Methods:
+        __iter__(self): Iterates through GitLab repositories and adds them to the database.
+    """
     min_forks = models.PositiveIntegerField(
         _("min forks"),
         default=1,
@@ -210,6 +288,13 @@ class GitLabIndexer(BaseIndexer):
     )
 
     def __iter__(self):
+        """
+        Iterates through GitLab repositories, fetching them in pages and filtering based on 
+        the minimum forks and stars. Repositories are added to the `Repository` model.
+        
+        Yields:
+            List[Repository]: A list of repositories scraped from GitLab.
+        """
         gitlab_client = gitlab.Client(
             token=os.environ.get("GITLAB_TOKEN"),
             after_id=self.last_project_id,
@@ -233,7 +318,18 @@ class GitLabIndexer(BaseIndexer):
         verbose_name = _("GitLab Indexer")
         verbose_name_plural = verbose_name
 
+
 def _is_repo_unique(clone_url: str, indexer_name: str) -> bool:
+    """
+    Checks if a repository with the given clone URL is already in the database.
+
+    Args:
+        clone_url (str): The URL of the repository's clone.
+        indexer_name (str): The name of the indexer class (used for logging purposes).
+
+    Returns:
+        bool: True if the repository is unique (not already in the database), False otherwise.
+    """
     if Repository.objects.filter(git_url=clone_url).exists():
         print(f"Indexer {indexer_name} ignored crawled repository {clone_url} as it's already in the database.", file=sys.stderr)
         return False
