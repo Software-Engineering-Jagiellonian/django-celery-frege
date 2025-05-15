@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Box2Fill, Braces } from 'react-bootstrap-icons';
 import { SideMenuItemDTO } from '../sideMenu/SideMenuStruct';
 import { MenuItem } from './MenuItem';
-import { ServicesItem, servicesComponents } from '../pages/services/Services';
+import { ServicesItem, servicesComponents } from '@/app/services/Services';
 
 const maplogsToSubnodes = (logs: ServicesItem[]) => {
   const result = [];

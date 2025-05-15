@@ -14,7 +14,6 @@ export default function NavigationBar({ children }: NavigationBarProps) {
   useEffect(() => {
     document.title = 'Frege';
   }, []);
-  //   return <Navbar onMenuClick={() => setIsMenuCollapsed(!isMenuCollapsed)} />;
   return (
     <div className={styles.App}>
       <Navbar onMenuClick={() => setIsMenuCollapsed(!isMenuCollapsed)} />

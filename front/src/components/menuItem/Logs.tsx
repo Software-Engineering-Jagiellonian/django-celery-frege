@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { CardList, BodyText } from 'react-bootstrap-icons';
-import { logsComponents, LogsItem } from '../pages/logs/Logs';
+import { logsComponents, LogsItem } from '@/app/logs/Logs';
 import { SideMenuItemDTO } from '../sideMenu/SideMenuStruct';
 import { MenuItem } from './MenuItem';
 

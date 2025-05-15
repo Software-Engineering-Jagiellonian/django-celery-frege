@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { CaretRight, Easel3 } from 'react-bootstrap-icons';
-// import { useNavigate } from 'react-router-dom';
 import styles from './MenuItem.module.scss';
 import FullscreenDashboards from '../FullScreenDashboards/FullscreenDashboards';
 import { savedFullscreenDashboardId } from '@/app/presentationMode/PresentationMode';

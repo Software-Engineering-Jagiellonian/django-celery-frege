@@ -5,7 +5,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from './user.module.scss';
 import { StyledButton } from '../../styledButton/StyledButton';
 import axios from 'axios';
-// import { useNavigate } from 'react-router-dom';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -37,7 +36,6 @@ export interface minimalUserI {
 
 export const User = () => {
   const [user, setUser] = useState<null | minimalUserI>(null);
-  // const navigate = useNavigate();
   const router = useRouter();
 
   useEffect(() => {
