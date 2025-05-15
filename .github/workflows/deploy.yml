@@ -17,7 +17,7 @@ jobs:
 
     - name: Build and tag Docker image via Compose
       run: |
-        docker compose --profile dev up -d
+        docker compose --profile prod build
 
     - name: Save Docker image to tar
       run: docker save ${{ secrets.DOCKER_IMAGE_NAME }} -o image.tar
