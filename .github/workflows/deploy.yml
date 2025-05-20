@@ -15,7 +15,7 @@ jobs:
     - name: Archive project
       run: |
         cd $GITHUB_WORKSPACE
-        tar -czf project.tar.gz .
+        tar --warning=no-file-changed --exclude=project.tar.gz -czf project.tar.gz .
 
     - name: Copy project to server via SCP
       uses: appleboy/scp-action@v0.1.4
