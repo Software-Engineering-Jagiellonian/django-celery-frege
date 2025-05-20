@@ -14,9 +14,16 @@ jobs:
 
     - name: Archive project
       run: |
-        # Create tar directly in the workspace (which is the current directory)
-        tar -czf project.tar.gz .
-        ls -la project.tar.gz # Verify the file exists and check size
+        # Use --warning=no-file-changed to ignore file changes during archiving
+        tar --warning=no-file-changed -czf project.tar.gz .
+        # Check if the tar file was created successfully
+        if [ -f project.tar.gz ] && [ -s project.tar.gz ]; then
+          echo "Archive created successfully"
+          ls -la project.tar.gz
+        else
+          echo "Failed to create archive"
+          exit 1
+        fi
 
     - name: Copy project to server via SCP
       uses: appleboy/scp-action@v0.1.4
@@ -24,8 +31,8 @@ jobs:
         host: \${{ secrets.SSH_HOST }}
         username: \${{ secrets.SSH_USER }}
         password: \${{ secrets.SSH_PASSWORD }}
-        source: "project.tar.gz" # Use file in current directory
-        target: "~" # Target is home directory
+        source: "project.tar.gz"
+        target: "~"
 
     - name: Deploy on server via SSH
       uses: appleboy/ssh-action@v1.0.3
