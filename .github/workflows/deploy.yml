@@ -13,7 +13,7 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Archive project
-      run: tar --exclude=project.tar.gz -czf project.tar.gz .
+      run: tar -czf /tmp/project.tar.gz .
 
     - name: Copy project to server via SCP
       uses: appleboy/scp-action@v0.1.4
@@ -21,7 +21,7 @@ jobs:
         host: ${{ secrets.SSH_HOST }}
         username: ${{ secrets.SSH_USER }}
         password: ${{ secrets.SSH_PASSWORD }}
-        source: "project.tar.gz"
+        source: "/tmp/project.tar.gz"
         target: "~"
 
     - name: Deploy on server via SSH
