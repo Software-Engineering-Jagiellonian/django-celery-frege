@@ -14,8 +14,8 @@ jobs:
 
     - name: Archive project
       run: |
-        # Create tar file in the current directory instead of /tmp
-        tar -czf project.tar.gz -C "\$GITHUB_WORKSPACE" .
+        # Create tar directly in the workspace (which is the current directory)
+        tar -czf project.tar.gz .
         ls -la project.tar.gz # Verify the file exists and check size
 
     - name: Copy project to server via SCP
