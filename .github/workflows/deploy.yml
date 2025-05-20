@@ -15,7 +15,7 @@ jobs:
     - name: Archive project
       run: |
         cd $GITHUB_WORKSPACE
-        tar -czf /tmp/project.tar.gz .
+        tar -czf project.tar.gz .
 
     - name: Copy project to server via SCP
       uses: appleboy/scp-action@v0.1.4
@@ -23,8 +23,9 @@ jobs:
         host: ${{ secrets.SSH_HOST }}
         username: ${{ secrets.SSH_USER }}
         password: ${{ secrets.SSH_PASSWORD }}
-        source: "/tmp/project.tar.gz"
+        source: "project.tar.gz"
         target: "~"
+        tar_exec: ""
 
     - name: Deploy on server via SSH
       uses: appleboy/ssh-action@v1.0.3
