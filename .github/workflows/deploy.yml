@@ -22,9 +22,8 @@ jobs:
         host: ${{ secrets.SSH_HOST }}
         username: ${{ secrets.SSH_USER }}
         password: ${{ secrets.SSH_PASSWORD }}
-        source: "project.tar.gz"
+        source: "/tmp/project.tar.gz"
         target: "~"
-        tar_exec: ""
 
     - name: Deploy on server via SSH
       uses: appleboy/ssh-action@v1.0.3
