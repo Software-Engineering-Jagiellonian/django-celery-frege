@@ -14,30 +14,32 @@ jobs:
 
     - name: Archive project
       run: |
-        tar --warning=no-file-changed -czf /tmp/project.tar.gz -C "$GITHUB_WORKSPACE" .
+        # Create tar file in the current directory instead of /tmp
+        tar -czf project.tar.gz -C "\$GITHUB_WORKSPACE" .
+        ls -la project.tar.gz # Verify the file exists and check size
 
     - name: Copy project to server via SCP
       uses: appleboy/scp-action@v0.1.4
       with:
-        host: ${{ secrets.SSH_HOST }}
-        username: ${{ secrets.SSH_USER }}
-        password: ${{ secrets.SSH_PASSWORD }}
-        source: "/tmp/project.tar.gz"
-        target: "~"
+        host: \${{ secrets.SSH_HOST }}
+        username: \${{ secrets.SSH_USER }}
+        password: \${{ secrets.SSH_PASSWORD }}
+        source: "project.tar.gz" # Use file in current directory
+        target: "~" # Target is home directory
 
     - name: Deploy on server via SSH
       uses: appleboy/ssh-action@v1.0.3
       with:
-        host: ${{ secrets.SSH_HOST }}
-        username: ${{ secrets.SSH_USER }}
-        password: ${{ secrets.SSH_PASSWORD }}
+        host: \${{ secrets.SSH_HOST }}
+        username: \${{ secrets.SSH_USER }}
+        password: \${{ secrets.SSH_PASSWORD }}
         script: |
           rm -rf frege || true
-          mkdir frege && tar -xzf project.tar.gz -C frege
+          mkdir frege && tar -xzf ~/project.tar.gz -C frege
           cd frege
 
           cp .env.template .env
-          echo "GITLAB_TOKEN=${{ secrets.GITLAB_TOKEN }}" >> .env
+          echo "GITLAB_TOKEN=\${{ secrets.GITLAB_TOKEN }}" >> .env
 
           docker compose --profile prod down || true
           docker compose --profile prod up -d --build
