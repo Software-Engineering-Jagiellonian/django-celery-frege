@@ -13,7 +13,9 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Archive project
-      run: tar -czf /tmp/project.tar.gz .
+      run: |
+        cd $GITHUB_WORKSPACE
+        tar -czf /tmp/project.tar.gz .
 
     - name: Copy project to server via SCP
       uses: appleboy/scp-action@v0.1.4
