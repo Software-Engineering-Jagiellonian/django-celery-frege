@@ -50,6 +50,6 @@ jobs:
             
             cp .env.template .env
             
-            docker compose --profile prod down
-            docker compose --profile prod build
-            docker compose --profile prod up -d
+            docker compose --profile dev down
+            docker compose --profile dev build
+            docker compose --profile dev up -d
