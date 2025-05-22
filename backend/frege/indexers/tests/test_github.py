@@ -11,9 +11,20 @@ from django.db import IntegrityError
 
 @pytest.fixture
 def github_indexer():
+    """Provides a GitHubIndexer instance for tests."""
     return GitHubIndexer.objects.create(min_forks=200, min_stars=300, current_page=0)
 
 def mock_repo(name="test-repo", sha="abc123"):
+    """
+    Returns a mock GitHub repository object with predefined values.
+
+    Args:
+        name (str): Name of the mock repository.
+        sha (str): SHA of the latest commit.
+
+    Returns:
+        unittest.mock.Mock: A mocked GHRepo object.
+    """
     mock_branch = mock.create_autospec(Branch)
     mock_branch.commit.sha = sha
 
@@ -31,6 +42,10 @@ def mock_repo(name="test-repo", sha="abc123"):
 @mock.patch("frege.indexers.models.Github")
 @pytest.mark.django_db
 def test_iter_creates_repositories(mock_github_cls, mock_bulk_create, mock_unique, github_indexer):
+    """
+    Tests that GitHubIndexer creates repository entries when valid results are returned
+    from the GitHub API. Also verifies that current_page is incremented.
+    """
     mock_github = mock.Mock()
     mock_repo_obj = mock_repo()
     mock_github.search_repositories.return_value = [mock_repo_obj]
@@ -52,15 +67,21 @@ def test_iter_creates_repositories(mock_github_cls, mock_bulk_create, mock_uniqu
 @mock.patch("frege.indexers.models.Github")
 @pytest.mark.django_db
 def test_iter_uses_no_token(mock_github_cls, github_indexer):
+    """
+    Verifies that the GitHub client is not initialized when no GitHub token is set
+    in the environment.
+    """
     iter(github_indexer)
     mock_github_cls.assert_not_called()
-
 
 @mock.patch("frege.indexers.models._is_repo_unique", return_value=True)
 @mock.patch("frege.indexers.models.Repository.objects.bulk_create")
 @mock.patch("frege.indexers.models.Github")
 @pytest.mark.django_db
 def test_repository_field_mapping(mock_github_cls, mock_bulk_create, mock_unique, github_indexer):
+    """
+    Tests that fields from the GitHub API are correctly mapped to the local Repository model.
+    """
     mock_github = mock.Mock()
     mock_repo_obj = mock_repo(name="test-repo", sha="test-sha")
     mock_github.search_repositories.return_value = [mock_repo_obj]
@@ -82,6 +103,10 @@ def test_repository_field_mapping(mock_github_cls, mock_bulk_create, mock_unique
 @mock.patch("frege.indexers.models.Github")
 @pytest.mark.django_db
 def test_query_construction(mock_github_cls, mock_bulk_create, mock_unique, github_indexer):
+    """
+    Verifies that the query to GitHub search is constructed using the
+    correct minimum forks and stars values.
+    """
     mock_github = mock.Mock()
     mock_github.search_repositories.return_value = []
     mock_github_cls.return_value = mock_github
@@ -100,6 +125,10 @@ def test_query_construction(mock_github_cls, mock_bulk_create, mock_unique, gith
 @mock.patch("frege.indexers.models.Github")
 @pytest.mark.django_db
 def test_iter_handles_rate_limit(mock_github_cls, github_indexer):
+    """
+    Tests that the GitHubIndexer gracefully handles a rate limit error from
+    the GitHub API and sets the `rate_limit_exceeded` flag.
+    """
     mock_github = mock.Mock()
     mock_github.search_repositories.side_effect = RateLimitExceededException(403, "Rate limited", headers={})
     mock_github_cls.return_value = mock_github

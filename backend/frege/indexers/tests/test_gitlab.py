@@ -1,3 +1,9 @@
+"""
+Unit tests for the GitLab Client class and related utilities.
+These tests cover internal HTTP requests, commit retrieval, pagination,
+rate limiting, and filtering of repositories based on stars and forks.
+"""
+
 import pytest
 from unittest.mock import patch, Mock
 from frege.indexers.utils.gitlab import Client, RateLimitExceededException
@@ -6,10 +12,12 @@ BASE_ENDPOINT = "https://gitlab.com/api/v4/projects"
 
 @pytest.fixture
 def client():
+    """Fixture to create a default GitLab Client with dummy credentials."""
     return Client(token="dummy-token", min_stars=10, min_forks=5)
 
 @patch("frege.indexers.utils.gitlab.requests.get")
 def test_get_adds_token_and_checks_limit(mock_get):
+    """Ensure that _get adds the auth token and updates rate limit from headers."""
     client = Client(token="abc123", _ratelimit_remaining=1)
     mock_response = Mock()
     mock_response.headers = {'RateLimit-Remaining': '999'}
@@ -22,15 +30,15 @@ def test_get_adds_token_and_checks_limit(mock_get):
     assert mock_get.call_args[1]["headers"] == {"PRIVATE-TOKEN": "abc123"}
     assert response == mock_response
 
-
 def test_get_raises_rate_limit():
+    """Test that _get raises RateLimitExceededException when limit is reached."""
     client = Client(_ratelimit_remaining=0)
     with pytest.raises(RateLimitExceededException):
         client._get("https://example.com")
 
-
 @patch("frege.indexers.utils.gitlab.requests.get")
 def test_commit_hash_success(mock_get, client):
+    """Check that _commit_hash returns correct commit ID on success."""
     mock_response = Mock()
     mock_response.status_code = 200
     mock_response.json.return_value = [{"id": "abc123"}]
@@ -43,9 +51,9 @@ def test_commit_hash_success(mock_get, client):
     mock_get.assert_called_once()
     assert "projects/101/repository/commits" in mock_get.call_args[0][0]
 
-
 @patch("frege.indexers.utils.gitlab.requests.get")
 def test_commit_hash_handles_empty_commits(mock_get, client, caplog):
+    """Test that _commit_hash returns None and logs info when no commits are found."""
     mock_response = Mock()
     mock_response.status_code = 200
     mock_response.json.return_value = []
@@ -58,9 +66,9 @@ def test_commit_hash_handles_empty_commits(mock_get, client, caplog):
     assert commit is None
     assert "No commits found for project 202" in caplog.text
 
-
 @patch("frege.indexers.utils.gitlab.requests.get")
 def test_commit_hash_handles_non_200(mock_get, client, caplog):
+    """Ensure _commit_hash handles non-200 responses and logs appropriately."""
     mock_response = Mock()
     mock_response.status_code = 404
     mock_response.headers = {}
@@ -74,8 +82,7 @@ def test_commit_hash_handles_non_200(mock_get, client, caplog):
 
 @patch("frege.indexers.utils.gitlab.Client._get")
 def test_projects_pagination(mock_get):
-    """Test if _projects method correctly handles pagination across multiple pages"""
-
+    """Test if _projects method correctly handles pagination across multiple pages."""
     first_response = Mock()
     first_response.json.return_value = [{"id": 1, "name": "Project 1"}, {"id": 2, "name": "Project 2"}]
     first_response.links = {"next": {"url": "https://gitlab.com/api/v4/projects/next-page"}}
@@ -91,7 +98,10 @@ def test_projects_pagination(mock_get):
     results = list(client._projects())
 
     assert len(results) == 2
-    assert results == [[{'id': 1, 'name': 'Project 1'}, {'id': 2, 'name': 'Project 2'}], [{'id': 3, 'name': 'Project 3'}, {'id': 4, 'name': 'Project 4'}]]
+    assert results == [
+        [{'id': 1, 'name': 'Project 1'}, {'id': 2, 'name': 'Project 2'}],
+        [{'id': 3, 'name': 'Project 3'}, {'id': 4, 'name': 'Project 4'}]
+    ]
 
     assert mock_get.call_count == 2
     mock_get.assert_any_call(BASE_ENDPOINT, params={'pagination': 'keyset', 'per_page': '100', 'order_by': 'id', 'sort': 'asc', 'id_after': client.after_id})
@@ -100,6 +110,7 @@ def test_projects_pagination(mock_get):
 @patch("frege.indexers.utils.gitlab.Client._get")
 @patch("frege.indexers.utils.gitlab.Client._commit_hash")
 def test_repositories_filters_and_yields(mock_commit_hash, mock_get, client):
+    """Test that repositories() filters projects and adds commit hash correctly."""
     mock_get.return_value = Mock(
         json=Mock(return_value=[
             {"id": 1, "star_count": 12, "forks_count": 6,
