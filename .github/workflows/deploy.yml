@@ -5,48 +5,51 @@ on:
     types: [published]
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Archive project
-      run: |
-        # Use --warning=no-file-changed to ignore file changes during archiving
-        tar --warning=no-file-changed -czf project.tar.gz .
-        # Check if the tar file was created successfully
-        if [ -f project.tar.gz ] && [ -s project.tar.gz ]; then
-          echo "Archive created successfully"
-          ls -la project.tar.gz
-        else
-          echo "Failed to create archive"
-          exit 1
-        fi
+      - name: Deploy to server and build
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          script: |
+            mkdir -p ~/frege-app
+            
+            rm -rf ~/frege-app/repo
+            mkdir -p ~/frege-app/repo
+            
+            cat > ~/frege-app/.env << EOL
+            GITLAB_TOKEN=\${{ secrets.GITLAB_TOKEN }}
+            # Add any other necessary environment variables
+            EOL
 
-    - name: Copy project to server via SCP
-      uses: appleboy/scp-action@v0.1.4
-      with:
-        host: \${{ secrets.SSH_HOST }}
-        username: \${{ secrets.SSH_USER }}
-        password: \${{ secrets.SSH_PASSWORD }}
-        source: "project.tar.gz"
-        target: "~"
+      - name: Copy repository to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          source: "./"
+          target: "~/frege-app/repo"
+          rm: false
+          strip_components: 0
 
-    - name: Deploy on server via SSH
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: \${{ secrets.SSH_HOST }}
-        username: \${{ secrets.SSH_USER }}
-        password: \${{ secrets.SSH_PASSWORD }}
-        script: |
-          rm -rf frege || true
-          mkdir frege && tar -xzf ~/project.tar.gz -C frege
-          cd frege
-
-          cp .env.template .env
-          echo "GITLAB_TOKEN=\${{ secrets.GITLAB_TOKEN }}" >> .env
-
-          docker compose --profile prod down || true
-          docker compose --profile prod up -d --build
+      - name: Build and run on server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          script: |
+            cd ~/frege-app/repo
+            
+            cp ~/frege-app/.env ./.env
+            
+            docker compose --profile prod down
+            docker compose --profile prod build
+            docker compose --profile prod up -d
