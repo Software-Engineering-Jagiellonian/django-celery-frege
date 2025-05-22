@@ -39,6 +39,6 @@ pytest-mock~=3.14.0
 pytest-unordered~=0.6.1
 pytest-django~=4.10.0
 pytest-asyncio==0.26.0
-daphne==4.1.2
+daphne==4.2.0
 
 whitenoise==6.9.0
