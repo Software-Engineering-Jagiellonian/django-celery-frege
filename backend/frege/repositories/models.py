@@ -5,6 +5,11 @@ from frege.repositories.constants import ProgrammingLanguages, CommitMessagesTyp
 
 
 class Repository(models.Model):
+    """
+    Represents a code repository in a version control system.
+    Stores details about the repository, such as name, description,
+    git URL, commit hash, and analysis timestamps.
+    """
     name = models.CharField(
         max_length=255,
         verbose_name=_("Repository name"),
@@ -64,6 +69,11 @@ class Repository(models.Model):
 
 
 class RepositoryFile(models.Model):
+    """
+    Represents a file within a repository.
+    Stores details about the file's language, path, analysis status,
+    and various metrics related to the file.
+    """
     repository = models.ForeignKey(
         Repository,
         on_delete=models.CASCADE,
@@ -144,7 +154,11 @@ class RepositoryFile(models.Model):
 
 
 class RepositoryCommitMessagesQuality(models.Model):
-
+    """
+    Represents the analysis of commit messages quality within a repository.
+    Stores various metrics such as average message length, ratio of meaningful
+    messages, and percentage of feature/fix commits.
+    """
     repository = models.ForeignKey(
         Repository,
         on_delete=models.CASCADE,
@@ -241,7 +255,9 @@ class RepositoryCommitMessagesQuality(models.Model):
 
 
 class CommitMessage(models.Model):
-
+    """
+    Represents an individual commit message and its analyzed characteristics.
+    """
     repository = models.ForeignKey(
         Repository,
         on_delete=models.CASCADE,

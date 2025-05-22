@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+
+<html lang="Eng" data-content_root="../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>frege.analyzers.core.generic &#8212; FREGE  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/alabaster.css?v=cb25574f" />
+    <script src="../../../../_static/documentation_options.js?v=8f7392b4"></script>
+    <script src="../../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for frege.analyzers.core.generic</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TypedDict</span>
+
+<span class="kn">import</span> <span class="nn">lizard</span>
+
+<span class="kn">from</span> <span class="nn">frege.analyzers.core.base</span> <span class="kn">import</span> <span class="n">BaseAnalyzer</span>
+<span class="kn">from</span> <span class="nn">frege.repositories.utils.analyzers</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">average_func_name_len</span><span class="p">,</span>
+    <span class="n">repo_file_content</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">frege.repositories.utils.paths</span> <span class="kn">import</span> <span class="n">get_file_abs_path</span>
+
+
+<div class="viewcode-block" id="GenericAnalysisResult">
+<a class="viewcode-back" href="../../../../core.html#frege.analyzers.core.generic.GenericAnalysisResult">[docs]</a>
+<span class="k">class</span> <span class="nc">GenericAnalysisResult</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A dictionary that holds the results of analyzing a source code file.</span>
+
+<span class="sd">    This dictionary contains various metrics calculated from the analysis, </span>
+<span class="sd">    such as lines of code, token count, average cyclomatic complexity, and </span>
+<span class="sd">    other function-related statistics.</span>
+
+<span class="sd">    Keys:</span>
+<span class="sd">        lines_of_code (int): The total number of lines of code in the file.</span>
+<span class="sd">        token_count (int): The total number of tokens in the file.</span>
+<span class="sd">        average_lines_of_code (float): The average number of lines of code per function.</span>
+<span class="sd">        average_token_count (float): The average number of tokens per function.</span>
+<span class="sd">        average_cyclomatic_complexity (float): The average cyclomatic complexity per function.</span>
+<span class="sd">        average_parameter_count (float): The average number of parameters per function.</span>
+<span class="sd">        function_count (int): The number of functions in the file.</span>
+<span class="sd">        average_function_name_length (float): The average length of function names in the file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lines_of_code</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">token_count</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">average_lines_of_code</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">average_token_count</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">average_cyclomatic_complexity</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">average_parameter_count</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">function_count</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">average_function_name_length</span><span class="p">:</span> <span class="nb">float</span></div>
+
+
+
+<div class="viewcode-block" id="get_analysis_results">
+<a class="viewcode-back" href="../../../../core.html#frege.analyzers.core.generic.get_analysis_results">[docs]</a>
+<span class="k">def</span> <span class="nf">get_analysis_results</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extracts and returns a dictionary of key metrics from a Lizard analysis result.</span>
+
+<span class="sd">    This function processes the results of the Lizard analysis, which includes </span>
+<span class="sd">    information such as lines of code, function count, token count, cyclomatic </span>
+<span class="sd">    complexity, and other function-related statistics.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        res (LizardAnalysisResult): The result object returned by Lizard&#39;s </span>
+<span class="sd">        analysis, containing various code metrics.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: A dictionary containing the extracted metrics:</span>
+<span class="sd">            - lines_of_code</span>
+<span class="sd">            - token_count</span>
+<span class="sd">            - function_count</span>
+<span class="sd">            - average_function_name_length</span>
+<span class="sd">            - average_lines_of_code</span>
+<span class="sd">            - average_token_count</span>
+<span class="sd">            - average_cyclomatic_complexity</span>
+<span class="sd">            - average_parameter_count</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;lines_of_code&quot;</span><span class="p">:</span> <span class="n">res</span><span class="o">.</span><span class="n">nloc</span><span class="p">,</span>
+        <span class="s2">&quot;token_count&quot;</span><span class="p">:</span> <span class="n">res</span><span class="o">.</span><span class="n">token_count</span><span class="p">,</span>
+        <span class="s2">&quot;function_count&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">function_list</span><span class="p">),</span>
+        <span class="s2">&quot;average_function_name_length&quot;</span><span class="p">:</span> <span class="n">average_func_name_len</span><span class="p">(</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">function_list</span>
+        <span class="p">),</span>
+        <span class="s2">&quot;average_lines_of_code&quot;</span><span class="p">:</span> <span class="n">res</span><span class="o">.</span><span class="n">average_nloc</span><span class="p">,</span>
+        <span class="s2">&quot;average_token_count&quot;</span><span class="p">:</span> <span class="n">res</span><span class="o">.</span><span class="n">average_token_count</span><span class="p">,</span>
+        <span class="s2">&quot;average_cyclomatic_complexity&quot;</span><span class="p">:</span> <span class="n">res</span><span class="o">.</span><span class="n">average_cyclomatic_complexity</span><span class="p">,</span>
+        <span class="s2">&quot;average_parameter_count&quot;</span><span class="p">:</span> <span class="n">res</span><span class="o">.</span><span class="n">functions_average</span><span class="p">(</span><span class="s2">&quot;parameter_count&quot;</span><span class="p">),</span>
+    <span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="GenericAnalyzer">
+<a class="viewcode-back" href="../../../../core.html#frege.analyzers.core.generic.GenericAnalyzer">[docs]</a>
+<span class="k">class</span> <span class="nc">GenericAnalyzer</span><span class="p">(</span><span class="n">BaseAnalyzer</span><span class="p">[</span><span class="n">GenericAnalysisResult</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Analyzes a source code file using the Lizard library to gather metrics about </span>
+<span class="sd">    the code&#39;s structure, including lines of code, token count, function count, </span>
+<span class="sd">    and cyclomatic complexity.</span>
+
+<span class="sd">    This class implements the `analyze()` method defined in the BaseAnalyzer, </span>
+<span class="sd">    using Lizard&#39;s analysis results to compute various metrics related to the </span>
+<span class="sd">    source code file.</span>
+
+<span class="sd">    Methods:</span>
+<span class="sd">        analyze(repo_file_obj): Analyzes the given repository file and returns </span>
+<span class="sd">        a dictionary with key metrics (lines of code, token count, average function </span>
+<span class="sd">        name length, etc.) calculated using the Lizard analysis.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+<div class="viewcode-block" id="GenericAnalyzer.analyze">
+<a class="viewcode-back" href="../../../../core.html#frege.analyzers.core.generic.GenericAnalyzer.analyze">[docs]</a>
+    <span class="k">def</span> <span class="nf">analyze</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo_file_obj</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Analyzes the given repository file and returns key metrics on its structure.</span>
+
+<span class="sd">        This method reads the source code of the given repository file, analyzes </span>
+<span class="sd">        it using the Lizard library, and then returns a dictionary containing </span>
+<span class="sd">        key metrics, such as lines of code, token count, function count, and </span>
+<span class="sd">        other relevant statistics.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            repo_file_obj (RepositoryFile): The repository file object to analyze.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            GenericAnalysisResult: A dictionary containing the analysis results, </span>
+<span class="sd">            including lines of code, token count, function count, and other key </span>
+<span class="sd">            metrics.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">with</span> <span class="n">repo_file_content</span><span class="p">(</span><span class="n">repo_file_obj</span><span class="p">)</span> <span class="k">as</span> <span class="n">source_code</span><span class="p">:</span>
+            <span class="n">analysis_result</span> <span class="o">=</span> <span class="n">lizard</span><span class="o">.</span><span class="n">analyze_file</span><span class="o">.</span><span class="n">analyze_source_code</span><span class="p">(</span>
+                <span class="nb">str</span><span class="p">(</span><span class="n">get_file_abs_path</span><span class="p">(</span><span class="n">repo_file_obj</span><span class="p">)),</span> <span class="n">source_code</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">get_analysis_results</span><span class="p">(</span><span class="n">analysis_result</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../index.html">FREGE</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../core.html">Core package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -33,6 +33,19 @@ logger = get_task_logger(__name__)
 
 
 def _finalize_repo_analysis(repo_obj):
+    """
+    Finalizes the analysis of the repository.
+
+    This function checks if all files and commit messages have been analyzed.
+    If so, it computes and stores commit message quality metrics, marks the
+    repository as fully analyzed, deletes the cloned repository from disk.
+
+    Args:
+        repo_obj (Repository): The repository object to finalize.
+
+    Returns:
+        None
+    """
     if not (
             repo_obj.files.filter(analyzed=False).exists() or
             repo_obj.commit_messages.filter(analyzed=False).exists()
@@ -84,7 +97,16 @@ def _finalize_repo_analysis(repo_obj):
 
 def _clone_repo(repo: Repository, local_path: Path) -> Optional[git.Repo]:
     _check_download_folder_size()
-    
+    """
+    Clones the repository from the given git URL to the specified local path.
+
+    Args:
+        repo (Repository): The repository object containing the git URL.
+        local_path (Path): The destination path for cloning the repository.
+
+    Returns:
+        Optional[git.Repo]: Cloned repository object or None if cloning fails.
+    """
     try:
         repo_obj = git.Repo.clone_from(repo.git_url, local_path)
         repo.fetch_time = timezone.now()
@@ -100,8 +122,11 @@ def _clone_repo(repo: Repository, local_path: Path) -> Optional[git.Repo]:
 
 def _check_download_folder_size(depth=0):
     """
-    Check if the size of downloads folder < DOWNLOAD_DIR_MAX_SIZE_BYTES.
-    If not, raise DownloadDirectoryFullException
+    Recursively checks if the download folder's size exceeds the configured limit.
+
+    Raises:
+        DownloadDirectoryFullException: If the folder exceeds allowed size
+        or if the check fails too many times.
     """
     if depth > 7:
         # Prevent infinite recursion
@@ -126,7 +151,11 @@ def _check_download_folder_size(depth=0):
 
 def _check_queued_tasks_number():
     """
-    Check the number of currently registered download tasks
+    Checks how many download tasks are currently queued for execution.
+
+    Raises:
+        DownloadQueueTooBigException: If the number of reserved tasks exceeds the limit.
+        ValueError: If inspection of the queue fails.
     """
     name = settings.DOWNLOAD_TASK_NAME
     inspect = app.control.inspect([name])
@@ -147,6 +176,12 @@ def _check_queued_tasks_number():
 
 @celeryd_after_setup.connect(sender="celery@worker_crawl")
 def init_worker(sender, **kwargs):
+    """
+    Initializes worker on startup.
+
+    Triggers the crawling task for each indexer if CELERY_CRAWL_ON_STARTUP is true.
+    """
+
     _sanitize()
 
     if os.environ.get("CELERY_CRAWL_ON_STARTUP", "true").lower() != "true":
@@ -164,6 +199,16 @@ def init_worker(sender, **kwargs):
     default_retry_delay=15,
 )
 def crawl_repos_task(indexer_class_name):
+    """
+    Main crawling task that schedules repository processing.
+
+    Args:
+        indexer_class_name (str): The name of the indexer class used to fetch repositories.
+
+    Raises:
+        DownloadDirectoryFullException: If the download folder is full.
+        DownloadQueueTooBigException: If the task queue is too long.
+    """
     try:
         _check_queued_tasks_number()
     except DownloadQueueTooBigException as ex:
@@ -206,7 +251,19 @@ def crawl_repos_task(indexer_class_name):
     default_retry_delay=15,
 )
 def process_repo_task(repo_pk):
-    # TODO: docstring & cleanup
+    """
+    Downloads and processes a repository:
+    - clones the repo
+    - saves commit messages and file data
+    - schedules analysis tasks
+
+    Args:
+        repo_pk (int): Primary key of the repository to process.
+
+    Raises:
+        DownloadDirectoryFullException: If download directory is too large.
+    """
+
 
     try:
         repo = Repository.objects.get(pk=repo_pk)
@@ -288,6 +345,13 @@ def process_repo_task(repo_pk):
 
 @shared_task
 def analyze_commit_message_quality_task(commit_message_pk):
+    """
+    Celery task that analyzes a single commit message using the CommitMessageAnalyzer.
+
+    Args:
+        commit_message_pk (int): Primary key of the commit message to analyze.
+    """
+
     try:
         logger.info(f"Attempt of analyzing commit message {commit_message_pk} quality")
         commit_message = CommitMessage.objects.get(pk=commit_message_pk)
@@ -322,7 +386,18 @@ def analyze_commit_message_quality_task(commit_message_pk):
 
 @shared_task
 def analyze_file_task(repo_file_pk):
-    # TODO: docstring & cleanup
+
+    """
+    Celery task that analyzes a single file from a repository using language-specific analyzers.
+
+    - Fetches the file from the database.
+    - Uses appropriate analyzers to collect code metrics.
+    - Saves the metrics in the database.
+    - Finalizes repository analysis if needed.
+
+    Args:
+        repo_file_pk (int): Primary key of the RepositoryFile to analyze.
+    """
 
     try:
         repo_file = RepositoryFile.objects.get(pk=repo_file_pk)
@@ -395,7 +470,13 @@ def analyze_file_task(repo_file_pk):
 
 def _remove_database_entries(repo: Repository):
     """
-    When processing a repository we need to make sure to remove all previous database entries, because we insert into the database all the files and commit messages again.
+    Removes all previously stored database entries related to a repository.
+
+    This includes commit messages, commit message quality metrics, and file metadata.
+    Used when restarting processing to avoid duplicates or inconsistencies.
+
+    Args:
+        repo (Repository): The repository whose data should be cleared.
     """
     repo_pk = repo.pk
     removed_commits_amount = CommitMessage.objects.filter(repository=repo_pk).delete()[0]
@@ -408,6 +489,16 @@ def _remove_database_entries(repo: Repository):
     repo.save(update_fields=["analyzed"])
 
 def _sanitize():
+
+    """
+    Sanitizes the environment before crawling new repositories.
+
+    If Redis-based task persistence is disabled, this function:
+    - Acquires a lock to ensure a single crawler performs sanitization.
+    - Wipes the downloads directory.
+    - Reschedules all unanalyzed repositories for processing.
+    """
+
     if settings.REDIS_PERSISTENCE_ENABLED:
         # If persistence is enabled, we don't need to sanitize
         # since all previous tasks are still in the queue.
@@ -426,6 +517,13 @@ def _sanitize():
         _reschedule_unanalyzed_repos()
 
 def _wipe_downloads_dir():
+
+    """
+    Deletes all contents of the downloads directory.
+
+    Used to clear previously cloned repository files from local storage.
+    """
+
     for filename in os.listdir(settings.DOWNLOAD_PATH):
         file_path = os.path.join(settings.DOWNLOAD_PATH, filename)
         if os.path.isfile(file_path) or os.path.islink(file_path):
@@ -434,6 +532,14 @@ def _wipe_downloads_dir():
             shutil.rmtree(file_path)
 
 def _reschedule_unanalyzed_repos():
+
+    """
+    Reschedules analysis tasks for repositories that haven't been analyzed yet.
+
+    This is used after wiping the download directory to reprocess incomplete repositories.
+    Logs the number of rescheduled repositories or if none are found.
+    """
+
     try:
         objects = Repository.objects.all()
         if objects.exists():

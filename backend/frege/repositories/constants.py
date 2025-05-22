@@ -5,6 +5,10 @@ from enum import Enum
 
 
 class CommitMessagesTypes(Enum):
+    """
+    Enum representing different types of commit messages.
+    """
+    
     FEATURE = "FEATURE"
     FIX = "FIX"
     CONFIG = "CONFIG CHANGE"
@@ -12,10 +16,17 @@ class CommitMessagesTypes(Enum):
     UNCLASSIFIED = "UNCLASSIFIED"
     @classmethod
     def choices(cls):
+        """
+        Returns a list of tuples (name, value) for all enum members.
+
+        """
         return [(lang.name, lang.value) for lang in cls]
 
 
 class ProgrammingLanguages(Enum):
+    """
+    Enum representing supported programming languages.
+    """
     PYTHON = "Python"
     C = "C"
     CPP = "C++"
@@ -33,6 +44,9 @@ class ProgrammingLanguages(Enum):
     TYPESCRIPT = "TypeScript"
     @classmethod
     def choices(cls):
+        """
+        Returns a list of tuples (name, value) for all enum members.
+        """
         return [(lang.name, lang.value) for lang in cls]
 
 
@@ -40,7 +54,16 @@ file_extensions_registry: dict[ProgrammingLanguages, list[str]] = {}
 
 
 def register_extension(lang_name: str, extensions: list[str]):
-    # TODO: docstring
+    """
+    Registers a list of file extensions for a given programming language.
+
+    Args:
+        lang_name (str): The name of the programming language (Enum name).
+        extensions (list[str]): A list of associated file extensions.
+
+    Raises:
+        AssertionError: If the language is not present in ProgrammingLanguages.
+    """
     if lang_name not in ProgrammingLanguages.__members__:
         raise AssertionError(
             f"There is no such programming language "
@@ -53,7 +76,18 @@ def register_extension(lang_name: str, extensions: list[str]):
 
 
 def get_extensions_for_language(language: ProgrammingLanguages) -> list[str]:
-    # TODO: docstring
+    """
+    Returns the list of registered file extensions for the given programming language.
+
+    Args:
+        language (ProgrammingLanguages): The programming language.
+
+    Returns:
+        list[str]: The list of file extensions.
+
+    Raises:
+        AssertionError: If the language has not been registered.
+    """
     try:
         return file_extensions_registry[language]
     except KeyError as ke:
@@ -68,7 +102,15 @@ def get_extensions_for_language(language: ProgrammingLanguages) -> list[str]:
 def get_languages_by_extension(
     extension: str,
 ) -> Generator[ProgrammingLanguages]:
-    # TODO: docstring
+    """
+    Yields all programming languages associated with the given file extension.
+
+    Args:
+        extension (str): A file extension (e.g., '.py').
+
+    Yields:
+        ProgrammingLanguages: Languages that use the provided extension.
+    """
     for lang, extensions in file_extensions_registry.items():
         if extension in extensions:
             yield lang
