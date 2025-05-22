@@ -48,7 +48,7 @@ jobs:
           script: |
             cd ~/frege-app/repo
             
-            cp ~/frege-app/.env ./.env
+            cp .env.template .env
             
             docker compose --profile prod down
             docker compose --profile prod build
