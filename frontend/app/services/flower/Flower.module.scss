@@ -1,0 +1,51 @@
+@import "@/src/colors.module.scss";
+
+.list{
+    line-height: 1.5;
+    list-style: none;
+}
+
+.subObject{
+    border-left: 1px solid $main-borders-color;
+    padding-left: 1.5rem;
+}
+
+.errorMessage{
+    color: $error;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+.subLink{
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.selectDropdown{
+    background: transparent;
+    color: $main-color;
+    border: 1px $main-color solid;
+    border-radius: 5px;
+    height: 30px;
+    padding: 0rem 0.5rem;
+}
+
+.workersList{
+    list-style: none;
+    padding-left: 0;
+
+    .workerItem{
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        border: 1px solid $main-borders-color;
+        border-radius: 1rem;
+        gap: 1rem;
+        padding: 0.5rem;
+
+        svg{
+            cursor: pointer;
+            color: red;
+        }
+    }
+}
