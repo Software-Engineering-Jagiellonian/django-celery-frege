@@ -15,6 +15,10 @@ from frege.indexers.tests.sourceforge import MOCKED_SOURCEFORGE_FILES
 
 @pytest.fixture
 def soup():
+    """
+    Loads and returns a BeautifulSoup object from a static HTML page
+    representing a SourceForge project code page, used for testing parsing logic.
+    """
     with open(
         MOCKED_SOURCEFORGE_FILES / "sourceforge_project_code_page.html",
         encoding="utf8",
@@ -25,6 +29,10 @@ def soup():
 
 @pytest.fixture
 def mocked_sourceforge_response():
+    """
+    Returns a mocked version of requests.get that reads and returns a
+    pre-saved SourceForge HTML page for testing HTTP response handling.
+    """
     class MockResponse:
         def __init__(self, text, status_code):
             self.text = text
@@ -42,12 +50,23 @@ def mocked_sourceforge_response():
 
 
 class TestSourceforgeProjectCodeExtractor:
+    """
+    Unit tests for the SourceforgeProjectCodeExtractor class and its helper functions.
+    """
+
     def test_extract_commit(self, soup):
+        """
+        Tests whether the commit hash is correctly extracted from the sample HTML page.
+        """
         commit_hash = extract_commit(soup)
         expected_commit = "53fba0e052502d7192bacdcef1bd8a51b066686b"
         assert commit_hash == expected_commit
 
     def test_extract_clone_url(self, soup):
+        """
+        Tests whether the clone URL and commit hash are correctly extracted
+        from the SourceForge project code page.
+        """
         git_clone_info = extract_clone_url(soup)
         expected_info = GitCloneInfo(
             url="https://git.code.sf.net/p/mingw/build-aux",
@@ -56,6 +75,10 @@ class TestSourceforgeProjectCodeExtractor:
         assert git_clone_info == expected_info
 
     def test_extract(self, mocker: MockerFixture, mocked_sourceforge_response):
+        """
+        Tests the extract() method with a mocked HTTP response. Ensures that None
+        is returned when the page doesn't contain valid repository information.
+        """
         mock_requests_get = mocker.patch("requests.get", side_effect=mocked_sourceforge_response)
         code_url = "test_string"
         git_clone_info = SourceforgeProjectCodeExtractor().extract(code_url=code_url)
