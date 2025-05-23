@@ -51,3 +51,9 @@ tasks from Redis when available. The task queue can persist between sessions, i.
 saved on the disk when FREGE is shut down and they will be restored when FREGE is started again.
 Currently it's not known whether task persistence is safe for FREGE, so it's disabled by default. You can enable it
 by setting the environmental variable `REDIS_PERSISTENCE_ENABLED=True`.
+
+### Profiling
+
+To start profiling, run `docker compose --profile profiling build` in the root of the repository.
+
+Then, run the script in `scripts/profile.sh` to start end-to-end profiling.
