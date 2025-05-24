@@ -55,8 +55,7 @@ jobs:
             
             docker compose --profile dev down
             docker compose --profile dev build
-            
-            timeout 1800 docker compose --profile dev up -d || true
+            docker compose --profile dev up
             
             docker compose --profile dev ps
             
