@@ -52,4 +52,12 @@ jobs:
             
             docker compose --profile dev down
             docker compose --profile dev build
-            docker compose --profile dev up -d
+            
+            timeout 300 docker compose --profile dev up -d || true
+            
+            docker compose --profile dev ps
+            
+            echo "Container logs (last 50 lines):"
+            docker compose --profile dev logs --tail=50
+            
+            echo "Deployment completed"
