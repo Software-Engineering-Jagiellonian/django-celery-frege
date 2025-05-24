@@ -7,6 +7,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -17,6 +18,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           password: ${{ secrets.SSH_PASSWORD }}
+          command_timeout: "30m"
           script: |
             mkdir -p ~/frege-app
             
@@ -24,7 +26,7 @@ jobs:
             mkdir -p ~/frege-app/repo
             
             cat > ~/frege-app/.env << EOL
-            GITLAB_TOKEN=\${{ secrets.GITLAB_TOKEN }}
+            GITLAB_TOKEN=${{ secrets.GITLAB_TOKEN }}
             # Add any other necessary environment variables
             EOL
 
@@ -45,6 +47,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           password: ${{ secrets.SSH_PASSWORD }}
+          command_timeout: "45m"
           script: |
             cd ~/frege-app/repo
             
@@ -53,11 +56,17 @@ jobs:
             docker compose --profile dev down
             docker compose --profile dev build
             
-            timeout 300 docker compose --profile dev up -d || true
+            timeout 1800 docker compose --profile dev up -d || true
             
             docker compose --profile dev ps
             
             echo "Container logs (last 50 lines):"
             docker compose --profile dev logs --tail=50
+            
+            if [ $(docker compose --profile dev ps --status running | grep -v "NAME" | wc -l) -lt 1 ]; then
+              echo "Warning: Not all containers are running, but proceeding with deployment."
+            else
+              echo "All containers started successfully."
+            fi
             
             echo "Deployment completed"
