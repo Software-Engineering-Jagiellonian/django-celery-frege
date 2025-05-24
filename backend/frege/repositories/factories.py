@@ -14,6 +14,15 @@ faker_obj = Faker()
 
 
 class RepositoryFactory(factory.django.DjangoModelFactory):
+    """
+    Factory for creating instances of the Repository model for generating test data.
+    
+    Attributes:
+        name (str): The repository name (unique for each instance).
+        git_url (str): A GitHub URL for the repository, generated based on the repository name.
+        repo_url (str): A randomly generated URL for the repository.
+        commit_hash (str): A random SHA-1 hash simulating a commit hash.
+    """ 
     class Meta:
         model = Repository
 
@@ -26,6 +35,14 @@ class RepositoryFactory(factory.django.DjangoModelFactory):
 
 
 class RepositoryFileFactory(factory.django.DjangoModelFactory):
+    """
+    Factory for creating instances of the RepositoryFile model for generating test data.
+    
+    Attributes:
+        repository (Repository): The repository associated with the file.
+        language (str): A randomly selected programming language assigned to the file.
+        repo_relative_file_path (str): The file path within the repository, generated based on the selected language and file extension.
+    """
     class Meta:
         model = RepositoryFile
 

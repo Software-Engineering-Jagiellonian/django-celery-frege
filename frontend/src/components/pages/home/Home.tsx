@@ -1,5 +1,5 @@
 import React from 'react';
-import ContributorsList from '../../authorsList/ContributorsList';
+import ContributorsList from '../../autorsList/ContributorsList';
 import styles from './home.module.scss';
 
 function Home() {

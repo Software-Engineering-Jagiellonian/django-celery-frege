@@ -86,7 +86,7 @@ services:
 
   frege-loki:
     image: grafana/loki:2.7.4
-    user: "1000"
+    user: root
     container_name: frege-loki
     ports:
       - ${DOCKER_LOKI_PORT}:${DOCKER_LOKI_PORT}
@@ -358,11 +358,10 @@ services:
       - DJANGO_SUPERUSER_PASSWORD=pass
       - CHOKIDAR_USEPOLLING=true
     volumes:
-      - /app/node_modules
       - ./frontend:/app
-    command: npm start
-    expose:
-      - ${DOCKER_FRONTEND_PORT}
+      - /app/node_modules
+      - /app/.next
+    command: npm run dev
     ports:
       - ${DOCKER_FRONTEND_PORT}:${DOCKER_FRONTEND_PORT}
     depends_on:

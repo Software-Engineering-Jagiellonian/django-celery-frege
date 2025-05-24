@@ -1,8 +1,10 @@
+'use client';
+
 import React, { FC, useState, MouseEvent } from 'react';
 import { SideMenuItemDTO } from '../sideMenu/SideMenuStruct';
 import { ArrowDownShort, ArrowUpShort } from 'react-bootstrap-icons';
 import styles from './MenuItem.module.scss';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 
 export interface MenuItemProps {
   presentationProps: SideMenuItemDTO;
@@ -30,12 +32,15 @@ export const MenuItem: FC<MenuItemProps> = ({ presentationProps, isActive, handl
           className={`${styles.menuItem} ${
             isActive(presentationProps.href) ? styles.active : styles.inactive
           }`}
-          to={presentationProps.href}
-          onClick={onNavigate}
-        >
+          href={presentationProps.href}
+          onClick={onNavigate}>
           <div className={styles.iconContainer}>{presentationProps.icon}</div>
           <div className={styles.label}>{presentationProps.label}</div>
-          {presentationProps.structOptions?.map((el, i) => <button key={i} type="button" className={styles.optionButton}>{el}</button>)}
+          {presentationProps.structOptions?.map((el, i) => (
+            <button key={i} type="button" className={styles.optionButton}>
+              {el}
+            </button>
+          ))}
           {presentationProps.subNodes && presentationProps.subNodes.length > 0 && (
             <button onClick={onExpandClick} type="button" className={styles.expandButton}>
               {isExpanded ? <ArrowUpShort /> : <ArrowDownShort />}
@@ -46,7 +51,11 @@ export const MenuItem: FC<MenuItemProps> = ({ presentationProps, isActive, handl
         <div className={styles.menuItem} onClick={onExpandClick}>
           <div className={styles.iconContainer}>{presentationProps.icon}</div>
           <div className={styles.label}>{presentationProps.label}</div>
-          {presentationProps.structOptions?.map((el, i) => <button key={i} type="button" className={styles.optionButton}>{el}</button>)}
+          {presentationProps.structOptions?.map((el, i) => (
+            <button key={i} type="button" className={styles.optionButton}>
+              {el}
+            </button>
+          ))}
           {presentationProps.subNodes && presentationProps.subNodes.length > 0 && (
             <button onClick={onExpandClick} type="button" className={styles.expandButton}>
               {isExpanded ? <ArrowUpShort /> : <ArrowDownShort />}

@@ -11,4 +11,4 @@ Contents:
    :maxdepth: 2
    :caption: Contents:
 
-   backend.rst
+   core.rst
