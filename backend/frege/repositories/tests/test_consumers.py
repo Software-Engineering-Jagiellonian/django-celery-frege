@@ -27,6 +27,12 @@ def api_key():
     _, key = APIKey.objects.create_key(name="test-key")
     return key
 
+@pytest.fixture(autouse=True)
+def use_test_channel_layer(settings):
+    settings.CHANNEL_LAYERS = {
+        "default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}
+    }
+
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio
 class TestLiveStatusConsumer:
@@ -45,7 +51,7 @@ class TestLiveStatusConsumer:
         api_key, request_action, create_fn, response_action, serializer
     ):
         communicator = WebsocketCommunicator(
-            LiveStatusConsumer.as_asgi(), "/ws/"
+            LiveStatusConsumer.as_asgi(), "/ws/test-live-status/"
         )
         try:
             connected, subprotocol = await communicator.connect()

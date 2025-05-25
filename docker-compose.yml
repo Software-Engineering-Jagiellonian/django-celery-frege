@@ -396,11 +396,10 @@ services:
       - DJANGO_SUPERUSER_PASSWORD=pass
       - CHOKIDAR_USEPOLLING=true
     volumes:
-      - /app/node_modules
       - ./frontend:/app
-    command: npm start
-    expose:
-      - ${DOCKER_FRONTEND_PORT}
+      - /app/node_modules
+      - /app/.next
+    command: npm run dev
     ports:
       - ${DOCKER_FRONTEND_PORT}:${DOCKER_FRONTEND_PORT}
     depends_on:
@@ -431,40 +430,6 @@ services:
     depends_on:
       - frege-grafana-prod
     profiles: ["prod"]
-
-  frege-front-dev: &frontend
-    container_name: frege-front-dev
-    hostname: frege-front-dev
-    build:
-      context: front
-      dockerfile: Dockerfile
-    environment:
-      - PORT=${DOCKER_NEW_FRONTEND_PORT}
-      - REACT_APP_DOCKER_GRAFANA_HOST=frege-grafana-dev
-      - REACT_APP_DOCKER_GRAFANA_PORT=3000
-      - DOCKER_FLOWER_HOST=frege-flower-dev
-      - DOCKER_FLOWER_PORT=5555
-      - DJANGO_SUPERUSER_USERNAME=django_admin
-      - DJANGO_SUPERUSER_PASSWORD=pass
-      - CHOKIDAR_USEPOLLING=true
-    volumes:
-      - ./front:/app
-      - /app/node_modules
-      - /app/.next
-    command: npm run dev
-    ports:
-      - ${DOCKER_NEW_FRONTEND_PORT}:${DOCKER_NEW_FRONTEND_PORT}
-    depends_on:
-      - frege-grafana-dev
-    networks: *network
-    profiles: ["dev"]
-    restart: on-failure
-    healthcheck:
-      test: "wget -nv -t1 --spider http://localhost:${DOCKER_NEW_FRONTEND_PORT} || exit 1"
-      interval: 10s
-      timeout: 10s
-      retries: 2
-      start_period: 40s
 
 networks:
   frege-main:
