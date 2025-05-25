@@ -57,9 +57,11 @@ def process_repo_task(repo_pk) -> None:
     except Repository.DoesNotExist:
         logger.error(f"Repository does not exist ({repo_pk = })")
         return
-    
+
     if repo.analysis_failed:
-        logger.warning(f"Repository {repo.git_url} previously failed. Skipping.")
+        logger.warning(
+            f"Repository {repo.git_url} previously failed. Skipping."
+        )
         return
 
     logger.info(f"Processing repository {repo.git_url}")
@@ -80,7 +82,7 @@ def process_repo_task(repo_pk) -> None:
                 f"Repository {repo.git_url} marked as failed. Skipping."
             )
         else:
-            error_message = f"Failed to obtain repository {repo.git_url}. This has unknown consequences."    
+            error_message = f"Failed to obtain repository {repo.git_url}. This has unknown consequences."
 
         logger.error(error_message)
 

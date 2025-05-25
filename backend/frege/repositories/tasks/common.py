@@ -19,7 +19,7 @@ logger = get_task_logger(__name__)
 
 
 def finalize_repo_analysis(repo_obj):
-        """
+    """
     Finalizes the analysis of the repository.
 
     This function checks if all files and commit messages have been analyzed.

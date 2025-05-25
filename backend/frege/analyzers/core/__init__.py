@@ -1,6 +1,7 @@
 from frege.analyzers.core.cpp import *
 from frege.analyzers.core.golang import *
 from frege.analyzers.core.java import *
+from frege.analyzers.core.javascript import *
 from frege.analyzers.core.kotlin import *
 from frege.analyzers.core.php import *
 from frege.analyzers.core.python import *
