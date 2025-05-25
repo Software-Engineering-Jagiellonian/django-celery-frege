@@ -52,15 +52,15 @@ jobs:
             
             cp .env.template .env
             
-            docker compose --profile dev down
-            docker compose --profile dev up --build -d
+            docker compose --profile prod down
+            docker compose --profile prod up --build -d
             
-            docker compose --profile dev ps
+            docker compose --profile prod ps
             
             echo "Container logs (last 50 lines):"
-            docker compose --profile dev logs --tail=50
+            docker compose --profile prod logs --tail=50
             
-            if [ $(docker compose --profile dev ps --status running | grep -v "NAME" | wc -l) -lt 1 ]; then
+            if [ $(docker compose --profile prod ps --status running | grep -v "NAME" | wc -l) -lt 1 ]; then
               echo "Warning: Not all containers are running, but proceeding with deployment."
             else
               echo "All containers started successfully."
