@@ -16,6 +16,12 @@ logger = get_task_logger(__name__)
 
 @shared_task
 def analyze_commit_message_quality_task(commit_message_pk):
+    """
+    Celery task that analyzes a single commit message using the CommitMessageAnalyzer.
+
+    Args:
+        commit_message_pk (int): Primary key of the commit message to analyze.
+    """
     try:
         logger.info(
             f"Attempt of analyzing commit message {commit_message_pk} quality"

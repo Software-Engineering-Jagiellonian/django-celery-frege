@@ -25,6 +25,11 @@ logger = get_task_logger(__name__)
 
 @celeryd_after_setup.connect(sender="celery@worker_crawl")
 def init_worker(sender, **kwargs):
+    """
+    Initializes worker on startup.
+
+    Triggers the crawling task for each indexer if CELERY_CRAWL_ON_STARTUP is true.
+    """
     _sanitize()
 
     if os.environ.get("CELERY_CRAWL_ON_STARTUP", "true").lower() != "true":
@@ -43,6 +48,16 @@ def init_worker(sender, **kwargs):
     default_retry_delay=15,
 )
 def crawl_repos_task(indexer_class_name):
+    """
+    Main crawling task that schedules repository processing.
+
+    Args:
+        indexer_class_name (str): The name of the indexer class used to fetch repositories.
+
+    Raises:
+        DownloadDirectoryFullException: If the download folder is full.
+        DownloadQueueTooBigException: If the task queue is too long.
+    """
     try:
         _check_queued_tasks_number()
     except DownloadQueueTooBigException as ex:
@@ -78,6 +93,14 @@ def crawl_repos_task(indexer_class_name):
 
 
 def _sanitize():
+    """
+    Sanitizes the environment before crawling new repositories.
+
+    If Redis-based task persistence is disabled, this function:
+    - Acquires a lock to ensure a single crawler performs sanitization.
+    - Wipes the downloads directory.
+    - Reschedules all unanalyzed repositories for processing.
+    """
     if settings.REDIS_PERSISTENCE_ENABLED:
         # If persistence is enabled, we don't need to sanitize
         # since all previous tasks are still in the queue.
@@ -99,6 +122,11 @@ def _sanitize():
 
 
 def _wipe_downloads_dir():
+    """
+    Deletes all contents of the downloads directory.
+
+    Used to clear previously cloned repository files from local storage.
+    """
     for filename in os.listdir(settings.DOWNLOAD_PATH):
         file_path = os.path.join(settings.DOWNLOAD_PATH, filename)
         if os.path.isfile(file_path) or os.path.islink(file_path):
@@ -108,6 +136,12 @@ def _wipe_downloads_dir():
 
 
 def _reschedule_unanalyzed_repos():
+    """
+    Reschedules analysis tasks for repositories that haven't been analyzed yet.
+
+    This is used after wiping the download directory to reprocess incomplete repositories.
+    Logs the number of rescheduled repositories or if none are found.
+    """
     try:
         objects = Repository.objects.all()
         if objects.exists():
@@ -128,7 +162,11 @@ def _reschedule_unanalyzed_repos():
 
 def _check_queued_tasks_number():
     """
-    Check the number of currently registered download tasks
+    Checks how many download tasks are currently queued for execution.
+
+    Raises:
+        DownloadQueueTooBigException: If the number of reserved tasks exceeds the limit.
+        ValueError: If inspection of the queue fails.
     """
     name = settings.DOWNLOAD_TASK_NAME
     inspect = app.control.inspect([name])
