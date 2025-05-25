@@ -156,10 +156,7 @@ REDIS_PERSISTENCE_ENABLED: bool = (
 CELERY_BROKER_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/"
 CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_TASK_SERIALIZER = "json"
-CELERY_IMPORTS = (
-    "frege.repositories.tasks.task_crawl",
-    "frege.repositories.tasks.task_profiling",
-)
+CELERY_IMPORTS = ("frege.repositories.tasks.task_crawl",)
 
 CELERY_RESULT_BACKEND = f"redis://{REDIS_HOST}:{REDIS_PORT}/"
 CELERY_CACHE_BACKEND = f"redis://{REDIS_HOST}:{REDIS_PORT}/"
@@ -170,9 +167,6 @@ CELERY_TASK_ROUTES = {
     },
     "frege.repositories.tasks.task_crawl.crawl_repos_task": {"queue": "crawl"},
     "frege.repositories.tasks.task_profiling.create_repos_task": {
-        "queue": "profiling"
-    },
-    "frege.repositories.tasks.task_profiling.summarize": {
         "queue": "profiling"
     },
 }

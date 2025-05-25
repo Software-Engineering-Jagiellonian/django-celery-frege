@@ -54,6 +54,36 @@ by setting the environmental variable `REDIS_PERSISTENCE_ENABLED=True`.
 
 ### Profiling
 
-To start profiling, run `docker compose --profile profiling build` in the root of the repository.
+Profiling FREGE is done by measuring the time of analysis for a fixed repositories. Repositories are kept as git bundles in [./frege/repositories/bundles](./frege/repositories/bundles/).
 
-Then, run the script in `scripts/profile.sh` to start end-to-end profiling.
+To start profiling, run the following in the root of the repository:
+
+```bash
+docker compose --profile profiling build
+```
+
+Then, start the profiling service with:
+
+```bash
+./scripts/start_profiling.sh
+```
+
+After some time you will get the results printed in the standard output. Remember, that the measurements are specific for your host machine and your current OS load.
+
+#### Adding new bundles for profiling
+
+To add new bundles for profiling, clone the target repository:
+
+```bash
+git clone <repo_url> <target_dir>
+```
+
+Then create a git bundle:
+
+```bash
+cd <target_dir>
+COMMIT_HASH=$(git rev-parse HEAD)
+git bundle create <bundle_name>-"$COMMIT_HASH".bundle -all
+```
+
+Finally, copy the bundle to the bundles directory.
