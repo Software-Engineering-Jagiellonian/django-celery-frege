@@ -11,13 +11,13 @@ You can generate html Sphinx documentation by following these steps:
 2. Generate dependencies:
 
     ```bash
-    sphinx-apidoc -o documentation .
+    sphinx-apidoc -o docs/api_docs backend
     ```
 
 3. Generate HTML files:
 
     ```bash
-    cd autodocs
+    cd docs
     make html
     ```
 

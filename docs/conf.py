@@ -9,10 +9,10 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath('../../backend'))
+sys.path.insert(0, os.path.abspath('..'))
 
-project = 'FREGE'
-author = 'IG, DD'
+project = 'Frege'
+author = 'Frege'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -28,7 +28,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 language = 'Eng'
 
-html_theme = 'alabaster'
+html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 
 autodoc_mock_imports = ['celery', 'django', 'lizard', 'lizard_ext', 'github', 'radon', 'conf']
