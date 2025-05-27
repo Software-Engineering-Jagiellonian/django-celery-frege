@@ -60,12 +60,6 @@ class AnalyzerFactory:
     analyzers: ClassVar[DefaultDict[str, list[Type[BaseAnalyzer]]]] = defaultdict(list)
 
     def __new__(cls):
-        """
-        Ensures that only one instance of AnalyzerFactory exists (singleton pattern).
-
-        Returns:
-            AnalyzerFactory: The singleton instance of the factory.
-        """
         if not cls.__instance:
             cls.__instance = super().__new__(cls)
         return cls.__instance

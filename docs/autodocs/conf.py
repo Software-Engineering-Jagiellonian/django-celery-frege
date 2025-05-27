@@ -9,7 +9,7 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath('../../backend'))
+sys.path.insert(0, os.path.abspath('../../'))
 
 project = 'FREGE'
 author = 'IG, DD'
@@ -31,4 +31,4 @@ language = 'Eng'
 html_theme = 'alabaster'
 html_static_path = ['_static']
 
-autodoc_mock_imports = ['celery', 'django', 'lizard', 'lizard_ext', 'github', 'radon', 'conf']
+autodoc_mock_imports = ['celery', 'django', 'lizard', 'lizard_ext', 'github', 'radon', 'test_php', 'pytest', 'core.python', 'core.ruby', 'frege']

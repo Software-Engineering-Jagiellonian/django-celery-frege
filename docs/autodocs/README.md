@@ -17,7 +17,7 @@ You can generate html Sphinx documentation by following these steps:
 3. Generate HTML files:
 
     ```bash
-    cd autodocs
+    cd docs/autodocs
     make html
     ```
 
