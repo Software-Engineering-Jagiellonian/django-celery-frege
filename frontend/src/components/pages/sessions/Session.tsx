@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from './session.module.scss';
 import { CheckLg, XLg } from 'react-bootstrap-icons';
