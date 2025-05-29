@@ -19,6 +19,19 @@ logger = get_task_logger(__name__)
 
 
 def finalize_repo_analysis(repo_obj):
+    """
+    Finalizes the analysis of the repository.
+
+    This function checks if all files and commit messages have been analyzed.
+    If so, it computes and stores commit message quality metrics, marks the
+    repository as fully analyzed, deletes the cloned repository from disk.
+
+    Args:
+        repo_obj (Repository): The repository object to finalize.
+
+    Returns:
+        None
+    """
     if not (
         repo_obj.files.filter(analyzed=False).exists()
         or repo_obj.commit_messages.filter(analyzed=False).exists()

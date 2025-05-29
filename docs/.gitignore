@@ -1,7 +1,9 @@
 # build files
-
 _build
-*.rst
+
+# autodoc
+api_docs/
 
 # cache files
 __pycache__
+

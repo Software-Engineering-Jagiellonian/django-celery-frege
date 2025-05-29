@@ -1,14 +1,14 @@
 Django==5.1.7
 djangorestframework==3.16.0
 django-extensions~=4.1
-celery[redis]==5.5.1
+celery[redis]==5.5.2
 psycopg2~=2.9.10
 Faker~=37.3.0
-GitPython~=3.1.27
+GitPython~=3.1.44
 radon~=6.0.1
-flower~=1.0.0
+flower~=2.0.1
 PyGithub~=2.6
-lizard~=1.17.30
+lizard~=1.17.31
 factory-boy~=3.3.3
 django-filter~=25.1
 requests~=2.32.3
@@ -28,7 +28,7 @@ regex==2024.11.6
 # Development tools:
 black~=25.1.0
 isort~=6.0.1
-flake8~=4.0.1
+flake8~=7.2.0
 pre-commit~=4.2.0
 pyupgrade~=3.19.1
 gitlint==0.19.1
