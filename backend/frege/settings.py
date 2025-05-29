@@ -166,6 +166,9 @@ CELERY_TASK_ROUTES = {
         "queue": "downloads"
     },
     "frege.repositories.tasks.task_crawl.crawl_repos_task": {"queue": "crawl"},
+    "frege.repositories.tasks.task_profiling.create_repos_task": {
+        "queue": "profiling"
+    },
 }
 
 

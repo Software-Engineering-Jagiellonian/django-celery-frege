@@ -4,7 +4,6 @@ env/
 .env
 
 *.csv
-*.sh
 *crt
 *.py.old
 # nginx

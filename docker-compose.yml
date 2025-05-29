@@ -22,6 +22,27 @@ x-celery: &celery
     timeout: 10s
     retries: 2
 
+x-postgres: &postgres
+  hostname: frege-postgres
+  image: postgres:14.2
+  environment:
+    - POSTGRES_USER=${DJANGO_DATABASE_USER}
+    - POSTGRES_PASSWORD=${DJANGO_DATABASE_PASSWORD}
+    - POSTGRES_DB=${DJANGO_DATABASE_NAME}
+  networks: *network
+  expose:
+    - "${DOCKER_POSTGRES_PORT}"
+  ports:
+    - "${DOCKER_POSTGRES_PORT}:${DOCKER_POSTGRES_PORT}"
+  restart: on-failure
+  # Removing code below is a workaround for 'role "root" does not exist' error.
+  # TODO: modification of healthcheck code below to error-free form.
+  #healthcheck:
+  #  test: "pg_isready -p ${DOCKER_POSTGRES_PORT} || exit 1"
+  #  interval: 10s
+  #  timeout: 10s
+  #  retries: 2
+
 services:
   # === [Common] ===
 
@@ -35,37 +56,12 @@ services:
       - "${DOCKER_REDIS_PORT}"
     ports:
       - "${DOCKER_REDIS_PORT}:${DOCKER_REDIS_PORT}"
-    profiles: ["dev", "prod"]
     restart: on-failure
     healthcheck:
       test: "redis-cli ping || exit 1"
       interval: 10s
       timeout: 10s
       retries: 2
-
-  frege-postgres:
-    container_name: frege-postgres
-    hostname: frege-postgres
-    image: postgres:14.2
-    environment:
-      - POSTGRES_USER=${DJANGO_DATABASE_USER}
-      - POSTGRES_PASSWORD=${DJANGO_DATABASE_PASSWORD}
-      - POSTGRES_DB=${DJANGO_DATABASE_NAME}
-    networks: *network
-    expose:
-      - "${DOCKER_POSTGRES_PORT}"
-    ports:
-      - "${DOCKER_POSTGRES_PORT}:${DOCKER_POSTGRES_PORT}"
-    restart: on-failure
-    volumes:
-      - frege_postgresql_data:/var/lib/postgresql/data
-    # Removing code below is a workaround for 'role "root" does not exist' error.
-    # TODO: modification of healthcheck code below to error-free form.
-    #healthcheck:
-    #  test: "pg_isready -p ${DOCKER_POSTGRES_PORT} || exit 1"
-    #  interval: 10s
-    #  timeout: 10s
-    #  retries: 2
 
   frege-prometheus:
     image: prom/prometheus:v2.35.0
@@ -83,6 +79,7 @@ services:
       interval: 10s
       timeout: 10s
       retries: 2
+    profiles: ["dev", "prod"]
 
   frege-loki:
     image: grafana/loki:2.7.4
@@ -95,6 +92,7 @@ services:
       # - ./loki/loki-config.yaml:/etc/loki/local-config.yaml
     # command: -config.file=/etc/loki/local-config.yaml
     networks: *network
+    profiles: ["dev", "prod"]
 
   frege-promtail:
     image: grafana/promtail:2.6.1
@@ -106,6 +104,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /var/lib/docker/containers:/var/lib/docker/containers
     networks: *network
+    profiles: ["dev", "prod"]
 
   nginx-proxy:
     image: nginx
@@ -169,6 +168,31 @@ services:
       - NGINX_PROXY_CONTAINER=frege-proxy
     profiles: ["tls"]
 
+  # === [Postgres] ===
+
+  frege-postgres:
+    <<: *postgres
+    container_name: frege-postgres
+    profiles: ["dev", "prod"]
+    volumes:
+      - frege_postgresql_data:/var/lib/postgresql/data
+    # Removing code below is a workaround for 'role "root" does not exist' error.
+    # TODO: modification of healthcheck code below to error-free form.
+    #healthcheck:
+    #  test: "pg_isready -p ${DOCKER_POSTGRES_PORT} || exit 1"
+    #  interval: 10s
+    #  timeout: 10s
+    #  retries: 2
+
+  frege-postgres-profiling:
+    <<: *postgres
+    container_name: frege-postgres-profiling
+    profiles: ["profiling"]
+    volumes:
+      - frege_postgresql_data_profiling:/var/lib/postgresql/data
+    command: >
+      bash -c "rm -rf /var/lib/postgresql/data/* && docker-entrypoint.sh postgres"
+
   # === [Django] ===
 
   frege-django-dev: &django
@@ -199,7 +223,7 @@ services:
       timeout: 10s
       retries: 2
 
-  frege-django-prod:
+  frege-django-prod: &django-prod
     <<: *django
     container_name: frege-django-prod
     profiles: ["prod"]
@@ -213,6 +237,14 @@ services:
       - VIRTUAL_HOST=${BACKEND_HOSTNAME}
       - LETSENCRYPT_HOST=${BACKEND_HOSTNAME}
       - DJANGO_DEBUG=False
+
+  frege-django-profiling:
+    <<: *django-prod
+    container_name: frege-django-profiling
+    profiles: ["profiling"]
+    depends_on:
+      - frege-postgres-profiling
+      - frege-redis
 
   # === [Flower] ===
 
@@ -279,13 +311,19 @@ services:
     <<: [*backend, *celery]
     container_name: frege-celery-downloads-worker-prod
     command: celery --app frege worker --loglevel=${CELERY_LOG_LEVEL_PROD} --queues downloads --concurrency=${CELERY_WORKER_DOWNLOADS_CONCURRENCY} --hostname worker_downloads --uid=nobody --gid=nogroup
-    profiles: ["prod"]
+    profiles: ["prod", "profiling"]
 
   frege-celery-worker-prod:
     <<: *celery
     container_name: frege-celery-worker-prod
     command: celery --app frege worker --loglevel=${CELERY_LOG_LEVEL_PROD} --queues celery --concurrency=${CELERY_WORKER_BASE_CONCURRENCY} --hostname worker_celery --uid=nobody --gid=nogroup
-    profiles: ["prod"]
+    profiles: ["prod", "profiling"]
+
+  frege-celery-worker-profiling:
+    <<: *celery
+    container_name: frege-celery-profiling-worker
+    command: celery --app frege worker --loglevel=${CELERY_LOG_LEVEL_PROD} --queues profiling --concurrency=1 --hostname worker_profiling
+    profiles: ["profiling"]
 
   # === [Grafana] ===
 
@@ -398,6 +436,7 @@ networks:
 
 volumes:
   frege_postgresql_data:
+  frege_postgresql_data_profiling:
   frege_tmp:
   frege_grafana_storage:
 
