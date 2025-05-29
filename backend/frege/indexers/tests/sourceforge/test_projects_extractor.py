@@ -68,6 +68,7 @@ def expected_projects_names():
 
 @pytest.fixture
 def mocked_sourceforge_response():
+
     """
     Fixture that returns a mocked response object simulating
     a successful GET request to the SourceForge projects page.
@@ -100,11 +101,29 @@ class TestProjectsExtractor:
         from the loaded SourceForge projects HTML page.
         """
         projects = extract_projects_names(soup)
-        assert projects == expected_projects_names, (
-            f"Extracted projects do not match expected names.\n"
-            f"Expected: {expected_projects_names}\n"
-            f"Got: {projects}"
-        )
+        assert projects == expected_projects_names
+
+    def test_extract_projects_names_with_malformed_html(self):
+        malformed_html = "<html><body><a href='/not-a-project/abc'>Invalid</a></body></html>"
+        soup = BeautifulSoup(malformed_html, "html.parser")
+        projects = extract_projects_names(soup)
+        assert projects == set()
+
+    def test_extract_projects_names_empty_page(self):
+        soup = BeautifulSoup("", "html.parser")
+        projects = extract_projects_names(soup)
+        assert projects == set()
+
+    def test_project_url_regex_excludes_invalid_links(self):
+        regex = SourceforgeProjectsExtractor.projects_url_regex
+        invalid_urls = [
+            "/project/invalid",
+            "/projects/",
+            "/projects//extra",
+            "/Projects/test",  # case-sensitive mismatch
+        ]
+        for url in invalid_urls:
+            assert not regex.match(url)
 
     def test_extract(
         self,
@@ -121,21 +140,35 @@ class TestProjectsExtractor:
         """
         mock_requests_get = mocker.patch("requests.get", side_effect=mocked_sourceforge_response)
 
-        class CustomSourceforgeProjectExtractor(SourceforgeProjectExtractor):
-            """Custom extractor returning projects without actual scraping."""
-
+        class CustomExtractor(SourceforgeProjectExtractor):
             def extract(self, project_name: str) -> Optional[SourceforgeProject]:
                 return SourceforgeProject(name=project_name, url="", code=None, subprojects=[])
 
-        extractor = SourceforgeProjectsExtractor(CustomSourceforgeProjectExtractor())
-
+        extractor = SourceforgeProjectsExtractor(CustomExtractor())
         result = extractor.extract(page_number=10)
+
         mock_requests_get.assert_called_once_with("https://sourceforge.net/directory/?sort=popular&page=10")
-
         parsed_project_names = {project.name for project in result}
+        assert parsed_project_names == expected_projects_names
 
-        assert parsed_project_names == expected_projects_names, (
-            f"Extracted project names do not match expected values.\n"
-            f"Expected: {expected_projects_names}\n"
-            f"Got: {parsed_project_names}"
-        )
+    def test_extract_with_failed_http(self, mocker: MockerFixture):
+        mock_response = mocker.Mock(ok=False, status_code=500, text="")
+        mocker.patch("requests.get", return_value=mock_response)
+
+        extractor = SourceforgeProjectsExtractor()
+        result = extractor.extract(page_number=1)
+        assert result == []
+
+    def test_extract_skips_none_projects(self, mocker: MockerFixture, mocked_sourceforge_response):
+        mocker.patch("requests.get", side_effect=mocked_sourceforge_response)
+
+        class NoneReturningExtractor(SourceforgeProjectExtractor):
+            def extract(self, project_name: str) -> Optional[SourceforgeProject]:
+                return None if project_name.startswith("f") else SourceforgeProject(
+                    name=project_name, url="", code=None, subprojects=[]
+                )
+
+        extractor = SourceforgeProjectsExtractor(NoneReturningExtractor())
+        result = extractor.extract(page_number=10)
+
+        assert all(not p.name.startswith("f") for p in result)
