@@ -1,10 +1,9 @@
 # build files
-
 _build
 
-
-#autodoc
+# autodoc
 api_docs/
 
 # cache files
 __pycache__
+
