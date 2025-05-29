@@ -1,7 +1,0 @@
-# build files
-
-_build
-*.rst
-
-# cache files
-__pycache__
