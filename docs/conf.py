@@ -16,7 +16,7 @@ sys.path.insert(0, os.path.abspath('../backend'))
 
 
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "frege.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "backend.frege.settings")
 
 
 project = 'Frege'
@@ -29,8 +29,15 @@ author = 'Frege'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
-    'sphinx.ext.viewcode',
+    'sphinx.ext.autosummary',
 ]
+
+autodoc_default_options = {
+    'members': True,
+    'undoc-members': False,
+    'private-members': False,
+    'show-inheritance': True,
+}
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']

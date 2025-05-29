@@ -1,6 +1,11 @@
 Welcome to the Frege project's documentation!
 =============================================
-Contents:
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Frege API
+
+   api/api
 
 .. toctree::
    :maxdepth: 2

@@ -1,6 +1,6 @@
 <div align="center">
 
-![Alt text](documentation/FREGE_SIMPLE_LOGO.png)
+![Alt text](docs/DESIGNDOC/FREGE_SIMPLE_LOGO.png)
 </div>
 
 <div align="center">
