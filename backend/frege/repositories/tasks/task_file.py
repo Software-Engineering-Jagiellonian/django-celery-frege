@@ -18,10 +18,15 @@ logger = get_task_logger(__name__)
 @shared_task
 def analyze_file_task(repo_file_pk) -> None:
     """
-    Analyze a repository file using appropriate analyzers for its language.
-    
+    Celery task that analyzes a single file from a repository using language-specific analyzers.
+
+    - Fetches the file from the database.
+    - Uses appropriate analyzers to collect code metrics.
+    - Saves the metrics in the database.
+    - Finalizes repository analysis if needed.
+
     Args:
-        repo_file_pk: Primary key of the RepositoryFile to analyze
+        repo_file_pk (int): Primary key of the RepositoryFile to analyze.
     """
 
     try:
