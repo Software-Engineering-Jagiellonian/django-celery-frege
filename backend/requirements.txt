@@ -1,7 +1,7 @@
 Django==5.1.7
 djangorestframework==3.16.0
 django-extensions~=4.1
-celery[redis]==5.5.1
+celery[redis]==5.5.2
 psycopg2~=2.9.10
 Faker~=37.3.0
 GitPython~=3.1.44
