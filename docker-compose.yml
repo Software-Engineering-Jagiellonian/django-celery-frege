@@ -342,8 +342,8 @@ services:
       - GF_SECURITY_ALLOW_EMBEDDING=true
       - GF_SERVER_ROOT_URL=https://frege.ii.uj.edu.pl/grafana/
       - GF_SERVER_SERVE_FROM_SUB_PATH=true
-      - VIRTUAL_HOST=${FRONTEND_HOSTNAME}
-      - LETSENCRYPT_HOST=${FRONTEND_HOSTNAME}
+      - VIRTUAL_HOST=frege.ii.uj.edu.pl
+      - LETSENCRYPT_HOST=frege.ii.uj.edu.pl
     env_file: []
 
   # === [Frontend] ===
