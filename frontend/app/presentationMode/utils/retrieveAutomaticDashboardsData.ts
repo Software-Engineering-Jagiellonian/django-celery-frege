@@ -1,4 +1,4 @@
-import { GrafanaCatalog } from '../../../sideMenu/DashboardsClient';
+import { GrafanaCatalog } from '@/src/components/sideMenu/DashboardsClient';
 import { ItemDTO } from './ItemDTO';
 
 export const retrieveAutomaticDashboardsData = (dashboardsData: GrafanaCatalog[]): ItemDTO[] => {

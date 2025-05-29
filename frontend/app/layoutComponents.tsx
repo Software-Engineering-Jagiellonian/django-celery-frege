@@ -18,7 +18,7 @@ export default function NavigationBar({ children }: NavigationBarProps) {
     <div className={styles.App}>
       <Navbar onMenuClick={() => setIsMenuCollapsed(!isMenuCollapsed)} />
       <div className={styles.ContentNav}>
-        <SideMenu className={isMenuCollapsed ? styles.hidden : undefined} />
+        <SideMenu className={isMenuCollapsed ? styles.hidden : styles.visible} />
         <div className={styles.mainContent}>{children}</div>
       </div>
     </div>
