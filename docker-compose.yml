@@ -389,6 +389,8 @@ services:
       - NODE_ENV=production
       - VIRTUAL_HOST=${FRONTEND_HOSTNAME}
       - LETSENCRYPT_HOST=${FRONTEND_HOSTNAME}
+    volumes: []
+    command: node server.js
     depends_on:
       - frege-grafana-prod
     profiles: ["prod"]
