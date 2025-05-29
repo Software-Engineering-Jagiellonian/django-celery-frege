@@ -12,35 +12,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Deploy to server and build
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          password: ${{ secrets.SSH_PASSWORD }}
-          command_timeout: "30m"
-          script: |
-            mkdir -p ~/frege-app
-            
-            rm -rf ~/frege-app/repo
-            mkdir -p ~/frege-app/repo
-            
-            cat > ~/frege-app/.env << EOL
-            GITLAB_TOKEN=${{ secrets.GITLAB_TOKEN }}
-            EOL
-
-      - name: Copy repository to server
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          password: ${{ secrets.SSH_PASSWORD }}
-          source: "./"
-          target: "~/frege-app/repo"
-          rm: false
-          strip_components: 0
-
-      - name: Build and run on server
+      - name: Deploy to server
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -48,13 +20,19 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           command_timeout: "45m"
           script: |
+            mkdir -p ~/frege-app
+            rm -rf ~/frege-app/repo
+            mkdir -p ~/frege-app/repo
+            
             cd ~/frege-app/repo
+            git clone https://github.com/${{ github.repository }} .
+            git checkout ${{ github.ref_name }}
             
             cp .env.template .env
+            echo "GITLAB_TOKEN=${{ secrets.GITLAB_TOKEN }}" >> .env
             
             docker compose --profile prod down
             docker compose --profile prod up --build -d
-            
             docker compose --profile prod ps
             
             echo "Container logs (last 50 lines):"
