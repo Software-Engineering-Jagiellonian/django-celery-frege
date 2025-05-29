@@ -393,8 +393,8 @@ services:
       - DOCKER_FLOWER_HOST=frege-flower-dev
       - DOCKER_FLOWER_PORT=5555
       - NODE_ENV=production
-      - VIRTUAL_HOST=${FRONTEND_HOSTNAME}
-      - LETSENCRYPT_HOST=${FRONTEND_HOSTNAME}
+      - VIRTUAL_HOST=frege.ii.uj.edu.pl
+      - LETSENCRYPT_HOST=frege.ii.uj.edu.pl
     depends_on:
       - frege-grafana-prod
     profiles: ["prod"]
