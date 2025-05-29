@@ -1,4 +1,13 @@
 export const contributors = {
+  '2024/2025': [
+    'Jakub Bystrowski',
+    'Małgorzata Drąg',
+    'Dorota Dyczek',
+    'Krzysztof Gębka',
+    'Izabela Golec',
+    'Agnieszka Trojanowska',
+    'Tomasz Żelawski'
+  ],
   '2021/2022': [
     'Jakub Baliński',
     'Joanna Bańkowska',
@@ -48,5 +57,5 @@ export const contributors = {
     'Vadzim Prakapenka',
     'Dariusz Tomczyszyn',
     'Tomasz Zieliński'
-  ]
+  ],
 };
