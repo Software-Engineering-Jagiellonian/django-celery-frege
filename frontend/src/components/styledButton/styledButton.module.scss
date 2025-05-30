@@ -1,10 +1,10 @@
-@import "../../colors.module";
+@use "../../colors.module";
 
 .menuButton {
   width: 30px;
   height: 30px;
-  border: $main-color 1px solid;
-  background-color: $navbar-background-color;
+  border: colors.$main-color 1px solid;
+  background-color: colors.$navbar-background-color;
   border-radius: 3px;
   margin-left: 10px;
   display: flex;
@@ -12,13 +12,13 @@
   justify-items: center;
   align-content: space-around;
   justify-content: space-around;
-  color: $button-font-color;
+  color: colors.$button-font-color;
 
   &:hover {
-    background-color: $navbar-button-hover;
+    background-color: colors.$navbar-button-hover;
   }
 
   path {
-    color: $main-color;
+    color: colors.$main-color;
   }
 }

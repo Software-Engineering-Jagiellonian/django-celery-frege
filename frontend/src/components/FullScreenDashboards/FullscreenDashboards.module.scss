@@ -1,4 +1,4 @@
-@import "../../colors.module.scss";
+@use "../../colors.module.scss";
 
 .widgetsGridWrapper{
   width: 100%;
@@ -12,12 +12,12 @@
   border: none;
 
   path {
-    color: $hub-color;
+    color: colors.$hub-color;
   }
 }
 
 .widget {
-  background: $widget-color;
+  background: colors.$widget-color;
   display: flex;
   flex-direction: column;
   align-items: center;

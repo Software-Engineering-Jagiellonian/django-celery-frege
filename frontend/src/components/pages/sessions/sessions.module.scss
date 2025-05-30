@@ -1,8 +1,8 @@
-@import '../../../colors.module';
+@use '../../../colors.module';
 
 .sessionsWrapper {
     .errorMessage{
-        color: $error;
+        color: colors.$error;
         margin-top: 2rem;
         margin-bottom: 2rem;
     }

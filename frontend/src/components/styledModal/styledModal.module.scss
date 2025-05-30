@@ -1,9 +1,9 @@
-@import '../../colors.module';
+@use '../../colors.module';
 
 .modal {
-  background-color: $background-color;
-  color: $button-font-color;
-  border: $main-color 1px solid;
+  background-color: colors.$background-color;
+  color: colors.$button-font-color;
+  border: colors.$main-color 1px solid;
   border-radius :10px
 }
 

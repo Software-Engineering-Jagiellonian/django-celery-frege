@@ -1,4 +1,4 @@
-@import '@/src/colors.module.scss';
+@use '../../../colors.module.scss';
 
 .userWrapper {
   display: flex;
@@ -34,13 +34,13 @@
 .userWrapper .loginButton {
   width: max-content;
   padding: 0.25rem 0.5rem;
-  color: $frege-color;
-  border: 1px solid $frege-color;
+  color: colors.$frege-color;
+  border: 1px solid colors.$frege-color;
 }
 
 .loginButton{
   width: max-content;
   padding: 0.25rem 0.5rem;
-  color: $frege-color;
-  border: 1px solid $frege-color;
+  color: colors.$frege-color;
+  border: 1px solid colors.$frege-color;
 }
