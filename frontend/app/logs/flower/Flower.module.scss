@@ -1,9 +1,9 @@
-@import "@/src/colors.module.scss";
+@use "../../../src/colors.module.scss";
 
 .refreshButton {
   background: none;
-  color: $main-color;
-  border: 1px $main-color solid;
+  color: colors.$main-color;
+  border: 1px colors.$main-color solid;
   width: 30px;
   height: 30px;
   min-width: 30px;
@@ -19,14 +19,14 @@
   }
 
   &:hover {
-    background: $button-super-light;
+    background: colors.$button-super-light;
   }
 }
 
 .selectDropdown{
   background: transparent;
-  color: $main-color;
-  border: 1px $main-color solid;
+  color: colors.$main-color;
+  border: 1px colors.$main-color solid;
   border-radius: 5px;
   height: 30px;
   padding: 0rem 0.5rem;
@@ -46,7 +46,7 @@
 
 .logsTable{
   max-width: 100%;
-  border: 1px solid $main-borders-color;
+  border: 1px solid colors.$main-borders-color;
   border-collapse: collapse;
 }
 
@@ -56,13 +56,13 @@
 }
 
 .cell{
-  border-left: 1px solid $main-borders-color;
+  border-left: 1px solid colors.$main-borders-color;
   padding: 0.25rem;
   max-width: 14%;
 }
 
 .rowHeader{
-  border-left: 1px solid $main-borders-color;
+  border-left: 1px solid colors.$main-borders-color;
   padding: 0.1rem;
 }
 

@@ -1,8 +1,8 @@
-@import "../../colors.module.scss";
+@use "../../colors.module.scss";
 .contributorsList {
     ul {
         margin-bottom:30px;
-        border-top:1px solid $main-color;
+        border-top:1px solid colors.$main-color;
         padding-top: 15px;
         list-style-type: none;
         columns: 3;

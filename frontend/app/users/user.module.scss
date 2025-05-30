@@ -1,4 +1,4 @@
-@import '@/src/colors.module.scss';
+@use '../../src/colors.module.scss';
 
 .personIcon{
     display: flex;
@@ -23,7 +23,7 @@
     align-items: center;
 
     svg{
-        color: $confirm;
+        color: colors.$confirm;
         width: 1.5rem;
         height: 1.5rem;
     }
@@ -34,7 +34,7 @@
     align-items: center;
     
     svg{
-        color: $error;
+        color: colors.$error;
         width: 1.5rem;
         height: 1.5rem;
     }
