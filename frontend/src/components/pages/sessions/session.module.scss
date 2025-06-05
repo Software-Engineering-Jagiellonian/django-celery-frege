@@ -1,4 +1,4 @@
-@import '../../../colors.module';
+@use '../../../colors.module';
 
 .sessionInfo{
     display: flex;
@@ -17,20 +17,20 @@
 .activeStatus{
     display: flex;
     align-items: center;
-    color: $confirm;
+    color: colors.$confirm;
 
 }
 
 .inactiveStatus{
     display: flex;
     align-items: center;
-    color: $error;
+    color: colors.$error;
 }
 
 .revokeButton{
     width: max-content;
     margin-right: 1rem;
     padding: 0.25rem 0.5rem;
-    color: $frege-color;
-    border: 1px solid $frege-color;
+    color: colors.$frege-color;
+    border: 1px solid colors.$frege-color;
 }

@@ -1,4 +1,4 @@
-@import "@/src/colors.module.scss";
+@use "../../../src/colors.module.scss";
 
 .list{
     line-height: 1.5;
@@ -6,12 +6,12 @@
 }
 
 .subObject{
-    border-left: 1px solid $main-borders-color;
+    border-left: 1px solid colors.$main-borders-color;
     padding-left: 1.5rem;
 }
 
 .errorMessage{
-    color: $error;
+    color: colors.$error;
     margin-top: 2rem;
     margin-bottom: 2rem;
 }
@@ -23,8 +23,8 @@
 
 .selectDropdown{
     background: transparent;
-    color: $main-color;
-    border: 1px $main-color solid;
+    color: colors.$main-color;
+    border: 1px colors.$main-color solid;
     border-radius: 5px;
     height: 30px;
     padding: 0rem 0.5rem;
@@ -38,7 +38,7 @@
         display: flex;
         justify-content: flex-start;
         align-items: center;
-        border: 1px solid $main-borders-color;
+        border: 1px solid colors.$main-borders-color;
         border-radius: 1rem;
         gap: 1rem;
         padding: 0.5rem;

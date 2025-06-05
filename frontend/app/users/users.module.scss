@@ -1,12 +1,12 @@
-@import '@/src/colors.module.scss';
+@use '../../src/colors.module.scss';
 
 .usersWrapper {
     .actionsRow{
         .pageSelector{
             border: none;
-            border: 1px $main-color solid;
+            border: 1px colors.$main-color solid;
             background: transparent;
-            color: $main-color;
+            color: colors.$main-color;
             border-radius: 5px;
             height: 30px;
             padding: 0 0.5rem;
@@ -15,7 +15,7 @@
     }
 
     .errorMessage{
-        color: $error;
+        color: colors.$error;
         margin-top: 2rem;
         margin-bottom: 2rem;
     }

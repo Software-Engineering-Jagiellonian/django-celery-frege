@@ -1,9 +1,9 @@
-@import "@/src/colors.module.scss";
+@use "../../src/colors.module.scss";
 
 .selectDropdown{
   background: transparent;
-  color: $main-color;
-  border: 1px $main-color solid;
+  color: colors.$main-color;
+  border: 1px colors.$main-color solid;
   border-radius: 5px;
   height: 30px;
   padding: 0rem 0.5rem;
@@ -14,26 +14,26 @@
 }
 
 .languageSelected{
-  border: 1px $main-color solid;
-  color: $main-color;
+  border: 1px colors.$main-color solid;
+  color: colors.$main-color;
   border-radius: 5px;
   padding: 0.25rem 0.5rem;
 
   :hover{
     cursor: pointer;
-    background: $main-color-dimmed;;
+    background: colors.$main-color-dimmed;;
   }
 }
 
 .languageNotSelected{
-  border: 1px $main-color-dimmed solid;
-  color: $main-color-dimmed;
+  border: 1px colors.$main-color-dimmed solid;
+  color: colors.$main-color-dimmed;
   border-radius: 5px;
   padding: 0.25rem 0.5rem;
 
   :hover{
     cursor: pointer;
-    background: $main-color-dimmed;
+    background: colors.$main-color-dimmed;
   }
 }
 
@@ -63,9 +63,9 @@
 
 .pageSelector{
   border: none;
-  border: 1px $main-color solid;
+  border: 1px colors.$main-color solid;
   background: transparent;
-  color: $main-color;
+  color: colors.$main-color;
   border-radius: 5px;
   height: 30px;
   padding: 0 0.5rem;
@@ -74,7 +74,7 @@
 
 .metricsTable{
   max-width: 100%;
-  border: 1px solid $main-borders-color;
+  border: 1px solid colors.$main-borders-color;
   border-collapse: collapse;
 }
 
@@ -84,13 +84,13 @@
 }
 
 .cell{
-  border-left: 1px solid $main-borders-color;
+  border-left: 1px solid colors.$main-borders-color;
   padding: 0.25rem;
   max-width: 14%;
 }
 
 .rowHeader{
-  border-left: 1px solid $main-borders-color;
+  border-left: 1px solid colors.$main-borders-color;
 }
 
 .refreshOptions{
