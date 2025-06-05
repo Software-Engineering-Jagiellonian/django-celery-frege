@@ -1,5 +1,4 @@
 from collections.abc import Generator
-
 from django.db import models
 
 

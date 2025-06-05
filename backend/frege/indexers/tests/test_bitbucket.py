@@ -10,6 +10,19 @@ from frege.indexers.tests.constants import MOCK_DIR
 
 
 def mocked_requests_get(repositories, forks, commits):
+    """
+    Returns a mock implementation of `requests.get` that provides
+    predefined responses for Bitbucket API endpoints based on the
+    requested URL suffix.
+
+    Args:
+        repositories (tuple): (filename, status_code) for /repositories
+        forks (tuple): (filename, status_code) for /forks
+        commits (tuple): (filename, status_code) for /commits
+
+    Returns:
+        callable: a function to be used as `side_effect` in mocking `requests.get`
+    """
     class MockResponse:
         def __init__(self, response_file, status_code):
             response_text = Path(
@@ -38,8 +51,18 @@ def mocked_requests_get(repositories, forks, commits):
 
 
 class TestBitbucketIndexer:
+    """
+    Integration tests for the BitbucketIndexer model, simulating
+    interaction with the Bitbucket API via mocked HTTP responses.
+    """
+
     @pytest.mark.django_db
     def test_bitbucket(self, mocker: MockerFixture) -> None:
+        """
+        Tests the successful indexing of a Bitbucket repository by mocking
+        /repositories, /forks, and /commits endpoints. Verifies that the
+        BitbucketIndexer yields a correctly parsed repository object.
+        """
         mocker.patch("frege.indexers.models.BitbucketIndexer.save")
         mocker.patch(
             "requests.get",
@@ -65,6 +88,11 @@ class TestBitbucketIndexer:
 
     @pytest.mark.django_db
     def test_bitbucket_on_error(self, mocker: MockerFixture) -> None:
+        """
+        Tests the behavior of BitbucketIndexer when the initial API call
+        to /repositories fails (e.g., rate limited with 429 status code).
+        Verifies that iteration raises StopIteration and no further calls are made.
+        """
         mocker.patch(
             "requests.get",
             side_effect=mocked_requests_get(

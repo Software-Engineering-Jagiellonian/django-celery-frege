@@ -40,10 +40,16 @@ logger = get_task_logger(__name__)
 )
 def process_repo_task(repo_pk) -> None:
     """
-    Process a repository by cloning it and scheduling analysis tasks for its files and commit messages.
-    
+    Downloads and processes a repository:
+    - clones the repo
+    - saves commit messages and file data
+    - schedules analysis tasks
+
     Args:
-        repo_pk: Primary key of the repository to process
+        repo_pk (int): Primary key of the repository to process.
+
+    Raises:
+        DownloadDirectoryFullException: If download directory is too large.
     """
 
     try:
@@ -51,9 +57,11 @@ def process_repo_task(repo_pk) -> None:
     except Repository.DoesNotExist:
         logger.error(f"Repository does not exist ({repo_pk = })")
         return
-    
+
     if repo.analysis_failed:
-        logger.warning(f"Repository {repo.git_url} previously failed. Skipping.")
+        logger.warning(
+            f"Repository {repo.git_url} previously failed. Skipping."
+        )
         return
 
     logger.info(f"Processing repository {repo.git_url}")
@@ -74,7 +82,7 @@ def process_repo_task(repo_pk) -> None:
                 f"Repository {repo.git_url} marked as failed. Skipping."
             )
         else:
-            error_message = f"Failed to obtain repository {repo.git_url}. This has unknown consequences."    
+            error_message = f"Failed to obtain repository {repo.git_url}. This has unknown consequences."
 
         logger.error(error_message)
 
@@ -137,6 +145,16 @@ def process_repo_task(repo_pk) -> None:
 
 
 def _clone_repo(repo: Repository, local_path: Path) -> Optional[git.Repo]:
+    """
+    Clones the repository from the given git URL to the specified local path.
+
+    Args:
+        repo (Repository): The repository object containing the git URL.
+        local_path (Path): The destination path for cloning the repository.
+
+    Returns:
+        Optional[git.Repo]: Cloned repository object or None if cloning fails.
+    """
     _check_download_folder_size()
 
     try:
@@ -157,8 +175,11 @@ def _clone_repo(repo: Repository, local_path: Path) -> Optional[git.Repo]:
 
 def _check_download_folder_size(depth: int = 0):
     """
-    Check if the size of downloads folder < DOWNLOAD_DIR_MAX_SIZE_BYTES.
-    If not, raise DownloadDirectoryFullException
+    Recursively checks if the download folder's size exceeds the configured limit.
+
+    Raises:
+        DownloadDirectoryFullException: If the folder exceeds allowed size
+        or if the check fails too many times.
     """
     if depth > 7:
         # Prevent infinite recursion
@@ -188,7 +209,13 @@ def _check_download_folder_size(depth: int = 0):
 
 def _remove_database_entries(repo: Repository):
     """
-    When processing a repository we need to make sure to remove all previous database entries, because we insert into the database all the files and commit messages again.
+    Removes all previously stored database entries related to a repository.
+
+    This includes commit messages, commit message quality metrics, and file metadata.
+    Used when restarting processing to avoid duplicates or inconsistencies.
+
+    Args:
+        repo (Repository): The repository whose data should be cleared.
     """
     repo_pk = repo.pk
     removed_commits_amount = CommitMessage.objects.filter(
