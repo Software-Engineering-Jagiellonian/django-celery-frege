@@ -345,6 +345,9 @@ services:
       - VIRTUAL_HOST=${FRONTEND_HOSTNAME}
       - LETSENCRYPT_HOST=${FRONTEND_HOSTNAME}
     env_file: []
+    networks:
+      frege-main:
+        ipv4_address: 172.18.0.41
 
   # === [Frontend] ===
 
