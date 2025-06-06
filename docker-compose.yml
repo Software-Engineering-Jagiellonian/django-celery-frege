@@ -297,7 +297,6 @@ services:
 
   frege-grafana-dev: &grafana
     image: grafana/grafana:8.5.2
-    hostname: *host
     container_name: frege-grafana-dev
     profiles: ["dev"]
     networks: *network
@@ -314,7 +313,7 @@ services:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_DISABLE_LOGIN_FORM=true
       - GF_SECURITY_ALLOW_EMBEDDING=true
-      - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/grafana/
+      - GF_SERVER_ROOT_URL=https://frege.ii.uj.edu.pl/grafana
       - GF_SERVER_SERVE_FROM_SUB_PATH=true
     ports:
       - ${DOCKER_GRAFANA_PORT}:${DOCKER_GRAFANA_PORT}
