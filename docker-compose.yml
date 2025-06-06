@@ -166,7 +166,7 @@ services:
       - frege_proxy_certs:/etc/nginx/certs:rw
     environment:
       - DEFAULT_EMAIL=${LETSENCRYPT_EMAIL}
-      - NGINX_PROXY_CONTAINER=frege-proxy
+      - NGINX_PROXY_CONTAINER=nginx-proxy
     profiles: ["tls"]
 
   # === [Django] ===

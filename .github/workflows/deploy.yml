@@ -53,7 +53,7 @@ jobs:
             cp .env.template .env
             
             docker compose --profile prod down
-            docker compose --profile prod up --build -d
+            docker compose --profile prod --profile tls up -d
             
             docker compose --profile prod ps
             
