@@ -340,7 +340,6 @@ services:
       - VIRTUAL_HOST=${FRONTEND_HOSTNAME}
       - LETSENCRYPT_HOST=${FRONTEND_HOSTNAME}
       - GF_SERVER_ROOT_URL=https://frege.ii.uj.edu.pl/grafana/
-    env_file: []
 
   # === [Frontend] ===
 
