@@ -319,7 +319,7 @@ services:
     ports:
       - ${DOCKER_GRAFANA_PORT}:${DOCKER_GRAFANA_PORT}
     expose:
-      - ${DOCKER_FRONTEND_PORT}
+      - ${DOCKER_GRAFANA_PORT}
     env_file: *env
     restart: on-failure
     healthcheck:
@@ -338,12 +338,11 @@ services:
       - GF_USERS_ALLOW_ORG_CREATE=false
       - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
       - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
-      # - GF_AUTH_ANONYMOUS_ENABLED=true
-      # - GF_SECURITY_ALLOW_EMBEDDING=true
-      # - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/grafana/
-      # - GF_SERVER_SERVE_FROM_SUB_PATH=true
-      - VIRTUAL_HOST=${FRONTEND_HOSTNAME}
-      - LETSENCRYPT_HOST=${FRONTEND_HOSTNAME}
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+      - GF_SECURITY_ALLOW_EMBEDDING=true
+      - GF_SERVER_ROOT_URL=https://frege.ii.uj.edu.pl
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true
     env_file: []
 
   # === [Frontend] ===
