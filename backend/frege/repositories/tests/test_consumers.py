@@ -89,3 +89,35 @@ class TestLiveStatusConsumer:
             response_action="repository/create",
             serializer=RepositorySerializer,
         )
+
+    async def test_invalid_api_key(self):
+        communicator = WebsocketCommunicator(
+            LiveStatusConsumer.as_asgi(), "/ws/test-live-status/"
+        )
+        try:
+            connected, _ = await communicator.connect()
+            assert connected
+            await communicator.send_json_to(
+                {"api_key": "invalid_key", "action": "subscribe_to_repository_activity", "request_id": 1}
+            )
+            response = await communicator.receive_json_from()
+            assert response["response_status"] == 403
+            assert await communicator.receive_nothing(), await communicator.show_queue()
+        finally:
+            await communicator.disconnect()
+
+    async def test_unknown_action(self, api_key):
+        communicator = WebsocketCommunicator(
+            LiveStatusConsumer.as_asgi(), "/ws/test-live-status/"
+        )
+        try:
+            connected, _ = await communicator.connect()
+            assert connected
+            await communicator.send_json_to(
+                {"api_key": api_key, "action": "non_existing_action", "request_id": 1}
+            )
+            response = await communicator.receive_json_from()
+            assert response["response_status"] == 405
+            assert await communicator.receive_nothing(), await communicator.show_queue()
+        finally:
+            await communicator.disconnect()
