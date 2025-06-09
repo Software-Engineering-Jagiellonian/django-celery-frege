@@ -17,7 +17,7 @@
     "react": "^19.0.0",
     "react-bootstrap": "^2.10.9",
     "react-bootstrap-icons": "^1.11.5",
-    "react-dom": "^19.0.0",
+    "react-dom": "^19.1.0",
     "react-grid-layout": "^1.5.1",
     "sass": "^1.86.0"
   },
