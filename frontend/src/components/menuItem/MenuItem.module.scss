@@ -1,4 +1,4 @@
-@import "../../colors.module.scss";
+@use "../../colors.module.scss";
 
 #fullscreen-view-wrapper{
   display: none;
@@ -9,36 +9,36 @@
   height: 40px;
   display: flex;
   align-items: center;
-  background: $button-main;
+  background: colors.$button-main;
   justify-content: space-between;
   padding: 2px 5px 2px 5px;
   box-sizing: border-box;
   border: none;
   text-decoration: none;
-  color: $button-font-color;
+  color: colors.$button-font-color;
   border-radius: 5px;
   font-size: 14px;
   margin-top: 3px;
   cursor: pointer;
 
   &:hover {
-    background: $frege-color;
-    color: $button-font-color;
+    background: colors.$frege-color;
+    color: colors.$button-font-color;
 
   }
 }
 
 .expandButton {
   background: none;
-  color: $main-color;
-  border: 1px $main-color solid;
+  color: colors.$main-color;
+  border: 1px colors.$main-color solid;
   width: 30px;
   height: 30px;
   border-radius: 3px;
   display: flex;
   align-items: center;
   justify-items: stretch;
-  justify-self: end;
+  justify-self: flex-end;
   justify-content: center;
 
   svg{
@@ -47,7 +47,7 @@
   }
 
   &:hover {
-    background: $button-super-light;
+    background: colors.$button-super-light;
   }
 }
 
@@ -75,19 +75,19 @@
 }
 
 .active {
-  color: $frege-color;
+  color: colors.$frege-color;
   font-weight: bold;
 
 
   &:hover {
-    color: $main-color;
+    color: colors.$main-color;
   }
 }
 
 .subNodes {
   padding-left: 9px;
   margin-left: 6px;
-  border-left: 2px $navbar-line-color solid;
+  border-left: 2px colors.$navbar-line-color solid;
   border-radius: 10px;
 }
 

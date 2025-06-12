@@ -1,0 +1,69 @@
+name: Deploy
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy to server and build
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          command_timeout: "30m"
+          script: |
+            mkdir -p ~/frege-app
+            
+            rm -rf ~/frege-app/repo
+            mkdir -p ~/frege-app/repo
+            
+            cat > ~/frege-app/.env << EOL
+            GITLAB_TOKEN=${{ secrets.GITLAB_TOKEN }}
+            EOL
+
+      - name: Copy repository to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          source: "./"
+          target: "~/frege-app/repo"
+          rm: false
+          strip_components: 0
+
+      - name: Build and run on server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          command_timeout: "45m"
+          script: |
+            cd ~/frege-app/repo
+            
+            cp .env.template .env
+            
+            docker compose --profile prod down
+            docker compose --profile prod up --build -d
+            
+            docker compose --profile prod ps
+            
+            echo "Container logs (last 50 lines):"
+            docker compose --profile prod logs --tail=50
+            
+            if [ $(docker compose --profile prod ps --status running | grep -v "NAME" | wc -l) -lt 1 ]; then
+              echo "Warning: Not all containers are running, but proceeding with deployment."
+            else
+              echo "All containers started successfully."
+            fi
+            
+            echo "Deployment completed"

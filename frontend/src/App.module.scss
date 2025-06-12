@@ -1,11 +1,11 @@
-@import "colors.module";
+@use "colors.module";
 .App {
   display: flex;
   flex-direction: column;
   width: 100vw;
   height: 100vh;
-  background: $background-color;
-  color: $button-font-color;
+  background: colors.$background-color;
+  color: colors.$button-font-color;
 }
 
 .ContentNav {
@@ -26,16 +26,16 @@
   &::-webkit-scrollbar {
     width: 8px;
     border-radius: 3px;
-    background: $background-color;
+    background: colors.$background-color;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: $main-borders-color;
+    background: colors.$main-borders-color;
     border-radius: 4px;
   }
 
   &::-webkit-scrollbar-thumb:hover {
-    background: $frege-color;
+    background: colors.$frege-color;
   }
 }
 

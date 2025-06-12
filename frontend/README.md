@@ -1,17 +1,36 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Production Build & Run
+
+To run the project in production mode:
+
+1. Go to the frontend directory and install dependencies:
+
+```bash
+cd frontend
+npm install
+```
+
+2. Build the project:
+
+```bash
+npm run build
+```
+
+3. Start the Next.js server:
+
+```bash
+npm run start
+```
+
+The production server will run at [http://localhost:3030](http://localhost:3030).
+
 ## Getting Started
 
 First, run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
