@@ -1,8 +1,8 @@
 import type { NextConfig } from 'next';
 
 
-const targetGrafana = process.env.REACT_APP_DOCKER_GRAFANA_HOST || 'localhost';
-const portGrafana = process.env.REACT_APP_DOCKER_GRAFANA_PORT || '3000';
+const targetGrafana = process.env.NODE_ENV === 'production' ? 'backend' : process.env.REACT_APP_DOCKER_GRAFANA_HOST || 'localhost';
+const portGrafana = process.env.NODE_ENV === 'production' ? '3000' : process.env.REACT_APP_DOCKER_GRAFANA_PORT || '3000';
 
 const nextConfig: NextConfig = {
   /* config options here */

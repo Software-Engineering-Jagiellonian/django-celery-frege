@@ -338,7 +338,7 @@ services:
       - GF_USERS_ALLOW_ORG_CREATE=false
       - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
       - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
-      # - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ENABLED=true
       # - GF_SECURITY_ALLOW_EMBEDDING=true
       # - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/grafana/
       # - GF_SERVER_SERVE_FROM_SUB_PATH=true
@@ -356,9 +356,9 @@ services:
       dockerfile: Dockerfile
     environment:
       - PORT=${DOCKER_FRONTEND_PORT}
-      - REACT_APP_DOCKER_GRAFANA_HOST=frege-grafana-dev
+      - REACT_APP_DOCKER_GRAFANA_HOST=backend
       - REACT_APP_DOCKER_GRAFANA_PORT=3000
-      - DOCKER_FLOWER_HOST=frege-flower-dev
+      - DOCKER_FLOWER_HOST=backend
       - DOCKER_FLOWER_PORT=5555
       - DJANGO_SUPERUSER_USERNAME=django_admin
       - DJANGO_SUPERUSER_PASSWORD=pass
@@ -386,11 +386,14 @@ services:
     <<: *frontend
     container_name: frege-frontend-prod
     hostname: frege-frontend-prod
+    build:
+      context: frontend
+      dockerfile: Dockerfile.prod
     environment:
       - PORT=${DOCKER_FRONTEND_PORT}
-      - REACT_APP_DOCKER_GRAFANA_HOST=frege-grafana-prod
+      - REACT_APP_DOCKER_GRAFANA_HOST=backend
       - REACT_APP_DOCKER_GRAFANA_PORT=3000
-      - DOCKER_FLOWER_HOST=frege-flower-dev
+      - DOCKER_FLOWER_HOST=backend
       - DOCKER_FLOWER_PORT=5555
       - NODE_ENV=production
       - VIRTUAL_HOST=${FRONTEND_HOSTNAME}
