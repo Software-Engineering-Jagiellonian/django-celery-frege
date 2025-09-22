@@ -19,7 +19,7 @@
     "react-bootstrap-icons": "^1.11.5",
     "react-dom": "^19.0.0",
     "react-grid-layout": "^1.5.1",
-    "sass": "^1.86.0"
+    "sass": "^1.93.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
