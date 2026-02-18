@@ -7,7 +7,7 @@ x-backend: &backend
   hostname: &host backend
   networks: &network
     - frege-main
-  restart: on-failure
+  restart: unless-stopped
   env_file: &env
     - .env
 
@@ -36,7 +36,7 @@ services:
     ports:
       - "${DOCKER_REDIS_PORT}:${DOCKER_REDIS_PORT}"
     profiles: ["dev", "prod"]
-    restart: on-failure
+    restart: unless-stopped
     healthcheck:
       test: "redis-cli ping || exit 1"
       interval: 10s
@@ -56,7 +56,7 @@ services:
       - "${DOCKER_POSTGRES_PORT}"
     ports:
       - "${DOCKER_POSTGRES_PORT}:${DOCKER_POSTGRES_PORT}"
-    restart: on-failure
+    restart: unless-stopped
     volumes:
       - frege_postgresql_data:/var/lib/postgresql/data
     # Removing code below is a workaround for 'role "root" does not exist' error.
@@ -77,7 +77,7 @@ services:
     expose:
       - ${DOCKER_PROMETHEUS_PORT}
     networks: *network
-    restart: on-failure
+    restart: unless-stopped
     healthcheck:
       test: "wget -nv -t1 --spider http://localhost:${DOCKER_PROMETHEUS_PORT} || exit 1"
       interval: 10s
@@ -146,7 +146,7 @@ services:
     volumes:
       - ./nginx/egress.nginx.conf:/etc/docker-gen/templates/nginx.tmpl:ro
       - /var/run/docker.sock:/tmp/docker.sock:ro
-    restart: on-failure
+    restart: unless-stopped
     profiles: ["prod"]
     networks:
       - frege-main
@@ -155,7 +155,7 @@ services:
     image: nginxproxy/acme-companion:2.2
     container_name: frege-proxy-acme
     hostname: frege-proxy-acme
-    restart: on-failure
+    restart: unless-stopped
     networks:
       - frege-main
     volumes:
@@ -321,7 +321,7 @@ services:
     expose:
       - ${DOCKER_FRONTEND_PORT}
     env_file: *env
-    restart: on-failure
+    restart: unless-stopped
     healthcheck:
       test: "wget -nv -t1 --spider http://localhost:${DOCKER_GRAFANA_PORT}/api/health || exit 1"
       interval: 10s
@@ -374,7 +374,7 @@ services:
       - frege-grafana-dev
     networks: *network
     profiles: ["dev"]
-    restart: on-failure
+    restart: unless-stopped
     healthcheck:
       test: "wget -nv -t1 --spider http://localhost:${DOCKER_FRONTEND_PORT} || exit 1"
       interval: 10s
