@@ -1,4 +1,6 @@
+from frege.analyzers.core.c import *
 from frege.analyzers.core.cpp import *
+from frege.analyzers.core.csharp import *
 from frege.analyzers.core.golang import *
 from frege.analyzers.core.java import *
 from frege.analyzers.core.javascript import *
