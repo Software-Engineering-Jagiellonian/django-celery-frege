@@ -16,6 +16,8 @@ SECRET_KEY = (
 DEBUG = os.environ.get("DJANGO_DEBUG", "true").lower() == "true"
 
 ALLOWED_HOSTS = [os.environ.get("BACKEND_HOSTNAME"), ".localhost", "127.0.0.1"]
+CSRF_TRUSTED_ORIGINS = ["https://frege.ii.uj.edu.pl", "https://www.frege.ii.uj.edu.pl"]
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 DJANGO_CORS_ALLOWED_HOSTS = [
     os.environ.get("FRONTEND_URL", "http://localhost:4200")
