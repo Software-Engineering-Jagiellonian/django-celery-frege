@@ -13,10 +13,10 @@
       }
     ]
   },
-  "description": "Dashboard showing Frege analysis progress, code quality metrics, and commit message statistics",
+  "description": "Frege analysis progress, code quality metrics, and commit message statistics",
   "editable": true,
   "fiscalYearStartMonth": 0,
-  "graphTooltip": 1,
+  "graphTooltip": 0,
   "id": null,
   "links": [],
   "liveNow": false,
@@ -25,6 +25,7 @@
       "collapsed": false,
       "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
       "id": 100,
+      "panels": [],
       "title": "Statystyki ogólne",
       "type": "row"
     },
@@ -195,8 +196,8 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "fixed", "fixedColor": "super-light-blue" },
-          "thresholds": { "mode": "absolute", "steps": [{ "color": "super-light-blue", "value": null }] }
+          "color": { "mode": "fixed", "fixedColor": "light-blue" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "light-blue", "value": null }] }
         },
         "overrides": []
       },
@@ -212,6 +213,7 @@
       "collapsed": false,
       "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
       "id": 200,
+      "panels": [],
       "title": "Wykresy czasowe",
       "type": "row"
     },
@@ -251,8 +253,8 @@
             "lineWidth": 2,
             "fillOpacity": 10,
             "spanNulls": true,
-            "lineInterpolation": "smooth",
-            "showPoints": "never"
+            "lineInterpolation": "linear",
+            "showPoints": "auto"
           },
           "unit": "short"
         },
@@ -273,7 +275,7 @@
       },
       "options": {
         "legend": { "displayMode": "list", "placement": "bottom" },
-        "tooltip": { "mode": "multi", "sort": "desc" }
+        "tooltip": { "mode": "multi" }
       }
     },
     {
@@ -297,8 +299,7 @@
           "custom": {
             "drawStyle": "bars",
             "fillOpacity": 80,
-            "lineWidth": 1,
-            "barAlignment": 0
+            "lineWidth": 1
           },
           "color": { "mode": "fixed", "fixedColor": "green" },
           "unit": "short"
@@ -314,6 +315,7 @@
       "collapsed": false,
       "gridPos": { "h": 1, "w": 24, "x": 0, "y": 15 },
       "id": 300,
+      "panels": [],
       "title": "Rozkłady",
       "type": "row"
     },
@@ -341,7 +343,7 @@
       },
       "options": {
         "pieType": "donut",
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "/^count$/", "values": true },
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": true },
         "legend": { "displayMode": "table", "placement": "right", "values": ["value", "percent"] },
         "tooltip": { "mode": "single" }
       }
@@ -370,7 +372,7 @@
       },
       "options": {
         "pieType": "donut",
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "/^count$/", "values": true },
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": true },
         "legend": { "displayMode": "table", "placement": "right", "values": ["value", "percent"] },
         "tooltip": { "mode": "single" }
       }
@@ -378,7 +380,7 @@
     {
       "type": "gauge",
       "title": "Czytelność commit messages (Fog Index)",
-      "description": "Średni Gunning Fog Index commit messages. Niższy = łatwiejszy do przeczytania. <8: łatwy, 8-14: umiarkowany, >14: trudny",
+      "description": "Średni Gunning Fog Index. Niższy = łatwiejszy do przeczytania. <8: łatwy, 8-14: umiarkowany, >14: trudny",
       "gridPos": { "h": 9, "w": 8, "x": 16, "y": 16 },
       "id": 11,
       "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
@@ -418,13 +420,14 @@
       "collapsed": false,
       "gridPos": { "h": 1, "w": 24, "x": 0, "y": 25 },
       "id": 400,
+      "panels": [],
       "title": "Jakość kodu",
       "type": "row"
     },
     {
       "type": "barchart",
       "title": "Średnia złożoność cyklomatyczna wg języka",
-      "description": "Średnia cyclomatic complexity per język programowania (top 10)",
+      "description": "Średnia cyclomatic complexity per język (top 10)",
       "gridPos": { "h": 9, "w": 8, "x": 0, "y": 26 },
       "id": 12,
       "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
@@ -439,18 +442,7 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 5 },
-              { "color": "red", "value": 10 }
-            ]
-          },
-          "custom": {
-            "thresholdsStyle": { "mode": "line" }
-          }
+          "color": { "mode": "palette-classic" }
         },
         "overrides": []
       },
@@ -459,8 +451,7 @@
         "barWidth": 0.7,
         "groupWidth": 0.7,
         "legend": { "displayMode": "hidden" },
-        "tooltip": { "mode": "single" },
-        "xTickLabelRotation": 0
+        "tooltip": { "mode": "single" }
       }
     },
     {
@@ -490,8 +481,7 @@
         "barWidth": 0.7,
         "groupWidth": 0.7,
         "legend": { "displayMode": "hidden" },
-        "tooltip": { "mode": "single" },
-        "xTickLabelRotation": 0
+        "tooltip": { "mode": "single" }
       }
     },
     {
@@ -511,12 +501,17 @@
         }
       ],
       "fieldConfig": {
-        "defaults": {},
+        "defaults": {
+          "custom": {
+            "displayMode": "auto",
+            "align": "auto"
+          }
+        },
         "overrides": [
           {
             "matcher": { "id": "byName", "options": "Avg Complexity" },
             "properties": [
-              { "id": "custom.cellOptions", "value": { "type": "color-background" } },
+              { "id": "custom.displayMode", "value": "color-background" },
               {
                 "id": "thresholds",
                 "value": {

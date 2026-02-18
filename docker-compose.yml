@@ -403,9 +403,19 @@ networks:
   frege-main:
 
 volumes:
+  # IMPORTANT: PostgreSQL and Grafana volumes are external to prevent data loss
+  # when the project directory name or COMPOSE_PROJECT_NAME changes.
+  # These volumes must exist before running docker compose up.
+  # To create them for a fresh install:
+  #   docker volume create frege_postgresql_data
+  #   docker volume create frege_grafana_storage
   frege_postgresql_data:
-  frege_tmp:
+    external: true
+    name: repo_frege_postgresql_data
   frege_grafana_storage:
+    external: true
+    name: django-celery-frege_frege_grafana_storage
+  frege_tmp:
 
   # Production
   frege_static_files:
