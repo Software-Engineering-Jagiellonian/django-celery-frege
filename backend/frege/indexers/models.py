@@ -160,7 +160,6 @@ class BitbucketIndexer(BaseIndexer):
                 break
 
             self.current_date = next_date
-            self.save(update_fields=["current_date"])
 
             if (
                 self.min_forks
@@ -185,6 +184,7 @@ class BitbucketIndexer(BaseIndexer):
                 repo_url=repo_url,
                 commit_hash=commit_hash,
             )
+            self.save(update_fields=["current_date"])
 
             yield [repo_to_process]
 
@@ -222,8 +222,8 @@ class GitLabIndexer(BaseIndexer):
                 self.last_project_id = _id
                 if not _is_repo_unique(repo_data["git_url"], self.__class__.__name__):
                     continue
-                self.save(update_fields=["last_project_id"])
                 repo_to_process = Repository.objects.create(**repo_data)
+                self.save(update_fields=["last_project_id"])
 
                 yield [repo_to_process]
         except gitlab.RateLimitExceededException:
