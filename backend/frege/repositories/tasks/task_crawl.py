@@ -108,7 +108,7 @@ def _sanitize():
     client = redis.StrictRedis(
         host=settings.REDIS_HOST, port=settings.REDIS_PORT
     )
-    lock = Lock(client, "sanitization_lock")
+    lock = Lock(client, "sanitization_lock", timeout=600)
     with lock:
         # Wait for only one crawler to sanitize. We cannot safely clean
         # the download dir and reschedule unanalyzed repos concurrently.
@@ -149,10 +149,9 @@ def _reschedule_unanalyzed_repos():
             logger.info(
                 f"Rescheduling {unanalyzed_repos.count()} unanalyzed repositories"
             )
-            for repo in unanalyzed_repos:
-                repo.analysis_failed = False
-                repo.save(update_fields=["analysis_failed"])
-                process_repo_task.apply_async(args=(repo.pk,))
+            unanalyzed_repos.update(analysis_failed=False)
+            for repo_pk in unanalyzed_repos.values_list("pk", flat=True).iterator(chunk_size=1000):
+                process_repo_task.apply_async(args=(repo_pk,))
         else:
             logger.info("No repositories found")
             return
