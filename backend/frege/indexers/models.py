@@ -42,7 +42,6 @@ class GitHubIndexer(BaseIndexer):
                     page=self.current_page,
                 )
                 self.current_page += 1
-                self.save(update_fields=["current_page"])
 
                 unique_repos = [repo for repo in list_of_repos if _is_repo_unique(repo.clone_url, self.__class__.__name__)]
 
@@ -59,6 +58,7 @@ class GitHubIndexer(BaseIndexer):
                     for repo in unique_repos
                 ]
                 Repository.objects.bulk_create(repos_to_process)
+                self.save(update_fields=["current_page"])
             except github.RateLimitExceededException:
                 self.rate_limit_exceeded = True
                 break
