@@ -48,7 +48,7 @@ class Client:
 
                 repo_data = dict(
                     name=project.get('name', 'Unnamed Project'),
-                    description=project.get('description', 'No description'),
+                    description=project.get('description') or '',
                     git_url=project.get('http_url_to_repo', ''),
                     repo_url=project.get('web_url', ''),
                     commit_hash=commit_hash

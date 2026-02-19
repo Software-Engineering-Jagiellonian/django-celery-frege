@@ -19,7 +19,7 @@ class Repository(models.Model):
         max_length=2048,
         verbose_name=_("Repository description"),
         help_text=_("The description of the repository"),
-        blank=True,
+        blank=True, default="",
     )
     analyzed = models.BooleanField(
         _("Analyzed"),

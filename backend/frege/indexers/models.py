@@ -49,7 +49,7 @@ class GitHubIndexer(BaseIndexer):
                 repos_to_process = [
                     Repository(
                         name=repo.name,
-                        description=repo.description,
+                        description=repo.description or "",
                         git_url=repo.clone_url,
                         repo_url=repo.html_url,
                         commit_hash=repo.get_branch(
@@ -105,7 +105,7 @@ class SourceforgeIndexer(BaseIndexer):
                 repos_to_process.append(
                     Repository(
                         name=project.name,
-                        description=project.description,
+                        description=project.description or "",
                         git_url=project.code.url,
                         repo_url=project.url,
                         commit_hash=project.code.commit_hash,
@@ -118,7 +118,7 @@ class SourceforgeIndexer(BaseIndexer):
                 repos_to_process.append(
                     Repository(
                         name=f"{project.name}/{subproject.name}",
-                        description=project.description,
+                        description=project.description or "",
                         git_url=subproject.code.url,
                         repo_url=project.url,
                         commit_hash=subproject.code.commit_hash,
@@ -180,7 +180,7 @@ class BitbucketIndexer(BaseIndexer):
 
             repo_to_process = Repository.objects.create(
                 name=repository_data.get("name"),
-                description=repository_data.get("description"),
+                description=repository_data.get("description") or "",
                 git_url=clone_url,
                 repo_url=repo_url,
                 commit_hash=commit_hash,
