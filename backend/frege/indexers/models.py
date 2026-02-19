@@ -1,3 +1,4 @@
+import logging
 import os
 import sys
 from typing import List
@@ -12,6 +13,8 @@ from frege.indexers.base import BaseIndexer
 from frege.indexers.sourceforge import SourceforgeProjectsExtractor
 from frege.indexers.utils import bitbucket, gitlab
 from frege.repositories.models import Repository
+
+logger = logging.getLogger(__name__)
 
 class GitHubIndexer(BaseIndexer):
     min_forks = models.PositiveIntegerField(
@@ -57,7 +60,10 @@ class GitHubIndexer(BaseIndexer):
                     )
                     for repo in unique_repos
                 ]
-                Repository.objects.bulk_create(repos_to_process)
+                try:
+                    Repository.objects.bulk_create(repos_to_process)
+                except Exception as e:
+                    logger.error(f"Failed to bulk create repositories on page {self.current_page - 1}: {e}")
                 self.save(update_fields=["current_page"])
             except github.RateLimitExceededException:
                 self.rate_limit_exceeded = True
@@ -177,13 +183,18 @@ class BitbucketIndexer(BaseIndexer):
             if not _is_repo_unique(clone_url, self.__class__.__name__):
                 continue
 
-            repo_to_process = Repository.objects.create(
-                name=repository_data.get("name"),
-                description=repository_data.get("description") or "",
-                git_url=clone_url,
-                repo_url=repo_url,
-                commit_hash=commit_hash,
-            )
+            try:
+                repo_to_process = Repository.objects.create(
+                    name=repository_data.get("name"),
+                    description=repository_data.get("description") or "",
+                    git_url=clone_url,
+                    repo_url=repo_url,
+                    commit_hash=commit_hash,
+                )
+            except Exception as e:
+                logger.error(f"Failed to create repository {clone_url}: {e}")
+                self.save(update_fields=["current_date"])
+                continue
             self.save(update_fields=["current_date"])
 
             yield [repo_to_process]
@@ -222,7 +233,12 @@ class GitLabIndexer(BaseIndexer):
                 self.last_project_id = _id
                 if not _is_repo_unique(repo_data["git_url"], self.__class__.__name__):
                     continue
-                repo_to_process = Repository.objects.create(**repo_data)
+                try:
+                    repo_to_process = Repository.objects.create(**repo_data)
+                except Exception as e:
+                    logger.error(f"Failed to create repository {repo_data.get('git_url')}: {e}")
+                    self.save(update_fields=["last_project_id"])
+                    continue
                 self.save(update_fields=["last_project_id"])
 
                 yield [repo_to_process]
