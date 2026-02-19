@@ -129,7 +129,7 @@ services:
     networks:
       - frege-main
     healthcheck:
-      test: "curl -f localhost || exit 1"
+      test: "service nginx status || exit 1"
       interval: 10s
       timeout: 10s
       retries: 2
@@ -386,6 +386,7 @@ services:
     <<: *frontend
     container_name: frege-frontend-prod
     hostname: frege-frontend-prod
+    command: sh -c "npm run build && npm run start"
     environment:
       - PORT=${DOCKER_FRONTEND_PORT}
       - REACT_APP_DOCKER_GRAFANA_HOST=frege-grafana-prod
