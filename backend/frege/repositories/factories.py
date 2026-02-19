@@ -8,7 +8,13 @@ from frege.repositories.constants import (
     ProgrammingLanguages,
     get_extensions_for_language,
 )
-from frege.repositories.models import Repository, RepositoryFile
+
+from frege.repositories.models import (
+    Repository, 
+    RepositoryFile, 
+    RepositoryCommitMessagesQuality,
+    CommitMessage
+)
 
 faker_obj = Faker()
 
@@ -57,3 +63,18 @@ class RepositoryFileFactory(factory.django.DjangoModelFactory):
             )
         )
     )
+
+class EmptyRepositoryCommitMessagesQualityFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = RepositoryCommitMessagesQuality
+
+    repository = factory.SubFactory(RepositoryFactory)
+
+class CommitMessageFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = CommitMessage
+
+    repository = factory.SubFactory(RepositoryFactory)
+    author = faker_obj.user_name()
+    commit_hash = factory.Faker("sha1", raw_output=False)
+    message = factory.Faker("text", max_nb_chars=200)
