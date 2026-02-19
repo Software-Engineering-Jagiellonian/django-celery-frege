@@ -13,3 +13,6 @@ env/
 # pyenv
 .python-version
 .DS_Store
+
+# Loki data
+loki/data/
