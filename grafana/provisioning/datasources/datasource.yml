@@ -3,6 +3,7 @@ apiVersion: 1
 datasources:
 - name: postgres
   type: postgres
+  uid: PA942B37CCFAF5A81
   access: proxy
   url: frege-postgres:5432
   secureJsonData:
@@ -37,3 +38,21 @@ datasources:
   type: loki
   url: http://frege-loki:3100
   isDefault: false
+
+# Datasource for Public org (org 2) - read-only access to PostgreSQL
+- name: postgres
+  type: postgres
+  uid: PA942B37CCFAF5A81
+  orgId: 2
+  access: proxy
+  url: frege-postgres:5432
+  secureJsonData:
+    password: 2Kw487QImCtEhapw
+  user: frege
+  database: frege
+  basicAuth: true
+  isDefault: true
+  jsonData:
+     sslmode: disable
+  version: 1
+  editable: false
