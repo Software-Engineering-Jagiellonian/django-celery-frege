@@ -196,7 +196,7 @@
       "title": "",
       "transparent": true,
       "gridPos": {
-        "h": 4,
+        "h": 8,
         "w": 24,
         "x": 0,
         "y": 14
@@ -204,7 +204,7 @@
       "id": 20,
       "options": {
         "mode": "html",
-        "content": "<div style=\"text-align: center; padding: 10px 0;\"><img src=\"/public/img/katedra.png\" alt=\"Katedra Inżynierii Oprogramowania UJ\" style=\"max-height: 80px;\"></div>"
+        "content": "<div style=\"text-align: center; padding: 20px 0;\"><img src=\"/public/img/katedra.png\" alt=\"Katedra Inżynierii Oprogramowania UJ\" style=\"width: 80%; max-width: 100%;\"></div>"
       }
     }
   ],
