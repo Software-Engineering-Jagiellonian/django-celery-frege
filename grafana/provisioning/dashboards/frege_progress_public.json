@@ -1,0 +1,126 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": { "type": "grafana", "uid": "-- Grafana --" },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": { "limit": 100, "matchAny": false, "tags": [], "type": "dashboard" },
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Frege - przegląd analizy kodu",
+  "editable": false,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Pliki przeanalizowane",
+      "gridPos": { "h": 4, "w": 24, "x": 0, "y": 0 },
+      "id": 5,
+      "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+      "targets": [
+        {
+          "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+          "rawQuery": true,
+          "rawSql": "SELECT COUNT(*) AS \"files\" FROM repositories_repositoryfile WHERE analyzed = true",
+          "refId": "A",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "fixed", "fixedColor": "purple" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "purple", "value": null }] }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "none"
+      }
+    },
+    {
+      "type": "piechart",
+      "title": "Języki programowania",
+      "description": "Rozkład przeanalizowanych plików wg języka programowania",
+      "gridPos": { "h": 10, "w": 12, "x": 0, "y": 4 },
+      "id": 9,
+      "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+      "targets": [
+        {
+          "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+          "rawQuery": true,
+          "rawSql": "SELECT language, COUNT(*) AS count FROM repositories_repositoryfile WHERE language != '' AND analyzed = true GROUP BY language ORDER BY count DESC LIMIT 15",
+          "refId": "A",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" }
+        },
+        "overrides": []
+      },
+      "options": {
+        "pieType": "donut",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": true },
+        "legend": { "displayMode": "table", "placement": "right", "values": ["value", "percent"] },
+        "tooltip": { "mode": "single" }
+      }
+    },
+    {
+      "type": "barchart",
+      "title": "Średnia złożoność cyklomatyczna wg języka",
+      "description": "Średnia cyclomatic complexity per język (top 10)",
+      "gridPos": { "h": 10, "w": 12, "x": 12, "y": 4 },
+      "id": 12,
+      "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+      "targets": [
+        {
+          "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+          "rawQuery": true,
+          "rawSql": "SELECT language, ROUND(AVG(average_cyclomatic_complexity)::numeric, 2) AS \"Avg Complexity\" FROM repositories_repositoryfile WHERE average_cyclomatic_complexity IS NOT NULL AND language != '' GROUP BY language ORDER BY \"Avg Complexity\" DESC LIMIT 10",
+          "refId": "A",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" }
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "horizontal",
+        "barWidth": 0.7,
+        "groupWidth": 0.7,
+        "legend": { "displayMode": "hidden" },
+        "tooltip": { "mode": "single" }
+      }
+    }
+  ],
+  "refresh": "5m",
+  "schemaVersion": 36,
+  "style": "dark",
+  "tags": ["frege", "public"],
+  "templating": { "list": [] },
+  "time": { "from": "now-1y", "to": "now" },
+  "timepicker": { "hidden": true },
+  "timezone": "",
+  "title": "Frege - Przegląd",
+  "uid": "frege-public",
+  "version": 1,
+  "weekStart": ""
+}
