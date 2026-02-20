@@ -362,7 +362,7 @@ volumes:
     name: repo_frege_postgresql_data
   frege_grafana_storage:
     external: true
-    name: django-celery-frege_frege_grafana_storage
+    name: repo_frege_grafana_storage
   frege_tmp:
 
   # Production
