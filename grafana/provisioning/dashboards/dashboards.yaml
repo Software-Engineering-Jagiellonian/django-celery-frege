@@ -1,31 +1,22 @@
 apiVersion: 1
 
 providers:
-  - name: 'Redis dashboard'
+  - name: "Default dashboards"
     orgId: 1
-    folder: 'Redis'
-    # <bool> disable dashboard deletion
+    folder: ""
     disableDeletion: false
-    # <int> how often Grafana will scan for changed dashboards
     updateIntervalSeconds: 10
-    # <bool> allow updating provisioned dashboards from the UI
     allowUiUpdates: false
     options:
-      # <string, required> path to dashboard files on disk. Required when using the 'file' type
       path: /etc/grafana/provisioning/dashboards
-      # <bool> use folder names from filesystem to create folders in Grafana
-      foldersFromFilesStructure: true
-  - name: 'Celery dashboard'
-    orgId: 1
-    folder: 'Celery'
-    # <bool> disable dashboard deletion
-    disableDeletion: false
-    # <int> how often Grafana will scan for changed dashboards
+      foldersFromFilesStructure: false
+
+  - name: "Public dashboard"
+    orgId: 2
+    folder: ""
+    disableDeletion: true
     updateIntervalSeconds: 10
-    # <bool> allow updating provisioned dashboards from the UI
     allowUiUpdates: false
     options:
-      # <string, required> path to dashboard files on disk. Required when using the 'file' type
-      path: /etc/grafana/provisioning/dashboards
-      # <bool> use folder names from filesystem to create folders in Grafana
-      foldersFromFilesStructure: true
+      path: /etc/grafana/provisioning/dashboards/public
+      foldersFromFilesStructure: false
