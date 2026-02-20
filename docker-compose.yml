@@ -310,6 +310,7 @@ services:
       - frege_grafana_storage:/var/lib/grafana
       - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
       - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./grafana/public/katedra.png:/usr/share/grafana/public/img/katedra.png:ro
     environment:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_DISABLE_LOGIN_FORM=true
@@ -341,6 +342,7 @@ services:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
       - GF_AUTH_ANONYMOUS_ORG_NAME=Public
+      - GF_PANELS_DISABLE_SANITIZE_HTML=true
       - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/etc/grafana/provisioning/dashboards/public/frege_progress_public.json
       # - GF_SECURITY_ALLOW_EMBEDDING=true
       # - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/grafana/
