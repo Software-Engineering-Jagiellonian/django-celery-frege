@@ -20,9 +20,10 @@ class BaseIndexer(SingletonModel):
     #: A variable signifying whether the indexer has been throttled.
     rate_limit_exceeded: bool = False
 
-    def __init_subclass__(cls, *args, **kwargs):
+    def __init_subclass__(cls, *args, enabled=True, **kwargs):
         super().__init_subclass__(*args, **kwargs)
-        indexers.append(cls)
+        if enabled:
+            indexers.append(cls)
 
     @abc.abstractmethod
     def __iter__(self) -> Iterator[Repository]:

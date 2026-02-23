@@ -145,7 +145,7 @@ class SourceforgeIndexer(BaseIndexer):
         verbose_name_plural = verbose_name
 
 
-class BitbucketIndexer(BaseIndexer):
+class BitbucketIndexer(BaseIndexer, enabled=False):
     min_forks = models.PositiveIntegerField(
         _("min forks"),
         default=1,
