@@ -50,6 +50,7 @@ def mocked_requests_get(repositories, forks, commits):
     return inner_mock
 
 
+@pytest.mark.skip(reason="Bitbucket API deprecated, sunset 2026-02-27")
 class TestBitbucketIndexer:
     """
     Integration tests for the BitbucketIndexer model, simulating

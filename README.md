@@ -36,7 +36,7 @@
 </details>
 
 # About
-FREGE is an open-source application dedicated to analyzing other open-source repositories available on Github, Gitlab ect. for various metrics like average number of lines of code, average cyclomatic complexity, token count or number of devs per project.
+FREGE is an open-source application dedicated to analyzing other open-source repositories available on GitHub and GitLab for various metrics like average number of lines of code, average cyclomatic complexity, token count or number of devs per project.
 
 The main goal is to gather largest database of code metrics in order to analyze them (with little help of ML) to extract hidden patterns to what makes successful project overall.
 
@@ -80,7 +80,6 @@ docker compose --profile dev up
 ```
 
 After running application in dev profile, check these sites:
-* `localhost:3030` - front-end application
 * `localhost:3000` - [Grafana](https://grafana.com/) (use search to find dashboards)
 * `localhost:5555` - [Flower](https://flower.readthedocs.io/en/latest/)
 * `localhost:8000` - back-end application
@@ -99,10 +98,10 @@ docker compose --profile prod up -d
 ## Linters
 This project employs a number of linters and formatters for overall DX.
 
-> :warning: To prevent common mistakes from being committed and pushed to the origin it is **highly recommended** to register git hooks configured via `pre-commit`. For this operation [pip](https://pip.pypa.io/en/stable/installation/) and [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) will be needed. \
-Alternatively, you can use **extensions** (such as prettier or black) to format your code in your IDE without installing anything more. However, with pip and npm already installed, pre-commit approached is more recommended.
+> :warning: To prevent common mistakes from being committed and pushed to the origin it is **highly recommended** to register git hooks configured via `pre-commit`. For this operation [pip](https://pip.pypa.io/en/stable/installation/) will be needed. \
+Alternatively, you can use **extensions** (such as black) to format your code in your IDE without installing anything more. However, with pip already installed, pre-commit approach is more recommended.
 
-There are three linters/formatters for Python: `flake8`, `isort`, `black`; and there are two for Javascript/TypeScript: `prettier`, `eslint`.
+There are three linters/formatters for Python: `flake8`, `isort`, `black`.
 
 In order to install pre-commit git-hook, run commands (recommended with [venv](https://docs.python.org/3/library/venv.html) previously created):
 
@@ -112,20 +111,7 @@ In order to install pre-commit git-hook, run commands (recommended with [venv](h
 
   For more information about development of BE please refer to [backend/README.md](backend/README.md)
 
-2. Install npm packages:
-
-```
-cd frontend
-npm install
-```
-
-To launch the application run the following command in frontend directory:
-
-```
-npm start
-```
-
-3. Install pre-commit git hook:
+2. Install pre-commit git hook:
 
 ```
 pre-commit install
@@ -147,5 +133,4 @@ In order to unify the commit messages creation strategy, it is strongly recommen
 :warning: For in-depth description of the tool please refer to the [Design Document](./documentation/DESIGNDOC.md).
 
 Some information also can be found in:
-* [FrontEnd readme](./frontend/README.md)
 * [Documentation readme](./documentation/README.md)

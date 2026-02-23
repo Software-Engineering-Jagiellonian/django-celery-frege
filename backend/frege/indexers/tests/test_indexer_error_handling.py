@@ -129,6 +129,7 @@ class TestGitLabIndexerErrorHandling:
         assert indexer.last_project_id == 30
 
 
+@pytest.mark.skip(reason="Bitbucket API deprecated, sunset 2026-02-27")
 @pytest.mark.django_db
 class TestBitbucketIndexerErrorHandling:
     """Tests for BitbucketIndexer.__iter__() error handling."""
