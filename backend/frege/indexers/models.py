@@ -34,19 +34,23 @@ class GitHubIndexer(BaseIndexer):
     def __iter__(self):
         github_token = os.environ.get("GITHUB_TOKEN")
         g = Github(github_token) if github_token else Github()
+        paginated_repos = g.search_repositories(
+            query=(
+                f"forks:>={self.min_forks} "
+                f"stars:>={self.min_stars} is:public"
+            ),
+            sort="stars",
+        )
         while True:
             try:
-                list_of_repos = g.search_repositories(
-                    query=(
-                        f"forks:>={self.min_forks} "
-                        f"stars:>={self.min_stars} is:public"
-                    ),
-                    sort="stars",
-                    page=self.current_page,
-                )
-                self.current_page += 1
+                page_repos = paginated_repos.get_page(self.current_page)
+                if not page_repos:
+                    logger.info(f"GitHub: no more results at page {self.current_page}, resetting to 0")
+                    self.current_page = 0
+                    self.save(update_fields=["current_page"])
+                    break
 
-                unique_repos = [repo for repo in list_of_repos if _is_repo_unique(repo.clone_url, self.__class__.__name__)]
+                unique_repos = [repo for repo in page_repos if _is_repo_unique(repo.clone_url, self.__class__.__name__)]
 
                 repos_to_process = [
                     Repository(
@@ -63,9 +67,11 @@ class GitHubIndexer(BaseIndexer):
                 try:
                     Repository.objects.bulk_create(repos_to_process)
                 except Exception as e:
-                    logger.error(f"Failed to bulk create repositories on page {self.current_page - 1}: {e}")
+                    logger.error(f"Failed to bulk create repositories on page {self.current_page}: {e}")
+
+                self.current_page += 1
                 self.save(update_fields=["current_page"])
-            except github.RateLimitExceededException:
+            except github.GithubException.RateLimitExceededException:
                 self.rate_limit_exceeded = True
                 break
             yield repos_to_process
