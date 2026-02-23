@@ -3,7 +3,7 @@ import os
 import sys
 from typing import List
 
-import github.GithubException
+from github.GithubException import RateLimitExceededException as GitHubRateLimitExceeded
 import requests
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -71,7 +71,7 @@ class GitHubIndexer(BaseIndexer):
 
                 self.current_page += 1
                 self.save(update_fields=["current_page"])
-            except github.GithubException.RateLimitExceededException:
+            except GitHubRateLimitExceeded:
                 self.rate_limit_exceeded = True
                 break
             yield repos_to_process

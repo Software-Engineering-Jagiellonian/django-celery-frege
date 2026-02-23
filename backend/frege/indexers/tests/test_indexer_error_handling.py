@@ -10,6 +10,7 @@ Covers:
 import pytest
 from unittest.mock import patch, MagicMock, Mock, PropertyMock, call
 from django.db import IntegrityError
+from github.GithubException import RateLimitExceededException
 
 
 MODULE = "frege.indexers.models"
@@ -299,11 +300,9 @@ class TestGitHubIndexerErrorHandling:
         mock_branch.commit.sha = "abc123"
         mock_repo.get_branch.return_value = mock_branch
 
-        # First call returns repos, second raises StopIteration via empty + rate limit
-        mock_github.search_repositories.side_effect = [
-            [mock_repo],
-            [],
-        ]
+        mock_paginated = Mock()
+        mock_paginated.get_page.side_effect = [[mock_repo], []]
+        mock_github.search_repositories.return_value = mock_paginated
         mock_github_cls.return_value = mock_github
 
         call_order = []
@@ -317,7 +316,6 @@ class TestGitHubIndexerErrorHandling:
             original_save(self, **kwargs)
 
         with patch.object(GitHubIndexer, "save", track_save):
-            # Get first yield (the one with data)
             it = iter(indexer)
             next(it)
 
@@ -333,7 +331,6 @@ class TestGitHubIndexerErrorHandling:
     ):
         """IntegrityError on bulk_create() should not prevent cursor save."""
         from frege.indexers.models import GitHubIndexer
-        import github
 
         mock_github = Mock()
         mock_repo = Mock()
@@ -346,10 +343,12 @@ class TestGitHubIndexerErrorHandling:
         mock_branch.commit.sha = "abc"
         mock_repo.get_branch.return_value = mock_branch
 
-        mock_github.search_repositories.side_effect = [
+        mock_paginated = Mock()
+        mock_paginated.get_page.side_effect = [
             [mock_repo],
-            github.RateLimitExceededException(403, "rate limit", headers={}),
+            RateLimitExceededException(403, "rate limit", headers={}),
         ]
+        mock_github.search_repositories.return_value = mock_paginated
         mock_github_cls.return_value = mock_github
 
         mock_bulk_create.side_effect = IntegrityError("dup")
@@ -371,7 +370,6 @@ class TestGitHubIndexerErrorHandling:
     ):
         """IntegrityError on bulk_create() should call logger.error."""
         from frege.indexers.models import GitHubIndexer
-        import github
 
         mock_github = Mock()
         mock_repo = Mock()
@@ -384,10 +382,12 @@ class TestGitHubIndexerErrorHandling:
         mock_branch.commit.sha = "abc"
         mock_repo.get_branch.return_value = mock_branch
 
-        mock_github.search_repositories.side_effect = [
+        mock_paginated = Mock()
+        mock_paginated.get_page.side_effect = [
             [mock_repo],
-            github.RateLimitExceededException(403, "rate limit", headers={}),
+            RateLimitExceededException(403, "rate limit", headers={}),
         ]
+        mock_github.search_repositories.return_value = mock_paginated
         mock_github_cls.return_value = mock_github
 
         mock_bulk_create.side_effect = IntegrityError("duplicate key value")
@@ -406,9 +406,8 @@ class TestGitHubIndexerErrorHandling:
     def test_bulk_create_failure_yields_empty_and_continues(
         self, mock_bulk_create, mock_unique, mock_github_cls
     ):
-        """After bulk_create failure, should yield repos_to_process (upserted) and continue."""
+        """After bulk_create failure, should yield repos_to_process and continue."""
         from frege.indexers.models import GitHubIndexer
-        import github
 
         mock_github = Mock()
 
@@ -432,11 +431,13 @@ class TestGitHubIndexerErrorHandling:
         mock_branch2.commit.sha = "a2"
         mock_repo2.get_branch.return_value = mock_branch2
 
-        mock_github.search_repositories.side_effect = [
+        mock_paginated = Mock()
+        mock_paginated.get_page.side_effect = [
             [mock_repo1],
             [mock_repo2],
-            github.RateLimitExceededException(403, "rate limit", headers={}),
+            RateLimitExceededException(403, "rate limit", headers={}),
         ]
+        mock_github.search_repositories.return_value = mock_paginated
         mock_github_cls.return_value = mock_github
 
         # First bulk_create fails, second succeeds
@@ -455,12 +456,13 @@ class TestGitHubIndexerErrorHandling:
     def test_rate_limit_stops_iteration(self, mock_github_cls):
         """RateLimitExceededException should break iteration and set flag."""
         from frege.indexers.models import GitHubIndexer
-        import github
 
         mock_github = Mock()
-        mock_github.search_repositories.side_effect = github.RateLimitExceededException(
+        mock_paginated = Mock()
+        mock_paginated.get_page.side_effect = RateLimitExceededException(
             403, "rate limit", headers={}
         )
+        mock_github.search_repositories.return_value = mock_paginated
         mock_github_cls.return_value = mock_github
 
         indexer = GitHubIndexer.objects.create(current_page=0)
