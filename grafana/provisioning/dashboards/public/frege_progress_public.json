@@ -36,7 +36,7 @@
         "h": 4,
         "w": 24,
         "x": 0,
-        "y": 0
+        "y": 4
       },
       "id": 5,
       "datasource": {
@@ -95,7 +95,7 @@
         "h": 10,
         "w": 12,
         "x": 0,
-        "y": 4
+        "y": 8
       },
       "id": 9,
       "datasource": {
@@ -152,7 +152,7 @@
         "h": 10,
         "w": 12,
         "x": 12,
-        "y": 4
+        "y": 8
       },
       "id": 12,
       "datasource": {
@@ -199,12 +199,85 @@
         "h": 3,
         "w": 24,
         "x": 0,
-        "y": 14
+        "y": 28
       },
       "id": 20,
       "options": {
         "mode": "html",
         "content": "<div style=\"text-align: center; padding: 16px 0;\"><span style=\"font-size: 1.6em; color: #6faef5; letter-spacing: 0.05em;\">Katedra Inżynierii Oprogramowania UJ</span></div>"
+      }
+    },
+    {
+      "type": "text",
+      "title": "",
+      "transparent": true,
+      "gridPos": {
+        "h": 4,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 21,
+      "options": {
+        "mode": "html",
+        "content": "<div style=\"text-align: center; padding: 12px 20px;\"><h2 style=\"color: #6faef5; margin: 0 0 8px 0; font-weight: 500;\">Frege — Analiza jakości kodu open source</h2><p style=\"color: #aaa; margin: 0; font-size: 1.05em;\">System Frege automatycznie crawluje repozytoria z GitHub, GitLab i Bitbucket, analizuje pliki źródłowe i oblicza metryki jakości kodu. Poniżej podsumowanie bieżącego postępu.</p></div>"
+      }
+    },
+    {
+      "type": "piechart",
+      "title": "Źródła repozytoriów",
+      "description": "Rozkład repozytoriów wg platformy źródłowej",
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 18
+      },
+      "id": 22,
+      "datasource": {
+        "type": "postgres",
+        "uid": "PA942B37CCFAF5A81"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "PA942B37CCFAF5A81"
+          },
+          "rawQuery": true,
+          "rawSql": "SELECT CASE WHEN git_url LIKE '%github.com%' THEN 'GitHub' WHEN git_url LIKE '%gitlab.com%' THEN 'GitLab' WHEN git_url LIKE '%bitbucket.org%' THEN 'Bitbucket' ELSE 'Inne' END AS source, COUNT(*) AS count FROM repositories_repository GROUP BY source ORDER BY count DESC",
+          "refId": "A",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": true
+        },
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "values": [
+            "value",
+            "percent"
+          ]
+        },
+        "tooltip": {
+          "mode": "single"
+        }
       }
     }
   ],
