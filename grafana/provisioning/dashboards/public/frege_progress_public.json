@@ -31,7 +31,7 @@
   "panels": [
     {
       "type": "stat",
-      "title": "Pliki przeanalizowane",
+      "title": "Liczba plików kodu źródłowego poddanych analizie do tej pory:",
       "gridPos": {
         "h": 4,
         "w": 24,
@@ -59,13 +59,13 @@
         "defaults": {
           "color": {
             "mode": "fixed",
-            "fixedColor": "purple"
+            "fixedColor": "#6faef5"
           },
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "purple",
+                "color": "#6faef5",
                 "value": null
               }
             ]
