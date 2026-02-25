@@ -393,12 +393,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "db0_keys"
+              "options": "keys"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Liczba kluczy (db0)"
+                "value": "Liczba kluczy"
               }
             ]
           }
@@ -424,15 +424,13 @@
       },
       "targets": [
         {
-          "command": "info",
+          "command": "dbsize",
           "datasource": {
             "type": "redis-datasource",
             "uid": "PA7F6415749A3297A"
           },
-          "field": "db0_keys",
           "query": "",
           "refId": "A",
-          "section": "keyspace",
           "streaming": true,
           "type": "command"
         }
