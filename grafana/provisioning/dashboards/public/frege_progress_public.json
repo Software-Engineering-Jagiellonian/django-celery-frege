@@ -36,7 +36,7 @@
         "h": 4,
         "w": 24,
         "x": 0,
-        "y": 4
+        "y": 3
       },
       "id": 5,
       "datasource": {
@@ -95,7 +95,7 @@
         "h": 10,
         "w": 12,
         "x": 0,
-        "y": 8
+        "y": 7
       },
       "id": 9,
       "datasource": {
@@ -151,7 +151,7 @@
         "h": 10,
         "w": 12,
         "x": 12,
-        "y": 8
+        "y": 7
       },
       "id": 12,
       "datasource": {
@@ -198,7 +198,7 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 18
+        "y": 17
       },
       "id": 22,
       "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
@@ -264,7 +264,7 @@
         "h": 3,
         "w": 24,
         "x": 0,
-        "y": 28
+        "y": 27
       },
       "id": 20,
       "options": {
@@ -277,7 +277,7 @@
       "title": "",
       "transparent": true,
       "gridPos": {
-        "h": 4,
+        "h": 3,
         "w": 24,
         "x": 0,
         "y": 0
@@ -285,7 +285,7 @@
       "id": 21,
       "options": {
         "mode": "html",
-        "content": "<div style=\"text-align: center; padding: 12px 20px;\"><h2 style=\"color: #6faef5; margin: 0 0 8px 0; font-weight: 500;\">Frege: Analiza statyczna kodu open source</h2><p style=\"color: #aaa; margin: 0; font-size: 1.05em;\">System Frege gromadzi metryki kodu źródłowego dostępnego w Internecie. Poniżej aktualny postęp jego pracy.</p></div>"
+        "content": "<div style=\"text-align: center; padding: 4px 20px;\"><h2 style=\"color: #6faef5; margin: 0 0 4px 0; font-weight: 500;\">Frege: Analiza statyczna kodu open source</h2><p style=\"color: #aaa; margin: 0; font-size: 1.05em;\">System Frege gromadzi metryki kodu źródłowego dostępnego w Internecie. Poniżej aktualny postęp jego pracy.</p></div>"
       }
     }
   ],
