@@ -354,7 +354,7 @@
         "type": "redis-datasource",
         "uid": "PA7F6415749A3297A"
       },
-      "description": "Liczba kluczy przechowywanych w Redis. Obejmuje kolejki Celery, wyniki zadań, flagi sterujące (has_sanitized, sanitization_lock) i inne dane tymczasowe.",
+      "description": "Trafienia (hits) vs pudła (misses) w Redis. Wysoki stosunek hits/misses oznacza efektywne wykorzystanie cache. Pudła oznaczają zapytania o klucze, które nie istnieją lub wygasły.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -393,12 +393,24 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "keys"
+              "options": "keyspace_hits"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Liczba kluczy"
+                "value": "Trafienia (hits)"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "keyspace_misses"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Pudła (misses)"
               }
             ]
           }
@@ -424,18 +436,20 @@
       },
       "targets": [
         {
-          "command": "dbsize",
+          "command": "info",
           "datasource": {
             "type": "redis-datasource",
             "uid": "PA7F6415749A3297A"
           },
+          "field": "keyspace_hits",
           "query": "",
           "refId": "A",
+          "section": "stats",
           "streaming": true,
           "type": "command"
         }
       ],
-      "title": "Liczba kluczy w bazie",
+      "title": "Trafienia vs pudła (keyspace)",
       "type": "timeseries"
     }
   ],
