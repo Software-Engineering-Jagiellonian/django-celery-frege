@@ -34,7 +34,7 @@
         "type": "prometheus",
         "uid": "PEBC2E3263E2CA5B6"
       },
-      "description": "Liczba zadań Celery aktualnie wykonywanych przez poszczególnych workerów. Każda linia na wykresie odpowiada jednemu workerowi. Wzrost oznacza większe obciążenie — jeśli wartość jest stale wysoka, workery mogą być przeciążone. Wartość 0 oznacza, że worker jest bezczynny.",
+      "description": "Liczba zadań Celery aktualnie wykonywanych przez poszczególnych workerów. Każda linia na wykresie odpowiada jednemu workerowi.\n\n- **Analiza** (worker_celery) — analiza plików źródłowych i commit messages\n- **Crawl** (worker_crawl) — indeksowanie repozytoriów z GitHub/GitLab\n- **Pobieranie** (worker_downloads) — klonowanie repozytoriów z Git\n\nWzrost oznacza większe obciążenie. Wartość 0 = worker bezczynny.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -45,7 +45,7 @@
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "line",
-            "fillOpacity": 0,
+            "fillOpacity": 10,
             "gradientMode": "none",
             "hideFrom": {
               "legend": false,
@@ -94,8 +94,8 @@
       "id": 2,
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
+          "calcs": ["last"],
+          "displayMode": "table",
           "placement": "bottom"
         },
         "tooltip": {
@@ -109,7 +109,8 @@
             "type": "prometheus",
             "uid": "PEBC2E3263E2CA5B6"
           },
-          "expr": "flower_worker_number_of_currently_executing_tasks{}",
+          "expr": "label_replace(flower_worker_number_of_currently_executing_tasks{}, \"worker_short\", \"$1\", \"worker\", \"celery@(.*)\")",
+          "legendFormat": "{{worker_short}}",
           "refId": "A"
         }
       ],
@@ -121,18 +122,18 @@
         "type": "prometheus",
         "uid": "PEBC2E3263E2CA5B6"
       },
-      "description": "Rozkład czasu wykonania zadań Celery (w sekundach). Pokazuje histogram — ile zadań zakończyło się w danym przedziale czasowym. Pozwala zidentyfikować zadania, które trwają zbyt długo (np. klonowanie dużych repozytoriów lub analiza złożonych projektów).",
+      "description": "Średni czas wykonania poszczególnych typów zadań Celery (w sekundach, średnia z ostatnich 5 minut).\n\n- **analyze_commit_message_quality_task** — analiza jakości commit messages\n- **analyze_file_task** — analiza metryk pliku źródłowego\n- **process_repo_task** — klonowanie i przetwarzanie repozytorium\n- **crawl_repos_task** — indeksowanie nowych repozytoriów z GitHub/GitLab\n\nWysokie wartości mogą wskazywać na duże repozytoria lub problemy z wydajnością.",
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "palette-classic"
           },
           "custom": {
-            "axisLabel": "Czas wykonania (s)",
+            "axisLabel": "Średni czas (s)",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "line",
-            "fillOpacity": 0,
+            "fillOpacity": 10,
             "gradientMode": "none",
             "hideFrom": {
               "legend": false,
@@ -156,6 +157,7 @@
             }
           },
           "mappings": [],
+          "unit": "s",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -181,8 +183,8 @@
       "id": 4,
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
+          "calcs": ["last"],
+          "displayMode": "table",
           "placement": "bottom"
         },
         "tooltip": {
@@ -196,11 +198,12 @@
             "type": "prometheus",
             "uid": "PEBC2E3263E2CA5B6"
           },
-          "expr": "flower_task_runtime_seconds_bucket{}",
+          "expr": "label_replace(rate(flower_task_runtime_seconds_sum{task!=\"\"}[5m]) / rate(flower_task_runtime_seconds_count{task!=\"\"}[5m]), \"task_short\", \"$1\", \"task\", \".*\\\\.(.*)\")",
+          "legendFormat": "{{task_short}} ({{worker}})",
           "refId": "A"
         }
       ],
-      "title": "Czas wykonania zadań",
+      "title": "Średni czas wykonania zadań",
       "type": "timeseries"
     }
   ],
