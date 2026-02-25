@@ -21,10 +21,11 @@
       }
     ]
   },
-  "editable": true,
+  "description": "Monitoring Redis — brokera kolejek Celery i cache'u. Redis przechowuje kolejki zadań do wykonania, wyniki zadań, oraz flagi sterujące pracą workerów (np. has_sanitized, sanitization_lock).",
+  "editable": false,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 1,
+  "id": null,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -33,13 +34,14 @@
         "type": "redis-datasource",
         "uid": "PA7F6415749A3297A"
       },
+      "description": "Ilość pamięci RAM zajmowanej przez Redis. Obejmuje dane w kolejkach Celery, wyniki zadań i klucze sterujące. Przy normalnej pracy wartość powinna być stabilna. Gwałtowny wzrost może oznaczać zapchanie kolejki (workery nie nadążają z przetwarzaniem).",
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "palette-classic"
           },
           "custom": {
-            "axisLabel": "",
+            "axisLabel": "Pamięć",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "line",
@@ -70,6 +72,7 @@
             }
           },
           "mappings": [],
+          "unit": "bytes",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -86,26 +89,38 @@
         },
         "overrides": [
           {
-            "__systemRef": "hideSeriesFrom",
             "matcher": {
-              "id": "byNames",
-              "options": {
-                "mode": "exclude",
-                "names": [
-                  "used_memory"
-                ],
-                "prefix": "All except:",
-                "readOnly": true
-              }
+              "id": "byName",
+              "options": "used_memory"
             },
             "properties": [
               {
-                "id": "custom.hideFrom",
-                "value": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": true
-                }
+                "id": "displayName",
+                "value": "Zajęta pamięć"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "used_memory_rss"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Pamięć RSS (widziana przez OS)"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "used_memory_peak"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Szczytowe zużycie pamięci"
               }
             ]
           }
@@ -120,8 +135,8 @@
       "id": 2,
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
+          "calcs": ["last"],
+          "displayMode": "table",
           "placement": "bottom"
         },
         "tooltip": {
@@ -144,11 +159,289 @@
           "type": "command"
         }
       ],
-      "title": "Redis: Allocated bytes",
+      "title": "Zużycie pamięci Redis",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "redis-datasource",
+        "uid": "PA7F6415749A3297A"
+      },
+      "description": "Liczba połączeń klientów do Redis. Każdy worker Celery utrzymuje stałe połączenie. Nagły spadek może oznaczać restart workerów, a nagły wzrost — nowe procesy próbujące się połączyć.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "Połączenia",
+            "axisPlacement": "auto",
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 50
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "connected_clients"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Aktywne połączenia"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 3,
+      "options": {
+        "legend": {
+          "calcs": ["last"],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "command": "info",
+          "datasource": {
+            "type": "redis-datasource",
+            "uid": "PA7F6415749A3297A"
+          },
+          "field": "connected_clients",
+          "query": "",
+          "refId": "A",
+          "section": "clients",
+          "streaming": true,
+          "type": "command"
+        }
+      ],
+      "title": "Połączenia klientów",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "redis-datasource",
+        "uid": "PA7F6415749A3297A"
+      },
+      "description": "Liczba operacji Redis na sekundę. Pokazuje jak intensywnie Celery korzysta z brokera — każde dodanie/pobranie zadania z kolejki to operacja Redis.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "ops/s",
+            "axisPlacement": "auto",
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "unit": "ops",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "instantaneous_ops_per_sec"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Operacje na sekundę"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "id": 4,
+      "options": {
+        "legend": {
+          "calcs": ["last"],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "command": "info",
+          "datasource": {
+            "type": "redis-datasource",
+            "uid": "PA7F6415749A3297A"
+          },
+          "field": "instantaneous_ops_per_sec",
+          "query": "",
+          "refId": "A",
+          "section": "stats",
+          "streaming": true,
+          "type": "command"
+        }
+      ],
+      "title": "Operacje na sekundę",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "redis-datasource",
+        "uid": "PA7F6415749A3297A"
+      },
+      "description": "Liczba kluczy przechowywanych w Redis. Obejmuje kolejki Celery, wyniki zadań, flagi sterujące (has_sanitized, sanitization_lock) i inne dane tymczasowe.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "Klucze",
+            "axisPlacement": "auto",
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "db0_keys"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Liczba kluczy (db0)"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "id": 5,
+      "options": {
+        "legend": {
+          "calcs": ["last"],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "command": "info",
+          "datasource": {
+            "type": "redis-datasource",
+            "uid": "PA7F6415749A3297A"
+          },
+          "field": "db0_keys",
+          "query": "",
+          "refId": "A",
+          "section": "keyspace",
+          "streaming": true,
+          "type": "command"
+        }
+      ],
+      "title": "Liczba kluczy w bazie",
       "type": "timeseries"
     }
   ],
-  "refresh": "",
+  "refresh": false,
   "schemaVersion": 36,
   "style": "dark",
   "tags": [],
@@ -163,6 +456,6 @@
   "timezone": "",
   "title": "Redis",
   "uid": "8lpCA3unk",
-  "version": 2,
+  "version": 1,
   "weekStart": ""
 }
