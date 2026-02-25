@@ -410,7 +410,7 @@
             "group": [],
             "metricColumn": "language",
             "rawQuery": true,
-            "rawSql": "SELECT\n  *\nFROM repositories_commitmessage\nORDER BY id",
+            "rawSql": "SELECT\n  *\nFROM repositories_commitmessage\nORDER BY id DESC\nLIMIT 1000",
             "refId": "A",
             "select": [
               [
@@ -434,7 +434,7 @@
             ]
           }
         ],
-        "title": "Commit Messages metrics",
+        "title": "Commit Messages metrics (last 1000 records)",
         "type": "table"
       }
     ],
