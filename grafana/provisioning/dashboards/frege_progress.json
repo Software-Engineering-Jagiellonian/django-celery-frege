@@ -359,7 +359,7 @@
         {
           "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
           "rawQuery": true,
-          "rawSql": "SELECT REPLACE(CASE WHEN commit_type = '' THEN 'unknown' ELSE commit_type END, 'CommitMessagesTypes.', '') AS commit_type, COUNT(*) AS count FROM repositories_commitmessage TABLESAMPLE SYSTEM(1) GROUP BY commit_type ORDER BY count DESC",
+          "rawSql": "SELECT REPLACE(COALESCE(val, 'unknown'), 'CommitMessagesTypes.', '') AS commit_type, (freq * c.reltuples)::bigint AS count FROM (SELECT unnest(most_common_vals::text::text[]) AS val, unnest(most_common_freqs) AS freq FROM pg_stats WHERE tablename = 'repositories_commitmessage' AND attname = 'commit_type') s CROSS JOIN pg_class c WHERE c.relname = 'repositories_commitmessage' ORDER BY count DESC",
           "refId": "A",
           "format": "table"
         }
@@ -388,7 +388,7 @@
         {
           "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
           "rawQuery": true,
-          "rawSql": "SELECT AVG(fog_index)::numeric(10,2) AS \"Avg Fog Index\" FROM repositories_commitmessage TABLESAMPLE SYSTEM(1) WHERE fog_index > 0",
+          "rawSql": "SELECT (SUM(val * freq) / SUM(freq))::numeric(10,2) AS \"Avg Fog Index\" FROM (SELECT unnest(most_common_vals::text::float8[]) AS val, unnest(most_common_freqs) AS freq FROM pg_stats WHERE tablename = 'repositories_commitmessage' AND attname = 'fog_index') s WHERE val > 0",
           "refId": "A",
           "format": "table"
         }
