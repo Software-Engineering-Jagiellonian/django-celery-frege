@@ -14,7 +14,7 @@
     ]
   },
   "description": "Frege analysis progress, code quality metrics, and commit message statistics",
-  "editable": true,
+  "editable": false,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
   "id": null,
