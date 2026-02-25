@@ -181,7 +181,7 @@
     },
     {
       "type": "stat",
-      "title": "Commit messages",
+      "title": "Commit messages (~)",
       "gridPos": { "h": 4, "w": 4, "x": 20, "y": 1 },
       "id": 6,
       "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
@@ -189,7 +189,7 @@
         {
           "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
           "rawQuery": true,
-          "rawSql": "SELECT COUNT(*) AS \"commits\" FROM repositories_commitmessage",
+          "rawSql": "SELECT reltuples::bigint AS \"commits\" FROM pg_class WHERE relname = 'repositories_commitmessage'",
           "refId": "A",
           "format": "table"
         }
@@ -350,7 +350,7 @@
     },
     {
       "type": "piechart",
-      "title": "Typy commitów",
+      "title": "Typy commitów (~)",
       "description": "Rozkład commit messages wg typu (feature, fix, config, merge/PR, unclassified)",
       "gridPos": { "h": 9, "w": 8, "x": 8, "y": 16 },
       "id": 10,
@@ -359,7 +359,7 @@
         {
           "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
           "rawQuery": true,
-          "rawSql": "SELECT REPLACE(CASE WHEN commit_type = '' THEN 'unknown' ELSE commit_type END, 'CommitMessagesTypes.', '') AS commit_type, COUNT(*) AS count FROM repositories_commitmessage GROUP BY commit_type ORDER BY count DESC",
+          "rawSql": "SELECT REPLACE(CASE WHEN commit_type = '' THEN 'unknown' ELSE commit_type END, 'CommitMessagesTypes.', '') AS commit_type, COUNT(*) AS count FROM repositories_commitmessage TABLESAMPLE SYSTEM(1) GROUP BY commit_type ORDER BY count DESC",
           "refId": "A",
           "format": "table"
         }
@@ -379,7 +379,7 @@
     },
     {
       "type": "gauge",
-      "title": "Czytelność commit messages (Fog Index)",
+      "title": "Czytelność commit messages (Fog Index, ~)",
       "description": "Średni Gunning Fog Index. Niższy = łatwiejszy do przeczytania. <8: łatwy, 8-14: umiarkowany, >14: trudny",
       "gridPos": { "h": 9, "w": 8, "x": 16, "y": 16 },
       "id": 11,
@@ -388,7 +388,7 @@
         {
           "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
           "rawQuery": true,
-          "rawSql": "SELECT AVG(fog_index)::numeric(10,2) AS \"Avg Fog Index\" FROM repositories_commitmessage WHERE fog_index > 0",
+          "rawSql": "SELECT AVG(fog_index)::numeric(10,2) AS \"Avg Fog Index\" FROM repositories_commitmessage TABLESAMPLE SYSTEM(1) WHERE fog_index > 0",
           "refId": "A",
           "format": "table"
         }
