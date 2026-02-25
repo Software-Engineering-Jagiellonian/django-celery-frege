@@ -168,7 +168,8 @@ def _clone_repo(repo: Repository, local_path: Path) -> Optional[git.Repo]:
             f"Unexpected error while processing repository {repo.git_url}: {e}"
         )
         repo.analysis_failed = True
-        repo.save(update_fields=["analysis_failed"])
+        repo.analysis_failure_reason = str(e)[:1000]
+        repo.save(update_fields=["analysis_failed", "analysis_failure_reason"])
 
         return None
 

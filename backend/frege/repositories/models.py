@@ -61,6 +61,7 @@ class Repository(models.Model):
     )
 
     analysis_failed = models.BooleanField(default=False)
+    analysis_failure_reason = models.TextField(blank=True, default="")
 
     def __str__(self):
         return self.name

@@ -456,7 +456,7 @@
         {
           "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
           "rawQuery": true,
-          "rawSql": "SELECT name AS \"Name\", git_url AS \"Git URL\", discovered_time::date AS \"Discovered\" FROM repositories_repository WHERE analysis_failed = true ORDER BY discovered_time DESC",
+          "rawSql": "SELECT name AS \"Name\", git_url AS \"Git URL\", analysis_failure_reason AS \"Reason\", discovered_time::date AS \"Discovered\" FROM repositories_repository WHERE analysis_failed = true ORDER BY discovered_time DESC",
           "refId": "A",
           "format": "table"
         }

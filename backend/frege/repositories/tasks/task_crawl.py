@@ -149,7 +149,7 @@ def _reschedule_unanalyzed_repos():
             logger.info(
                 f"Rescheduling {unanalyzed_repos.count()} unanalyzed repositories"
             )
-            unanalyzed_repos.update(analysis_failed=False)
+            unanalyzed_repos.update(analysis_failed=False, analysis_failure_reason="")
             for repo_pk in unanalyzed_repos.values_list("pk", flat=True).iterator(chunk_size=1000):
                 process_repo_task.apply_async(args=(repo_pk,))
         else:
