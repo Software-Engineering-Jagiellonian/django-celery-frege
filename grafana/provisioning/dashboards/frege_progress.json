@@ -417,8 +417,72 @@
       }
     },
     {
+      "type": "piechart",
+      "title": "Źródła repozytoriów",
+      "description": "Rozkład repozytoriów wg platformy źródłowej (GitHub, GitLab, inne)",
+      "gridPos": { "h": 9, "w": 8, "x": 0, "y": 25 },
+      "id": 15,
+      "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+      "targets": [
+        {
+          "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+          "rawQuery": true,
+          "rawSql": "SELECT CASE WHEN git_url LIKE '%github.com%' THEN 'GitHub' WHEN git_url LIKE '%gitlab.com%' THEN 'GitLab' ELSE 'Other' END AS source, COUNT(*) AS count FROM repositories_repository GROUP BY source ORDER BY count DESC",
+          "refId": "A",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" }
+        },
+        "overrides": []
+      },
+      "options": {
+        "pieType": "donut",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": true },
+        "legend": { "displayMode": "table", "placement": "right", "values": ["value", "percent"] },
+        "tooltip": { "mode": "single" }
+      }
+    },
+    {
+      "type": "table",
+      "title": "Repozytoria z błędem analizy",
+      "description": "Repozytoria gdzie analysis_failed = true",
+      "gridPos": { "h": 9, "w": 16, "x": 8, "y": 25 },
+      "id": 16,
+      "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+      "targets": [
+        {
+          "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+          "rawQuery": true,
+          "rawSql": "SELECT name AS \"Name\", git_url AS \"Git URL\", discovered_time::date AS \"Discovered\" FROM repositories_repository WHERE analysis_failed = true ORDER BY discovered_time DESC",
+          "refId": "A",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "displayMode": "auto",
+            "align": "auto"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "Git URL" },
+            "properties": [{ "id": "custom.displayMode", "value": "auto" }]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "footer": { "show": true, "reducer": ["count"], "fields": ["Name"] }
+      }
+    },
+    {
       "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 25 },
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 34 },
       "id": 400,
       "panels": [],
       "title": "Jakość kodu",
@@ -428,7 +492,7 @@
       "type": "barchart",
       "title": "Średnia złożoność cyklomatyczna wg języka",
       "description": "Średnia cyclomatic complexity per język (top 10)",
-      "gridPos": { "h": 9, "w": 8, "x": 0, "y": 26 },
+      "gridPos": { "h": 9, "w": 8, "x": 0, "y": 35 },
       "id": 12,
       "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
       "targets": [
@@ -458,7 +522,7 @@
       "type": "barchart",
       "title": "Średnie LOC wg języka",
       "description": "Średnia liczba linii kodu na plik per język (top 10)",
-      "gridPos": { "h": 9, "w": 8, "x": 8, "y": 26 },
+      "gridPos": { "h": 9, "w": 8, "x": 8, "y": 35 },
       "id": 13,
       "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
       "targets": [
@@ -488,7 +552,7 @@
       "type": "table",
       "title": "Top 10 repozytoriów wg złożoności",
       "description": "Repozytoria z najwyższą średnią złożonością cyklomatyczną",
-      "gridPos": { "h": 9, "w": 8, "x": 16, "y": 26 },
+      "gridPos": { "h": 9, "w": 8, "x": 16, "y": 35 },
       "id": 14,
       "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
       "targets": [
