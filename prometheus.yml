@@ -8,4 +8,4 @@ scrape_configs:
       - targets: [ 'frege-prometheus:9090' ]
   - job_name: flower
     static_configs:
-      - targets: ['frege-flower:5555']
+      - targets: ['frege-flower-prod:5555']

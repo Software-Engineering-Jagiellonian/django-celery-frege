@@ -21,9 +21,11 @@
       }
     ]
   },
-  "editable": true,
+  "description": "Monitoring workerów Celery — systemu kolejkowania zadań odpowiedzialnego za pobieranie, klonowanie i analizę repozytoriów. Dane pochodzą z Flower (narzędzie monitorujące Celery) poprzez Prometheus.",
+  "editable": false,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
+  "id": null,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -32,13 +34,14 @@
         "type": "prometheus",
         "uid": "PEBC2E3263E2CA5B6"
       },
+      "description": "Liczba zadań Celery aktualnie wykonywanych przez poszczególnych workerów. Każda linia na wykresie odpowiada jednemu workerowi. Wzrost oznacza większe obciążenie — jeśli wartość jest stale wysoka, workery mogą być przeciążone. Wartość 0 oznacza, że worker jest bezczynny.",
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "palette-classic"
           },
           "custom": {
-            "axisLabel": "",
+            "axisLabel": "Liczba zadań",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "line",
@@ -110,7 +113,7 @@
           "refId": "A"
         }
       ],
-      "title": "Number of currently executing tasks",
+      "title": "Aktualnie wykonywane zadania",
       "type": "timeseries"
     },
     {
@@ -118,13 +121,14 @@
         "type": "prometheus",
         "uid": "PEBC2E3263E2CA5B6"
       },
+      "description": "Rozkład czasu wykonania zadań Celery (w sekundach). Pokazuje histogram — ile zadań zakończyło się w danym przedziale czasowym. Pozwala zidentyfikować zadania, które trwają zbyt długo (np. klonowanie dużych repozytoriów lub analiza złożonych projektów).",
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "palette-classic"
           },
           "custom": {
-            "axisLabel": "",
+            "axisLabel": "Czas wykonania (s)",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "line",
@@ -169,7 +173,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 9,
         "w": 12,
         "x": 12,
         "y": 0
@@ -196,7 +200,7 @@
           "refId": "A"
         }
       ],
-      "title": "Task execution time",
+      "title": "Czas wykonania zadań",
       "type": "timeseries"
     }
   ],
