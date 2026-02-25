@@ -380,7 +380,7 @@
     {
       "type": "gauge",
       "title": "Czytelność commit messages (Fog Index, ~)",
-      "description": "Średni Gunning Fog Index. Niższy = łatwiejszy do przeczytania. <8: łatwy, 8-14: umiarkowany, >14: trudny",
+      "description": "Gunning Fog Index — miara czytelności tekstu (Robert Gunning, 1952).\n\nWzór: 0.4 × (średnia liczba słów w zdaniu + % słów trudnych [≥3 sylaby]).\n\nInterpretacja:\n• < 8 — łatwy (tabloid, SMS)\n• 8–12 — umiarkowany (gazeta, dokumentacja)\n• 12–14 — trudny (artykuł naukowy)\n• > 14 — bardzo trudny (prawo, biurokracja)\n\nW kontekście Frege mierzy czytelność commit messages. Ideał dla commit messages to 6–10.\n\nWartość przybliżona — obliczona ze statystyk PostgreSQL (pg_stats), nie z pełnego skanu tabeli.",
       "gridPos": { "h": 9, "w": 8, "x": 16, "y": 16 },
       "id": 11,
       "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
