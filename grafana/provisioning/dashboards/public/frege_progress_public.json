@@ -191,6 +191,72 @@
       }
     },
     {
+      "type": "timeseries",
+      "title": "Postęp analizy",
+      "description": "Kumulatywna liczba repozytoriów znalezionych (discovered), pobranych (fetched) i przeanalizowanych (analyzed) od 20 lutego 2026.",
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 18
+      },
+      "id": 22,
+      "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+      "targets": [
+        {
+          "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+          "rawQuery": true,
+          "rawSql": "SELECT discovered_time AS time, SUM(COUNT(*)) OVER (ORDER BY discovered_time) AS \"Znalezione\" FROM repositories_repository WHERE discovered_time >= '2026-02-20' GROUP BY discovered_time ORDER BY discovered_time",
+          "refId": "A",
+          "format": "time_series"
+        },
+        {
+          "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+          "rawQuery": true,
+          "rawSql": "SELECT fetch_time AS time, SUM(COUNT(*)) OVER (ORDER BY fetch_time) AS \"Pobrane\" FROM repositories_repository WHERE fetch_time IS NOT NULL AND fetch_time >= '2026-02-20' GROUP BY fetch_time ORDER BY fetch_time",
+          "refId": "B",
+          "format": "time_series"
+        },
+        {
+          "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+          "rawQuery": true,
+          "rawSql": "SELECT analyzed_time AS time, SUM(COUNT(*)) OVER (ORDER BY analyzed_time) AS \"Przeanalizowane\" FROM repositories_repository WHERE analyzed = true AND analyzed_time IS NOT NULL AND analyzed_time >= '2026-02-20' GROUP BY analyzed_time ORDER BY analyzed_time",
+          "refId": "C",
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "spanNulls": true,
+            "lineInterpolation": "linear",
+            "showPoints": "auto"
+          },
+          "unit": "short"
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "Znalezione" },
+            "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "#6faef5" } }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Pobrane" },
+            "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "orange" } }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Przeanalizowane" },
+            "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "#73BF69" } }]
+          }
+        ]
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["last"] },
+        "tooltip": { "mode": "multi" }
+      }
+    },
+    {
       "type": "text",
       "title": "",
       "transparent": true,
@@ -198,7 +264,7 @@
         "h": 3,
         "w": 24,
         "x": 0,
-        "y": 18
+        "y": 28
       },
       "id": 20,
       "options": {
