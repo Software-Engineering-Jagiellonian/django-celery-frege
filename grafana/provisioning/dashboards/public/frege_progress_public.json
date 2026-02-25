@@ -192,7 +192,7 @@
     },
     {
       "type": "timeseries",
-      "title": "Postęp analizy",
+      "title": "",
       "description": "Kumulatywna liczba repozytoriów znalezionych (discovered), pobranych (fetched) i przeanalizowanych (analyzed) od 20 lutego 2026.",
       "gridPos": {
         "h": 10,
@@ -252,7 +252,7 @@
         ]
       },
       "options": {
-        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["last"] },
+        "legend": { "displayMode": "table", "placement": "right", "calcs": ["last"] },
         "tooltip": { "mode": "multi" }
       }
     },
