@@ -21,7 +21,7 @@
       }
     ]
   },
-  "description": "Monitoring workerów Celery — systemu kolejkowania zadań odpowiedzialnego za pobieranie, klonowanie i analizę repozytoriów. Dane pochodzą z Flower (narzędzie monitorujące Celery) poprzez Prometheus.",
+  "description": "Monitoring workerów Celery — systemu kolejkowania zadań odpowiedzialnego za pobieranie, klonowanie i analizę repozytoriów. Dane pochodzą z Flower (narzędzie monitorujące Celery) poprzez Prometheus oraz z logów kontenerów poprzez Loki.",
   "editable": false,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
@@ -205,9 +205,302 @@
       ],
       "title": "Średni czas wykonania zadań",
       "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PEBC2E3263E2CA5B6"
+      },
+      "description": "Tempo uruchamiania zadań przez poszczególnych workerów w rozbiciu na typ zadania (zadania/minutę, średnia z 5 minut). Pokazuje CO robi każdy worker — jaki typ zadań aktualnie przetwarza.\n\nNp. worker_celery: analyze_file_task i analyze_commit_message_quality_task, worker_downloads: process_repo_task.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "Zadania / min",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 9
+      },
+      "id": 10,
+      "options": {
+        "legend": {
+          "calcs": ["mean", "lastNotNull"],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PEBC2E3263E2CA5B6"
+          },
+          "expr": "label_replace(\n  label_replace(\n    rate(flower_events_total{type=\"task-started\", task!=\"\"}[5m]) * 60,\n    \"worker_short\", \"$1\", \"worker\", \"celery@(.*)\"\n  ),\n  \"task_short\", \"$1\", \"task\", \".*\\\\.(.*)\"\n)",
+          "legendFormat": "{{worker_short}}: {{task_short}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Tempo zadań per worker (zadania/min)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PEBC2E3263E2CA5B6"
+      },
+      "description": "Liczba zadań oczekujących w prefetch (pobranych z kolejki, ale jeszcze nie wykonywanych) per worker i typ zadania. Wysoka wartość = worker ma dużo pracy w buforze.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "Zadania w buforze",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "stepAfter",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 18
+      },
+      "id": 12,
+      "options": {
+        "legend": {
+          "calcs": ["lastNotNull"],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PEBC2E3263E2CA5B6"
+          },
+          "expr": "label_replace(\n  label_replace(\n    flower_worker_prefetched_tasks{task!=\"\"},\n    \"worker_short\", \"$1\", \"worker\", \"celery@(.*)\"\n  ),\n  \"task_short\", \"$1\", \"task\", \".*\\\\.(.*)\"\n)",
+          "legendFormat": "{{worker_short}}: {{task_short}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Zadania w prefetch (bufor)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PEBC2E3263E2CA5B6"
+      },
+      "description": "Wskaźnik błędów i ponownych prób per worker i typ zadania (błędy/minutę, 5-min okno). Pomaga zidentyfikować problematyczne zadania.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "Błędy / min",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 18
+      },
+      "id": 14,
+      "options": {
+        "legend": {
+          "calcs": ["mean", "lastNotNull"],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PEBC2E3263E2CA5B6"
+          },
+          "expr": "label_replace(\n  label_replace(\n    rate(flower_events_total{type=~\"task-failed|task-retried\", task!=\"\"}[5m]) * 60,\n    \"worker_short\", \"$1\", \"worker\", \"celery@(.*)\"\n  ),\n  \"task_short\", \"$1\", \"task\", \".*\\\\.(.*)\"\n)",
+          "legendFormat": "{{worker_short}}: {{task_short}} ({{type}})",
+          "refId": "A"
+        }
+      ],
+      "title": "Błędy i retry per worker (błędy/min)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "P8E80F9AEF21F6940"
+      },
+      "description": "Logi na żywo z kontenerów workerów Celery. Pokazują dokładnie co robi każdy worker — nazwy repozytoriów, pliki, błędy.\n\nKolory: worker_celery = zielony, worker_downloads = niebieski, worker_crawl = pomarańczowy.\n\nFiltrowane są powtarzające się SyntaxWarning aby zmniejszyć szum.",
+      "gridPos": {
+        "h": 12,
+        "w": 24,
+        "x": 0,
+        "y": 26
+      },
+      "id": 16,
+      "options": {
+        "showTime": true,
+        "showLabels": true,
+        "showCommonLabels": false,
+        "wrapLogMessage": true,
+        "prettifyLogMessage": false,
+        "enableLogDetails": true,
+        "dedupStrategy": "signature",
+        "sortOrder": "Descending"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "P8E80F9AEF21F6940"
+          },
+          "expr": "{container=~\"frege-celery-worker-prod|frege-celery-downloads-worker-prod|frege-celery-crawl-worker-prod\"} !~ \"SyntaxWarning\"",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "title": "Aktywność workerów — logi na żywo",
+      "type": "logs"
     }
   ],
-  "refresh": false,
+  "refresh": "30s",
   "schemaVersion": 36,
   "style": "dark",
   "tags": [],
@@ -215,7 +508,7 @@
     "list": []
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-1h",
     "to": "now"
   },
   "timepicker": {},
