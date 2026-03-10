@@ -1,0 +1,155 @@
+{
+  "uid": "frege-loki-logs",
+  "title": "Frege — Logi Loki",
+  "tags": ["loki", "logs", "frege"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "time": { "from": "now-3h", "to": "now" },
+  "templating": {
+    "list": [
+      {
+        "name": "container",
+        "label": "Kontener",
+        "type": "query",
+        "datasource": { "type": "loki", "uid": "P8E80F9AEF21F6940" },
+        "query": { "label": "container", "stream": "", "type": 1 },
+        "refresh": 2,
+        "sort": 1,
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".+",
+        "current": {
+          "text": ["frege-celery-worker-prod", "frege-celery-downloads-worker-prod", "frege-celery-crawl-worker-prod", "frege-django-prod"],
+          "value": ["frege-celery-worker-prod", "frege-celery-downloads-worker-prod", "frege-celery-crawl-worker-prod", "frege-django-prod"]
+        }
+      },
+      {
+        "name": "level",
+        "label": "Poziom",
+        "type": "custom",
+        "query": "Wszystkie : .+,ERROR,WARNING,INFO,DEBUG",
+        "multi": false,
+        "includeAll": false,
+        "current": { "text": "Wszystkie", "value": ".+" }
+      },
+      {
+        "name": "search",
+        "label": "Szukaj",
+        "type": "textbox",
+        "query": "",
+        "current": { "text": "", "value": "" }
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Wolumen logów w czasie",
+      "description": "Liczba linii logów na kontener w wybranym oknie czasowym.",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 0, "w": 16, "h": 8 },
+      "datasource": { "type": "loki", "uid": "P8E80F9AEF21F6940" },
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "desc" },
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "fillOpacity": 10, "lineWidth": 1 },
+          "unit": "short"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "loki", "uid": "P8E80F9AEF21F6940" },
+          "expr": "sum by (container) (count_over_time({container=~\"$container\"} |~ \"$level\" |~ \"$search\" [$__interval]))",
+          "legendFormat": "{{container}}"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Błędy i ostrzeżenia w czasie",
+      "description": "Liczba linii zawierających ERROR lub WARNING na kontener.",
+      "type": "timeseries",
+      "gridPos": { "x": 16, "y": 0, "w": 8, "h": 8 },
+      "datasource": { "type": "loki", "uid": "P8E80F9AEF21F6940" },
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "desc" },
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "fillOpacity": 15, "lineWidth": 2 },
+          "unit": "short"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "loki", "uid": "P8E80F9AEF21F6940" },
+          "expr": "sum by (container) (count_over_time({container=~\"$container\"} |~ \"ERROR|WARNING|CRITICAL\" [$__interval]))",
+          "legendFormat": "{{container}}"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Wszystkie logi",
+      "description": "Logi z wybranych kontenerów. Użyj zmiennych powyżej do filtrowania po kontenerze, poziomie i szukanej frazie.",
+      "type": "logs",
+      "gridPos": { "x": 0, "y": 8, "w": 24, "h": 14 },
+      "datasource": { "type": "loki", "uid": "P8E80F9AEF21F6940" },
+      "options": {
+        "showTime": true,
+        "showLabels": true,
+        "showCommonLabels": false,
+        "wrapLogMessage": true,
+        "prettifyLogMessage": false,
+        "enableLogDetails": true,
+        "dedupStrategy": "signature",
+        "sortOrder": "Descending"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "loki", "uid": "P8E80F9AEF21F6940" },
+          "expr": "{container=~\"$container\"} |~ \"$level\" |~ \"$search\" != \"SyntaxWarning\"",
+          "legendFormat": ""
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Tylko błędy i ostrzeżenia",
+      "description": "Wyłącznie linie z ERROR, WARNING lub CRITICAL ze wszystkich wybranych kontenerów.",
+      "type": "logs",
+      "gridPos": { "x": 0, "y": 22, "w": 24, "h": 10 },
+      "datasource": { "type": "loki", "uid": "P8E80F9AEF21F6940" },
+      "options": {
+        "showTime": true,
+        "showLabels": true,
+        "showCommonLabels": false,
+        "wrapLogMessage": true,
+        "prettifyLogMessage": false,
+        "enableLogDetails": true,
+        "dedupStrategy": "none",
+        "sortOrder": "Descending"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "loki", "uid": "P8E80F9AEF21F6940" },
+          "expr": "{container=~\"$container\"} |~ \"ERROR|WARNING|CRITICAL\" |~ \"$search\"",
+          "legendFormat": ""
+        }
+      ]
+    }
+  ],
+  "annotations": { "list": [] },
+  "links": []
+}
