@@ -1,3 +1,5 @@
+import shutil
+import subprocess
 from contextlib import closing
 from pathlib import Path
 from typing import Optional
@@ -29,6 +31,8 @@ from frege.repositories.utils.paths import (
 from .common import finalize_repo_analysis
 
 logger = get_task_logger(__name__)
+
+GIT_CLONE_TIMEOUT_SECONDS = 300
 
 
 @shared_task(
@@ -148,6 +152,9 @@ def _clone_repo(repo: Repository, local_path: Path) -> Optional[git.Repo]:
     """
     Clones the repository from the given git URL to the specified local path.
 
+    Cleans up any pre-existing directory at the target path before cloning.
+    Enforces a timeout of GIT_CLONE_TIMEOUT_SECONDS to prevent indefinite hangs.
+
     Args:
         repo (Repository): The repository object containing the git URL.
         local_path (Path): The destination path for cloning the repository.
@@ -155,14 +162,41 @@ def _clone_repo(repo: Repository, local_path: Path) -> Optional[git.Repo]:
     Returns:
         Optional[git.Repo]: Cloned repository object or None if cloning fails.
     """
+    if local_path.exists():
+        logger.warning(
+            f"Pre-existing directory found for {repo.git_url}, removing before clone."
+        )
+        shutil.rmtree(str(local_path), ignore_errors=True)
+
     _check_download_folder_size()
 
     try:
-        repo_obj = git.Repo.clone_from(repo.git_url, local_path)
+        result = subprocess.run(
+            ["git", "clone", repo.git_url, str(local_path)],
+            timeout=GIT_CLONE_TIMEOUT_SECONDS,
+            capture_output=True,
+            text=True,
+        )
+        if result.returncode != 0:
+            raise Exception(
+                f"git clone exited with code {result.returncode}: {result.stderr[:500]}"
+            )
+
+        repo_obj = git.Repo(str(local_path))
         repo.fetch_time = timezone.now()
         repo.save(update_fields=["fetch_time"])
         logger.info(f"Repository {repo.git_url} cloned")
         return repo_obj
+
+    except subprocess.TimeoutExpired:
+        shutil.rmtree(str(local_path), ignore_errors=True)
+        error_msg = f"git clone timed out after {GIT_CLONE_TIMEOUT_SECONDS}s"
+        logger.error(f"{error_msg} for {repo.git_url}")
+        repo.analysis_failed = True
+        repo.analysis_failure_reason = error_msg
+        repo.save(update_fields=["analysis_failed", "analysis_failure_reason"])
+        return None
+
     except Exception as e:
         logger.error(
             f"Unexpected error while processing repository {repo.git_url}: {e}"
@@ -170,7 +204,6 @@ def _clone_repo(repo: Repository, local_path: Path) -> Optional[git.Repo]:
         repo.analysis_failed = True
         repo.analysis_failure_reason = str(e)[:1000]
         repo.save(update_fields=["analysis_failed", "analysis_failure_reason"])
-
         return None
 
 
@@ -198,6 +231,11 @@ def _check_download_folder_size(depth: int = 0):
         )
         logger.info(f"Current temp file size = {size}")
         if size >= settings.DOWNLOAD_DIR_MAX_SIZE_BYTES:
+            logger.warning(
+                f"Download directory full: size={size} bytes, "
+                f"limit={settings.DOWNLOAD_DIR_MAX_SIZE_BYTES} bytes. "
+                f"Retrying in {15}s."
+            )
             raise DownloadDirectoryFullException(
                 f"Current temp file too big. Size = {size}"
             )
