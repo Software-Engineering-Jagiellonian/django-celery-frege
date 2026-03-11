@@ -92,8 +92,8 @@ services:
       - ${DOCKER_LOKI_PORT}:${DOCKER_LOKI_PORT}
     volumes:
       - ./loki/data:/loki
-      # - ./loki/loki-config.yaml:/etc/loki/local-config.yaml
-    # command: -config.file=/etc/loki/local-config.yaml
+      - ./loki/loki-config.yaml:/etc/loki/local-config.yaml
+    command: -config.file=/etc/loki/local-config.yaml
     networks: *network
 
   frege-promtail:
