@@ -31,6 +31,9 @@ limits_config:
 frontend:
   max_outstanding_per_tenant: 4096
 
+querier:
+  max_concurrent: 32
+
 ruler:
   alertmanager_url: http://localhost:9093
 
