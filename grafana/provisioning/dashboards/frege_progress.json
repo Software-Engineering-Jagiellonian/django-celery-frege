@@ -3,12 +3,20 @@
     "list": [
       {
         "builtIn": 1,
-        "datasource": { "type": "grafana", "uid": "-- Grafana --" },
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
         "enable": true,
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
         "name": "Annotations & Alerts",
-        "target": { "limit": 100, "matchAny": false, "tags": [], "type": "dashboard" },
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
         "type": "dashboard"
       }
     ]
@@ -23,7 +31,12 @@
   "panels": [
     {
       "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
       "id": 100,
       "panels": [],
       "title": "Statystyki ogólne",
@@ -32,12 +45,23 @@
     {
       "type": "stat",
       "title": "Repozytoria ogółem",
-      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 1 },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 0,
+        "y": 1
+      },
       "id": 1,
-      "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+      "datasource": {
+        "type": "postgres",
+        "uid": "PA942B37CCFAF5A81"
+      },
       "targets": [
         {
-          "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+          "datasource": {
+            "type": "postgres",
+            "uid": "PA942B37CCFAF5A81"
+          },
           "rawQuery": true,
           "rawSql": "SELECT COUNT(*) AS \"total\" FROM repositories_repository",
           "refId": "A",
@@ -46,13 +70,30 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "fixed", "fixedColor": "blue" },
-          "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }] }
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "blue"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
         },
         "overrides": []
       },
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
         "orientation": "auto",
         "textMode": "auto",
         "colorMode": "background",
@@ -62,12 +103,23 @@
     {
       "type": "stat",
       "title": "Przeanalizowane",
-      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 1 },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 4,
+        "y": 1
+      },
       "id": 2,
-      "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+      "datasource": {
+        "type": "postgres",
+        "uid": "PA942B37CCFAF5A81"
+      },
       "targets": [
         {
-          "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+          "datasource": {
+            "type": "postgres",
+            "uid": "PA942B37CCFAF5A81"
+          },
           "rawQuery": true,
           "rawSql": "SELECT COUNT(*) AS \"analyzed\" FROM repositories_repository WHERE analyzed = true",
           "refId": "A",
@@ -76,13 +128,30 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "fixed", "fixedColor": "green" },
-          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "green"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
         },
         "overrides": []
       },
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
         "orientation": "auto",
         "textMode": "auto",
         "colorMode": "background",
@@ -92,12 +161,23 @@
     {
       "type": "stat",
       "title": "Oczekujące",
-      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 1 },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 8,
+        "y": 1
+      },
       "id": 3,
-      "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+      "datasource": {
+        "type": "postgres",
+        "uid": "PA942B37CCFAF5A81"
+      },
       "targets": [
         {
-          "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+          "datasource": {
+            "type": "postgres",
+            "uid": "PA942B37CCFAF5A81"
+          },
           "rawQuery": true,
           "rawSql": "SELECT COUNT(*) AS \"pending\" FROM repositories_repository WHERE analyzed = false AND analysis_failed = false",
           "refId": "A",
@@ -106,13 +186,30 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "fixed", "fixedColor": "orange" },
-          "thresholds": { "mode": "absolute", "steps": [{ "color": "orange", "value": null }] }
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "orange"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "orange",
+                "value": null
+              }
+            ]
+          }
         },
         "overrides": []
       },
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
         "orientation": "auto",
         "textMode": "auto",
         "colorMode": "background",
@@ -122,12 +219,23 @@
     {
       "type": "stat",
       "title": "Błędne",
-      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 1 },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 12,
+        "y": 1
+      },
       "id": 4,
-      "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+      "datasource": {
+        "type": "postgres",
+        "uid": "PA942B37CCFAF5A81"
+      },
       "targets": [
         {
-          "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+          "datasource": {
+            "type": "postgres",
+            "uid": "PA942B37CCFAF5A81"
+          },
           "rawQuery": true,
           "rawSql": "SELECT COUNT(*) AS \"failed\" FROM repositories_repository WHERE analysis_failed = true",
           "refId": "A",
@@ -136,13 +244,30 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "fixed", "fixedColor": "red" },
-          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }] }
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "red"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              }
+            ]
+          }
         },
         "overrides": []
       },
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
         "orientation": "auto",
         "textMode": "auto",
         "colorMode": "background",
@@ -152,12 +277,23 @@
     {
       "type": "stat",
       "title": "Pliki przeanalizowane",
-      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 1 },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 16,
+        "y": 1
+      },
       "id": 5,
-      "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+      "datasource": {
+        "type": "postgres",
+        "uid": "PA942B37CCFAF5A81"
+      },
       "targets": [
         {
-          "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+          "datasource": {
+            "type": "postgres",
+            "uid": "PA942B37CCFAF5A81"
+          },
           "rawQuery": true,
           "rawSql": "SELECT COUNT(*) AS \"files\" FROM repositories_repositoryfile WHERE analyzed = true",
           "refId": "A",
@@ -166,13 +302,30 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "fixed", "fixedColor": "purple" },
-          "thresholds": { "mode": "absolute", "steps": [{ "color": "purple", "value": null }] }
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "purple"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "purple",
+                "value": null
+              }
+            ]
+          }
         },
         "overrides": []
       },
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
         "orientation": "auto",
         "textMode": "auto",
         "colorMode": "background",
@@ -182,12 +335,23 @@
     {
       "type": "stat",
       "title": "Commit messages (~)",
-      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 1 },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 1
+      },
       "id": 6,
-      "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+      "datasource": {
+        "type": "postgres",
+        "uid": "PA942B37CCFAF5A81"
+      },
       "targets": [
         {
-          "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+          "datasource": {
+            "type": "postgres",
+            "uid": "PA942B37CCFAF5A81"
+          },
           "rawQuery": true,
           "rawSql": "SELECT reltuples::bigint AS \"commits\" FROM pg_class WHERE relname = 'repositories_commitmessage'",
           "refId": "A",
@@ -196,13 +360,30 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "fixed", "fixedColor": "light-blue" },
-          "thresholds": { "mode": "absolute", "steps": [{ "color": "light-blue", "value": null }] }
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "light-blue"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "light-blue",
+                "value": null
+              }
+            ]
+          }
         },
         "overrides": []
       },
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
         "orientation": "auto",
         "textMode": "auto",
         "colorMode": "background",
@@ -211,7 +392,12 @@
     },
     {
       "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 5
+      },
       "id": 200,
       "panels": [],
       "title": "Wykresy czasowe",
@@ -221,28 +407,45 @@
       "type": "timeseries",
       "title": "Postęp analizy (kumulatywny)",
       "description": "Kumulatywna liczba repozytoriów discovered, fetched i analyzed w czasie",
-      "gridPos": { "h": 9, "w": 14, "x": 0, "y": 6 },
+      "gridPos": {
+        "h": 9,
+        "w": 14,
+        "x": 0,
+        "y": 6
+      },
       "id": 7,
-      "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+      "datasource": {
+        "type": "postgres",
+        "uid": "PA942B37CCFAF5A81"
+      },
       "targets": [
         {
-          "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+          "datasource": {
+            "type": "postgres",
+            "uid": "PA942B37CCFAF5A81"
+          },
           "rawQuery": true,
-          "rawSql": "SELECT discovered_time AS time, SUM(COUNT(*)) OVER (ORDER BY discovered_time) AS \"Discovered\" FROM repositories_repository GROUP BY discovered_time ORDER BY discovered_time",
+          "rawSql": "WITH base AS (\n  SELECT COUNT(*) AS prior\n  FROM repositories_repository\n  WHERE discovered_time IS NOT NULL\n    AND discovered_time < $__timeFrom()::timestamptz\n)\nSELECT\n  discovered_time AS time,\n  (SELECT prior FROM base) + SUM(COUNT(*)) OVER (ORDER BY discovered_time) AS \"Discovered\"\nFROM repositories_repository\nWHERE discovered_time IS NOT NULL\n  AND $__timeFilter(discovered_time)\nGROUP BY discovered_time\nORDER BY discovered_time",
           "refId": "A",
           "format": "time_series"
         },
         {
-          "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+          "datasource": {
+            "type": "postgres",
+            "uid": "PA942B37CCFAF5A81"
+          },
           "rawQuery": true,
-          "rawSql": "SELECT fetch_time AS time, SUM(COUNT(*)) OVER (ORDER BY fetch_time) AS \"Fetched\" FROM repositories_repository WHERE fetch_time IS NOT NULL GROUP BY fetch_time ORDER BY fetch_time",
+          "rawSql": "WITH base AS (\n  SELECT COUNT(*) AS prior\n  FROM repositories_repository\n  WHERE fetch_time IS NOT NULL\n    AND fetch_time < $__timeFrom()::timestamptz\n)\nSELECT\n  fetch_time AS time,\n  (SELECT prior FROM base) + SUM(COUNT(*)) OVER (ORDER BY fetch_time) AS \"Fetched\"\nFROM repositories_repository\nWHERE fetch_time IS NOT NULL\n  AND $__timeFilter(fetch_time)\nGROUP BY fetch_time\nORDER BY fetch_time",
           "refId": "B",
           "format": "time_series"
         },
         {
-          "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+          "datasource": {
+            "type": "postgres",
+            "uid": "PA942B37CCFAF5A81"
+          },
           "rawQuery": true,
-          "rawSql": "SELECT analyzed_time AS time, SUM(COUNT(*)) OVER (ORDER BY analyzed_time) AS \"Analyzed\" FROM repositories_repository WHERE analyzed = true AND analyzed_time IS NOT NULL GROUP BY analyzed_time ORDER BY analyzed_time",
+          "rawSql": "WITH base AS (\n  SELECT COUNT(*) AS prior\n  FROM repositories_repository\n  WHERE analyzed = true\n    AND analyzed_time IS NOT NULL\n    AND analyzed_time < $__timeFrom()::timestamptz\n)\nSELECT\n  analyzed_time AS time,\n  (SELECT prior FROM base) + SUM(COUNT(*)) OVER (ORDER BY analyzed_time) AS \"Analyzed\"\nFROM repositories_repository\nWHERE analyzed = true\n  AND analyzed_time IS NOT NULL\n  AND $__timeFilter(analyzed_time)\nGROUP BY analyzed_time\nORDER BY analyzed_time",
           "refId": "C",
           "format": "time_series"
         }
@@ -260,34 +463,83 @@
         },
         "overrides": [
           {
-            "matcher": { "id": "byName", "options": "Discovered" },
-            "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "blue" } }]
+            "matcher": {
+              "id": "byName",
+              "options": "Discovered"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "blue"
+                }
+              }
+            ]
           },
           {
-            "matcher": { "id": "byName", "options": "Fetched" },
-            "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "orange" } }]
+            "matcher": {
+              "id": "byName",
+              "options": "Fetched"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "orange"
+                }
+              }
+            ]
           },
           {
-            "matcher": { "id": "byName", "options": "Analyzed" },
-            "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "green" } }]
+            "matcher": {
+              "id": "byName",
+              "options": "Analyzed"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "green"
+                }
+              }
+            ]
           }
         ]
       },
       "options": {
-        "legend": { "displayMode": "list", "placement": "bottom" },
-        "tooltip": { "mode": "multi" }
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
       }
     },
     {
       "type": "timeseries",
       "title": "Tempo analizy (dziennie)",
       "description": "Liczba repozytoriów przeanalizowanych każdego dnia",
-      "gridPos": { "h": 9, "w": 10, "x": 14, "y": 6 },
+      "gridPos": {
+        "h": 9,
+        "w": 10,
+        "x": 14,
+        "y": 6
+      },
       "id": 8,
-      "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+      "datasource": {
+        "type": "postgres",
+        "uid": "PA942B37CCFAF5A81"
+      },
       "targets": [
         {
-          "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+          "datasource": {
+            "type": "postgres",
+            "uid": "PA942B37CCFAF5A81"
+          },
           "rawQuery": true,
           "rawSql": "SELECT DATE_TRUNC('day', analyzed_time) AS time, COUNT(*) AS \"Analyzed per day\" FROM repositories_repository WHERE analyzed = true AND analyzed_time IS NOT NULL GROUP BY DATE_TRUNC('day', analyzed_time) ORDER BY time",
           "refId": "A",
@@ -301,19 +553,32 @@
             "fillOpacity": 80,
             "lineWidth": 1
           },
-          "color": { "mode": "fixed", "fixedColor": "green" },
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "green"
+          },
           "unit": "short"
         },
         "overrides": []
       },
       "options": {
-        "legend": { "displayMode": "list", "placement": "bottom" },
-        "tooltip": { "mode": "single" }
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
       }
     },
     {
       "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 15 },
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 15
+      },
       "id": 300,
       "panels": [],
       "title": "Rozkłady",
@@ -323,12 +588,23 @@
       "type": "piechart",
       "title": "Języki programowania",
       "description": "Rozkład przeanalizowanych plików wg języka programowania",
-      "gridPos": { "h": 9, "w": 8, "x": 0, "y": 16 },
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 0,
+        "y": 16
+      },
       "id": 9,
-      "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+      "datasource": {
+        "type": "postgres",
+        "uid": "PA942B37CCFAF5A81"
+      },
       "targets": [
         {
-          "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+          "datasource": {
+            "type": "postgres",
+            "uid": "PA942B37CCFAF5A81"
+          },
           "rawQuery": true,
           "rawSql": "SELECT language, COUNT(*) AS count FROM repositories_repositoryfile WHERE language != '' AND analyzed = true GROUP BY language ORDER BY count DESC LIMIT 15",
           "refId": "A",
@@ -337,27 +613,55 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" }
+          "color": {
+            "mode": "palette-classic"
+          }
         },
         "overrides": []
       },
       "options": {
         "pieType": "donut",
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": true },
-        "legend": { "displayMode": "table", "placement": "right", "values": ["value", "percent"] },
-        "tooltip": { "mode": "single" }
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": true
+        },
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "values": [
+            "value",
+            "percent"
+          ]
+        },
+        "tooltip": {
+          "mode": "single"
+        }
       }
     },
     {
       "type": "piechart",
       "title": "Typy commitów (~)",
       "description": "Rozkład commit messages wg typu (feature, fix, config, merge/PR, unclassified)",
-      "gridPos": { "h": 9, "w": 8, "x": 8, "y": 16 },
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 8,
+        "y": 16
+      },
       "id": 10,
-      "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+      "datasource": {
+        "type": "postgres",
+        "uid": "PA942B37CCFAF5A81"
+      },
       "targets": [
         {
-          "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+          "datasource": {
+            "type": "postgres",
+            "uid": "PA942B37CCFAF5A81"
+          },
           "rawQuery": true,
           "rawSql": "SELECT REPLACE(COALESCE(val, 'unknown'), 'CommitMessagesTypes.', '') AS commit_type, (freq * c.reltuples)::bigint AS count FROM (SELECT unnest(most_common_vals::text::text[]) AS val, unnest(most_common_freqs) AS freq FROM pg_stats WHERE tablename = 'repositories_commitmessage' AND attname = 'commit_type') s CROSS JOIN pg_class c WHERE c.relname = 'repositories_commitmessage' ORDER BY count DESC",
           "refId": "A",
@@ -366,27 +670,55 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" }
+          "color": {
+            "mode": "palette-classic"
+          }
         },
         "overrides": []
       },
       "options": {
         "pieType": "donut",
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": true },
-        "legend": { "displayMode": "table", "placement": "right", "values": ["value", "percent"] },
-        "tooltip": { "mode": "single" }
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": true
+        },
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "values": [
+            "value",
+            "percent"
+          ]
+        },
+        "tooltip": {
+          "mode": "single"
+        }
       }
     },
     {
       "type": "gauge",
       "title": "Czytelność commit messages (Fog Index, ~)",
       "description": "Gunning Fog Index — miara czytelności tekstu (Robert Gunning, 1952).\n\nWzór: 0.4 × (średnia liczba słów w zdaniu + % słów trudnych [≥3 sylaby]).\n\nInterpretacja:\n• < 8 — łatwy (tabloid, SMS)\n• 8–12 — umiarkowany (gazeta, dokumentacja)\n• 12–14 — trudny (artykuł naukowy)\n• > 14 — bardzo trudny (prawo, biurokracja)\n\nW kontekście Frege mierzy czytelność commit messages. Ideał dla commit messages to 6–10.\n\nWartość przybliżona — obliczona ze statystyk PostgreSQL (pg_stats), nie z pełnego skanu tabeli.",
-      "gridPos": { "h": 9, "w": 8, "x": 16, "y": 16 },
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 16,
+        "y": 16
+      },
       "id": 11,
-      "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+      "datasource": {
+        "type": "postgres",
+        "uid": "PA942B37CCFAF5A81"
+      },
       "targets": [
         {
-          "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+          "datasource": {
+            "type": "postgres",
+            "uid": "PA942B37CCFAF5A81"
+          },
           "rawQuery": true,
           "rawSql": "SELECT (SUM(val * freq) / SUM(freq))::numeric(10,2) AS \"Avg Fog Index\" FROM (SELECT unnest(most_common_vals::text::float8[]) AS val, unnest(most_common_freqs) AS freq FROM pg_stats WHERE tablename = 'repositories_commitmessage' AND attname = 'fog_index') s WHERE val > 0",
           "refId": "A",
@@ -401,16 +733,31 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 8 },
-              { "color": "red", "value": 14 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 8
+              },
+              {
+                "color": "red",
+                "value": 14
+              }
             ]
           }
         },
         "overrides": []
       },
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
         "orientation": "auto",
         "showThresholdLabels": true,
         "showThresholdMarkers": true
@@ -420,12 +767,23 @@
       "type": "piechart",
       "title": "Źródła repozytoriów",
       "description": "Rozkład repozytoriów wg platformy źródłowej (GitHub, GitLab, inne)",
-      "gridPos": { "h": 9, "w": 8, "x": 0, "y": 25 },
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 0,
+        "y": 25
+      },
       "id": 15,
-      "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+      "datasource": {
+        "type": "postgres",
+        "uid": "PA942B37CCFAF5A81"
+      },
       "targets": [
         {
-          "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+          "datasource": {
+            "type": "postgres",
+            "uid": "PA942B37CCFAF5A81"
+          },
           "rawQuery": true,
           "rawSql": "SELECT CASE WHEN git_url LIKE '%github.com%' THEN 'GitHub' WHEN git_url LIKE '%gitlab.com%' THEN 'GitLab' ELSE 'Other' END AS source, COUNT(*) AS count FROM repositories_repository GROUP BY source ORDER BY count DESC",
           "refId": "A",
@@ -434,27 +792,55 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" }
+          "color": {
+            "mode": "palette-classic"
+          }
         },
         "overrides": []
       },
       "options": {
         "pieType": "donut",
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": true },
-        "legend": { "displayMode": "table", "placement": "right", "values": ["value", "percent"] },
-        "tooltip": { "mode": "single" }
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": true
+        },
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "values": [
+            "value",
+            "percent"
+          ]
+        },
+        "tooltip": {
+          "mode": "single"
+        }
       }
     },
     {
       "type": "table",
       "title": "Repozytoria z błędem analizy",
       "description": "Repozytoria gdzie analysis_failed = true",
-      "gridPos": { "h": 9, "w": 16, "x": 8, "y": 25 },
+      "gridPos": {
+        "h": 9,
+        "w": 16,
+        "x": 8,
+        "y": 25
+      },
       "id": 16,
-      "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+      "datasource": {
+        "type": "postgres",
+        "uid": "PA942B37CCFAF5A81"
+      },
       "targets": [
         {
-          "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+          "datasource": {
+            "type": "postgres",
+            "uid": "PA942B37CCFAF5A81"
+          },
           "rawQuery": true,
           "rawSql": "SELECT name AS \"Name\", git_url AS \"Git URL\", analysis_failure_reason AS \"Reason\", discovered_time::date AS \"Discovered\" FROM repositories_repository WHERE analysis_failed = true ORDER BY discovered_time DESC",
           "refId": "A",
@@ -470,19 +856,40 @@
         },
         "overrides": [
           {
-            "matcher": { "id": "byName", "options": "Git URL" },
-            "properties": [{ "id": "custom.displayMode", "value": "auto" }]
+            "matcher": {
+              "id": "byName",
+              "options": "Git URL"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "auto"
+              }
+            ]
           }
         ]
       },
       "options": {
         "showHeader": true,
-        "footer": { "show": true, "reducer": ["count"], "fields": ["Name"] }
+        "footer": {
+          "show": true,
+          "reducer": [
+            "count"
+          ],
+          "fields": [
+            "Name"
+          ]
+        }
       }
     },
     {
       "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 34 },
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 34
+      },
       "id": 400,
       "panels": [],
       "title": "Jakość kodu",
@@ -492,12 +899,23 @@
       "type": "barchart",
       "title": "Średnia złożoność cyklomatyczna wg języka",
       "description": "Średnia cyclomatic complexity per język (top 10)",
-      "gridPos": { "h": 9, "w": 8, "x": 0, "y": 35 },
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 0,
+        "y": 35
+      },
       "id": 12,
-      "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+      "datasource": {
+        "type": "postgres",
+        "uid": "PA942B37CCFAF5A81"
+      },
       "targets": [
         {
-          "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+          "datasource": {
+            "type": "postgres",
+            "uid": "PA942B37CCFAF5A81"
+          },
           "rawQuery": true,
           "rawSql": "SELECT language, ROUND(AVG(average_cyclomatic_complexity)::numeric, 2) AS \"Avg Complexity\" FROM repositories_repositoryfile WHERE average_cyclomatic_complexity IS NOT NULL AND language != '' GROUP BY language ORDER BY \"Avg Complexity\" DESC LIMIT 10",
           "refId": "A",
@@ -506,7 +924,9 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" }
+          "color": {
+            "mode": "palette-classic"
+          }
         },
         "overrides": []
       },
@@ -514,20 +934,35 @@
         "orientation": "horizontal",
         "barWidth": 0.7,
         "groupWidth": 0.7,
-        "legend": { "displayMode": "hidden" },
-        "tooltip": { "mode": "single" }
+        "legend": {
+          "displayMode": "hidden"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
       }
     },
     {
       "type": "barchart",
       "title": "Średnie LOC wg języka",
       "description": "Średnia liczba linii kodu na plik per język (top 10)",
-      "gridPos": { "h": 9, "w": 8, "x": 8, "y": 35 },
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 8,
+        "y": 35
+      },
       "id": 13,
-      "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+      "datasource": {
+        "type": "postgres",
+        "uid": "PA942B37CCFAF5A81"
+      },
       "targets": [
         {
-          "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+          "datasource": {
+            "type": "postgres",
+            "uid": "PA942B37CCFAF5A81"
+          },
           "rawQuery": true,
           "rawSql": "SELECT language, ROUND(AVG(average_lines_of_code)::numeric, 1) AS \"Avg LOC\" FROM repositories_repositoryfile WHERE average_lines_of_code IS NOT NULL AND language != '' GROUP BY language ORDER BY \"Avg LOC\" DESC LIMIT 10",
           "refId": "A",
@@ -536,7 +971,9 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" }
+          "color": {
+            "mode": "palette-classic"
+          }
         },
         "overrides": []
       },
@@ -544,20 +981,35 @@
         "orientation": "horizontal",
         "barWidth": 0.7,
         "groupWidth": 0.7,
-        "legend": { "displayMode": "hidden" },
-        "tooltip": { "mode": "single" }
+        "legend": {
+          "displayMode": "hidden"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
       }
     },
     {
       "type": "table",
       "title": "Top 10 repozytoriów wg złożoności",
       "description": "Repozytoria z najwyższą średnią złożonością cyklomatyczną",
-      "gridPos": { "h": 9, "w": 8, "x": 16, "y": 35 },
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 16,
+        "y": 35
+      },
       "id": 14,
-      "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+      "datasource": {
+        "type": "postgres",
+        "uid": "PA942B37CCFAF5A81"
+      },
       "targets": [
         {
-          "datasource": { "type": "postgres", "uid": "PA942B37CCFAF5A81" },
+          "datasource": {
+            "type": "postgres",
+            "uid": "PA942B37CCFAF5A81"
+          },
           "rawQuery": true,
           "rawSql": "SELECT r.name AS \"Repository\", ROUND(AVG(f.average_cyclomatic_complexity)::numeric, 2) AS \"Avg Complexity\", COUNT(f.id) AS \"Files\", ROUND(AVG(f.average_lines_of_code)::numeric, 1) AS \"Avg LOC\" FROM repositories_repositoryfile f JOIN repositories_repository r ON f.repository_id = r.id WHERE f.average_cyclomatic_complexity IS NOT NULL GROUP BY r.name ORDER BY \"Avg Complexity\" DESC LIMIT 10",
           "refId": "A",
@@ -573,17 +1025,32 @@
         },
         "overrides": [
           {
-            "matcher": { "id": "byName", "options": "Avg Complexity" },
+            "matcher": {
+              "id": "byName",
+              "options": "Avg Complexity"
+            },
             "properties": [
-              { "id": "custom.displayMode", "value": "color-background" },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
               {
                 "id": "thresholds",
                 "value": {
                   "mode": "absolute",
                   "steps": [
-                    { "color": "green", "value": null },
-                    { "color": "yellow", "value": 5 },
-                    { "color": "red", "value": 10 }
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 5
+                    },
+                    {
+                      "color": "red",
+                      "value": 10
+                    }
                   ]
                 }
               }
@@ -593,16 +1060,26 @@
       },
       "options": {
         "showHeader": true,
-        "footer": { "show": false }
+        "footer": {
+          "show": false
+        }
       }
     }
   ],
   "refresh": "5m",
   "schemaVersion": 36,
   "style": "dark",
-  "tags": ["frege", "analysis"],
-  "templating": { "list": [] },
-  "time": { "from": "now-1y", "to": "now" },
+  "tags": [
+    "frege",
+    "analysis"
+  ],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-1y",
+    "to": "now"
+  },
   "timepicker": {},
   "timezone": "",
   "title": "Frege - Analysis Progress",
