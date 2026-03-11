@@ -425,7 +425,7 @@
             "uid": "PA942B37CCFAF5A81"
           },
           "rawQuery": true,
-          "rawSql": "WITH base AS (\n  SELECT COUNT(*) AS prior\n  FROM repositories_repository\n  WHERE discovered_time IS NOT NULL\n    AND discovered_time < to_timestamp($__timeFrom())\n)\nSELECT\n  discovered_time AS time,\n  (SELECT prior FROM base) + SUM(COUNT(*)) OVER (ORDER BY discovered_time) AS \"Discovered\"\nFROM repositories_repository\nWHERE discovered_time IS NOT NULL\n  AND $__timeFilter(discovered_time)\nGROUP BY discovered_time\nORDER BY discovered_time",
+          "rawSql": "WITH base AS (\n  SELECT COUNT(*) AS prior\n  FROM repositories_repository\n  WHERE discovered_time IS NOT NULL\n    AND discovered_time < $__timeFrom()\n)\nSELECT\n  discovered_time AS time,\n  (SELECT prior FROM base) + SUM(COUNT(*)) OVER (ORDER BY discovered_time) AS \"Discovered\"\nFROM repositories_repository\nWHERE discovered_time IS NOT NULL\n  AND $__timeFilter(discovered_time)\nGROUP BY discovered_time\nORDER BY discovered_time",
           "refId": "A",
           "format": "time_series"
         },
@@ -435,7 +435,7 @@
             "uid": "PA942B37CCFAF5A81"
           },
           "rawQuery": true,
-          "rawSql": "WITH base AS (\n  SELECT COUNT(*) AS prior\n  FROM repositories_repository\n  WHERE fetch_time IS NOT NULL\n    AND fetch_time < to_timestamp($__timeFrom())\n)\nSELECT\n  fetch_time AS time,\n  (SELECT prior FROM base) + SUM(COUNT(*)) OVER (ORDER BY fetch_time) AS \"Fetched\"\nFROM repositories_repository\nWHERE fetch_time IS NOT NULL\n  AND $__timeFilter(fetch_time)\nGROUP BY fetch_time\nORDER BY fetch_time",
+          "rawSql": "WITH base AS (\n  SELECT COUNT(*) AS prior\n  FROM repositories_repository\n  WHERE fetch_time IS NOT NULL\n    AND fetch_time < $__timeFrom()\n)\nSELECT\n  fetch_time AS time,\n  (SELECT prior FROM base) + SUM(COUNT(*)) OVER (ORDER BY fetch_time) AS \"Fetched\"\nFROM repositories_repository\nWHERE fetch_time IS NOT NULL\n  AND $__timeFilter(fetch_time)\nGROUP BY fetch_time\nORDER BY fetch_time",
           "refId": "B",
           "format": "time_series"
         },
@@ -445,7 +445,7 @@
             "uid": "PA942B37CCFAF5A81"
           },
           "rawQuery": true,
-          "rawSql": "WITH base AS (\n  SELECT COUNT(*) AS prior\n  FROM repositories_repository\n  WHERE analyzed = true\n    AND analyzed_time IS NOT NULL\n    AND analyzed_time < to_timestamp($__timeFrom())\n)\nSELECT\n  analyzed_time AS time,\n  (SELECT prior FROM base) + SUM(COUNT(*)) OVER (ORDER BY analyzed_time) AS \"Analyzed\"\nFROM repositories_repository\nWHERE analyzed = true\n  AND analyzed_time IS NOT NULL\n  AND $__timeFilter(analyzed_time)\nGROUP BY analyzed_time\nORDER BY analyzed_time",
+          "rawSql": "WITH base AS (\n  SELECT COUNT(*) AS prior\n  FROM repositories_repository\n  WHERE analyzed = true\n    AND analyzed_time IS NOT NULL\n    AND analyzed_time < $__timeFrom()\n)\nSELECT\n  analyzed_time AS time,\n  (SELECT prior FROM base) + SUM(COUNT(*)) OVER (ORDER BY analyzed_time) AS \"Analyzed\"\nFROM repositories_repository\nWHERE analyzed = true\n  AND analyzed_time IS NOT NULL\n  AND $__timeFilter(analyzed_time)\nGROUP BY analyzed_time\nORDER BY analyzed_time",
           "refId": "C",
           "format": "time_series"
         }
