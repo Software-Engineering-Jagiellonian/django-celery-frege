@@ -31,6 +31,12 @@ limits_config:
 frontend:
   max_outstanding_per_tenant: 4096
 
+frontend_worker:
+  parallelism: 32
+
+query_scheduler:
+  max_outstanding_requests_per_tenant: 4096
+
 querier:
   max_concurrent: 32
 
